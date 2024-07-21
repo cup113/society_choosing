@@ -1,0 +1,16 @@
+{
+	"packageManager": "pnpm@9.0.6",
+	"scripts": {
+		"ts-build": "tsc -p server/tsconfig.json",
+		"init-data": "start pnpm run serve-pocket && pnpm run ts-build && node server/dist/script/database_init.mjs",
+		"allocate": "start pnpm run serve-pocket && pnpm run ts-build && node server/dist/script/allocate.mjs",
+		"serve-pocket": "pocketbase.exe serve",
+		"serve-express": "pnpm run ts-build && node server/dist/main.mjs",
+		"dev": "SET NODE_ENV=development && start pnpm run serve-pocket & start pnpm run serve-express",
+		"start": "vite build client && SET NODE_ENV=production && start pnpm run serve-pocket && start pnpm run serve-express"
+	},
+	"dependencies": {
+		"tailwindcss": "^3.4.4",
+		"tailwindcss-animate": "^1.0.7"
+	}
+}
