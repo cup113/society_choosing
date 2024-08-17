@@ -19,7 +19,7 @@ def students_txt_to_json():
         for line in f:
             if line.strip() == "":
                 continue
-            no, name = line.strip().split(" ")
+            no, name = line.strip().split("\t")
             students.append(Student(no, name))
 
     # write json

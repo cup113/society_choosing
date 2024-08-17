@@ -11,8 +11,17 @@ router.post('/', async function (req, res) {
   const auth = await pb.collection('users').authWithPassword(username, password);
   await pb.collection('users').authRefresh();
 
-  // TODO also return user data
-  res.json({ success: true, userID: auth.record.id, token: auth.token });
+  console.log(auth);
+  res.json({
+    success: true,
+    userID: auth.record.id,
+    token: auth.token,
+    userInformation: {
+      name: auth.record.name,
+      role: auth.record.role,
+      username: auth.record.username,
+    }
+  });
 });
 
 export default router;
