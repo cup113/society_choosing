@@ -55,9 +55,9 @@ function submit() {
   const data = {
     token: store.token,
     user: store.userID,
-    'first_choice': store.choice.first_choice[0],
-    'second_choice': store.choice.second_choice[0],
-    'adjust_prior': store.choice.adjust_prior,
+    'first_choice': choice.value.first_choice[0],
+    'second_choice': choice.value.second_choice[0],
+    'adjust_prior': choice.value.adjust_prior,
   };
   fetch('/api/choose', {
     method: 'POST',

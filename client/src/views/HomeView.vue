@@ -1,8 +1,14 @@
 <script lang="ts" setup>
 // TODO choosing record & times
 import { useUserStore } from '@/stores/user';
+import { Button } from '@/components/ui/button';
 
 const userStore = useUserStore();
+
+function clear_storage() {
+  localStorage.clear();
+  location.reload();
+}
 </script>
 
 <template>
@@ -13,6 +19,9 @@ const userStore = useUserStore();
     </div>
     <div class="text-blue-500" v-else>
       <RouterLink to="/choose">点击前往选课</RouterLink>
+    </div>
+    <div>
+      <Button @click="clear_storage">清空数据缓存</Button>
     </div>
   </div>
 </template>
