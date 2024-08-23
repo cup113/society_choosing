@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import { useUserStore } from '@/stores/user';
 
 import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
 import SocietyCard from '@/components/SocietyCard.vue';
 
 import router from '@/router';
@@ -34,6 +35,25 @@ const choice = computed(() => {
 
   return _choice;
 });
+
+const get_society = (id: string) => {
+  return societies.value.find(society => society.id === id);
+}
+
+const batches = [
+  {
+    name: "第一志愿",
+    key: "first_choice",
+  },
+  {
+    name: "第二志愿",
+    key: "second_choice",
+  },
+  {
+    name: "优先调剂",
+    key: "adjust_prior",
+  }
+] as const;
 
 function submit() {
   if (choice.value.first_choice.length === 0) {
@@ -82,11 +102,42 @@ function submit() {
 <template>
   <main class="flex flex-col gap-4">
     <h1 class="text-center font-bold text-3xl">社团选课系统</h1>
-    <div class="flex flex-wrap justify-around">
-      <SocietyCard v-for="society in societies" :key="society.id" :society="society" />
-    </div>
-    <div class="text-center">
-      <Button @click="submit()">提交</Button>
+    <div class="flex gap-4 p-8">
+      <div class="flex flex-wrap justify-around grow">
+        <SocietyCard v-for="society in societies" :key="society.id" :society="society" />
+      </div>
+      <div>
+        <Card class="border-2 shadow-lg bg-cream min-w-48">
+          <CardHeader>
+            <CardTitle>志愿选择</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div v-for="batch in batches" :key="batch.key">
+              <div>{{ batch.name }}</div>
+              <div class="flex flex-wrap gap-2">
+                <span v-for="society in choice[batch.key]" :key="society" class="bg-slate-200 px-2 py-1 rounded-md text-sm">
+                  <span>{{ get_society(society)?.name }}</span>
+                </span>
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button @click="submit()" class="submit-btn relative w-full my-8">提交</Button><!--TODO confirm-->
+          </CardFooter>
+        </Card>
+      </div>
     </div>
   </main>
 </template>
+
+<style>
+.submit-btn::before {
+  @apply absolute left-0 bg-contain;
+  width: 32px;
+  height: 22.5px;
+  top: -22.5px;
+  transform: rotateY(180deg);
+  content: "";
+  background-image: url('/img/button-bird.png');
+}
+</style>

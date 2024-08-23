@@ -8,7 +8,6 @@ import {
   NavigationMenuItem,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
-import { Button } from '@/components/ui/button';
 
 import { useUserStore } from './stores/user';
 
@@ -24,7 +23,7 @@ function clear_local_storage_cache() {
 </script>
 
 <template>
-  <div class="flex flex-col min-h-screen gap-4 bg-[#fef8d8]">
+  <div class="flex flex-col min-h-screen gap-4 bg-cream">
     <header>
       <NavigationMenu class="mx-auto">
         <NavigationMenuList>
@@ -45,9 +44,10 @@ function clear_local_storage_cache() {
       <RouterView />
     </div>
 
-    <footer class="bg-red-300">
-      <div>华东师范大学第二附属中学（宝山校区）</div>
-      <Button @click="clear_local_storage_cache">清除缓存</Button>
+    <footer class="bg-cyan-100 p-4 flex justify-between items-center gap-x-4 text-lg text-gray-500">
+      <img src="/img/logo.png" width="323">
+      <RouterLink to="/about">关于选课系统/贡献者</RouterLink>
+      <button @click="clear_local_storage_cache">清除缓存</button>
     </footer>
   </div>
 </template>

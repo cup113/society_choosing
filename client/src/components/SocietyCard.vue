@@ -23,7 +23,7 @@ if (store.choice[society.value.id] === undefined) {
 </script>
 
 <template>
-  <Card>
+  <Card class="h-fit">
     <CardHeader>
       <CardTitle>{{ society.name }}</CardTitle>
       <CardDescription class="text-lg">上限人数：<b>{{ society.cap }}</b></CardDescription>
@@ -33,10 +33,10 @@ if (store.choice[society.value.id] === undefined) {
     </CardContent>
     <CardFooter>
       <Select v-model="store.choice[society.id]">
-        <SelectTrigger>
+        <SelectTrigger class="bg-cream">
           <SelectValue placeholder="选择为..."></SelectValue>
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent class="bg-cream">
           <SelectItem value="first_choice">第一志愿</SelectItem>
           <SelectItem value="second_choice">第二志愿</SelectItem>
           <SelectItem value="adjust_prior">优先调剂</SelectItem>
