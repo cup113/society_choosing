@@ -38,7 +38,7 @@ function login() {
 
 <template>
   <div class="flex flex-col gap-y-8 min-h-[70vh] justify-center px-6">
-    <form @submit.prevent class="max-w-96 flex mx-auto flex-col gap-4" ref="form_el">
+    <form @submit.prevent class="max-w-96 flex mx-auto flex-col gap-8" ref="form_el">
       <Card class="shadow-lg border-4">
         <CardHeader></CardHeader>
         <CardContent class="flex flex-col gap-4">
@@ -57,7 +57,7 @@ function login() {
       </Card>
     </form>
     <div>
-      <img :width="width" class="mx-auto select-none" src="/img/homepage-bird.jpg">
+      <img :width="width * 0.6" class="mx-auto select-none" src="/img/homepage-bird.jpg">
     </div>
     <div></div>
   </div>

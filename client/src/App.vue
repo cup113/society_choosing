@@ -24,7 +24,8 @@ function clear_local_storage_cache() {
 
 <template>
   <div class="flex flex-col min-h-screen gap-4 bg-cream">
-    <header>
+    <header class="flex items-center bg-amber-700 text-white p-2">
+      <span>华二宝山选课系统</span>
       <NavigationMenu class="mx-auto">
         <NavigationMenuList>
           <NavigationMenuItem :class="navigationMenuTriggerStyle()">
@@ -36,6 +37,12 @@ function clear_local_storage_cache() {
           <NavigationMenuItem :class="navigationMenuTriggerStyle()" v-if="role === 'teacher'">
             <RouterLink to="/export">导出数据</RouterLink>
           </NavigationMenuItem>
+          <NavigationMenuItem :class="navigationMenuTriggerStyle()">
+            <RouterLink to="/about">关于此网站</RouterLink>
+          </NavigationMenuItem>
+          <NavigationMenuItem :class="navigationMenuTriggerStyle()">
+            <button @click="clear_local_storage_cache">清除缓存</button>
+          </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
     </header>
@@ -44,10 +51,8 @@ function clear_local_storage_cache() {
       <RouterView />
     </div>
 
-    <footer class="bg-cyan-100 p-4 flex flex-col md:flex-row justify-between items-center gap-x-4 gap-y-1 text-lg text-gray-500">
-      <img src="/img/logo.png" width="323">
-      <RouterLink to="/about">关于选课系统/贡献者</RouterLink>
-      <button @click="clear_local_storage_cache">清除缓存</button>
+    <footer class="p-4 text-center">
+      <img src="/img/logo.png" width="323" class="inline-block">
     </footer>
   </div>
 </template>
