@@ -44,7 +44,7 @@ function clear_local_storage_cache() {
       <RouterView />
     </div>
 
-    <footer class="bg-cyan-100 p-4 flex justify-between items-center gap-x-4 text-lg text-gray-500">
+    <footer class="bg-cyan-100 p-4 flex flex-col md:flex-row justify-between items-center gap-x-4 gap-y-1 text-lg text-gray-500">
       <img src="/img/logo.png" width="323">
       <RouterLink to="/about">关于选课系统/贡献者</RouterLink>
       <button @click="clear_local_storage_cache">清除缓存</button>

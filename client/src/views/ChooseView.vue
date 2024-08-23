@@ -102,7 +102,8 @@ function submit() {
 <template>
   <main class="flex flex-col gap-4">
     <h1 class="text-center font-bold text-3xl">社团选课系统</h1>
-    <div class="flex gap-4 p-8">
+    <div class="flex flex-col sm:flex-row gap-4 p-8">
+      <!--TODO card fixed sidebar-->
       <div class="flex flex-wrap justify-around grow">
         <SocietyCard v-for="society in societies" :key="society.id" :society="society" />
       </div>

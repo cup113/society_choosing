@@ -8,7 +8,7 @@ function go_home() {
 </script>
 
 <template>
-  <div class="flex flex-col gap-y-4 max-w-96 mx-auto my-4 p-4 bg-white rounded-2xl">
+  <div class="flex flex-col gap-y-4 max-w-72 sm:max-w-96 mx-auto my-4 p-4 bg-white rounded-2xl">
     <h1 class="text-2xl font-bold">贡献者 / Contributors</h1>
     <ul>
         <li>前后端程序开发: 2604 李牧</li>

@@ -38,17 +38,17 @@ function login() {
 </script>
 
 <template>
-  <div class="flex flex-col gap-y-8 min-h-[70vh] justify-center">
+  <div class="flex flex-col gap-y-8 min-h-[70vh] justify-center px-6">
     <form @submit.prevent class="max-w-96 flex mx-auto flex-col gap-4" ref="form_el">
       <Card class="shadow-lg border-4">
         <CardHeader></CardHeader>
         <CardContent class="flex flex-col gap-4">
-          <div class="flex items-center">
+          <div class="flex items-center gap-2">
             <Label for="username" class="text-xl w-24">用户名</Label>
             <Input type="text" name="username" id="username" v-model="username" placeholder="Username" class="bg-cream"></Input>
             <!--TODO default hint-->
           </div>
-          <div class="flex items-center">
+          <div class="flex items-center gap-2">
             <Label for="password" class="text-xl w-24">密码</Label>
             <Input type="password" name="password" id="password" v-model="password" placeholder="Password" class="bg-cream"></Input>
           </div>
