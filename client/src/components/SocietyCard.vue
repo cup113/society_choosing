@@ -29,7 +29,6 @@ if (store.choice[society.value.id] === undefined) {
       <CardDescription class="text-lg">上限人数：<b>{{ society.cap }}</b></CardDescription>
     </CardHeader>
     <CardContent>
-      <!--TODO 社团介绍-->
     </CardContent>
     <CardFooter>
       <Select v-model="store.choice[society.id]">

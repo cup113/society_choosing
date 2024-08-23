@@ -19,7 +19,7 @@ const { width } = useElementSize(form_el);
 function login() {
   const data = {
     username: username.value,
-    password: password.value, // TODO sha256 encryption
+    password: password.value,
   };
   fetch('/api/login', {
     method: 'POST',
@@ -28,7 +28,6 @@ function login() {
     },
     body: JSON.stringify(data),
   }).then(response => response.json()).then(data => {
-    // TODO loading animation
     store.userID = data.userID;
     store.token = data.token;
     store.userInformation = data.userInformation;
@@ -46,7 +45,6 @@ function login() {
           <div class="flex items-center gap-2">
             <Label for="username" class="text-xl w-24">用户名</Label>
             <Input type="text" name="username" id="username" v-model="username" placeholder="Username" class="bg-cream"></Input>
-            <!--TODO default hint-->
           </div>
           <div class="flex items-center gap-2">
             <Label for="password" class="text-xl w-24">密码</Label>

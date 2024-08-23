@@ -24,7 +24,6 @@ interface User {
     submit: Date;
 }
 
-// TODO test
 router.post('/choosing', async function (req, res) {
     logger.info(`Received exporting choosing data request from ${req.ip}: ${req.body.token}`);
 
@@ -172,7 +171,7 @@ router.post('/choosing', async function (req, res) {
         }
         XLSX.writeFile(workbook, "instances/exports/按班级分.xlsx");
     }
-    execSync("7z a ./instances/exports/导出数据.zip ./instances/exports/按社团分.xlsx ./instances/exports/按班级分.xlsx"); // TODO avoid crash
+    execSync("7z a ./instances/exports/导出数据.zip ./instances/exports/按社团分.xlsx ./instances/exports/按班级分.xlsx");
 
     res.sendFile(join(process.cwd(), "instances/exports/导出数据.zip"));
 });

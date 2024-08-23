@@ -90,7 +90,7 @@ function submit() {
       return response.json();
     } else {
       alert('Network response ' + response.status.toString());
-      throw new Error('Network response was not ok'); // TODO error feedback
+      throw new Error('Network response was not ok');
     }
   }).then(data => {
     console.log(data);
@@ -103,7 +103,6 @@ function submit() {
   <main class="flex flex-col gap-4">
     <h1 class="text-center font-bold text-3xl">社团选课系统</h1>
     <div class="flex flex-col sm:flex-row gap-4 p-8">
-      <!--TODO card fixed sidebar-->
       <div class="flex flex-wrap justify-around grow">
         <SocietyCard v-for="society in societies" :key="society.id" :society="society" />
       </div>
@@ -123,7 +122,7 @@ function submit() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button @click="submit()" class="submit-btn relative w-full my-8">提交</Button><!--TODO confirm-->
+            <Button @click="submit()" class="submit-btn relative w-full my-8">提交</Button>
           </CardFooter>
         </Card>
       </div>
