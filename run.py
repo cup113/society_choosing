@@ -83,8 +83,8 @@ def main():
         except KeyboardInterrupt:
             pass
         finally:
-            pocket_base.kill()
-            express_server.kill()
+            pocket_base.terminate()
+            express_server.terminate()
 
 
 if __name__ == "__main__":
