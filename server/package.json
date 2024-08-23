@@ -13,6 +13,7 @@
     "jszip": "^3.10.1",
     "morgan": "~1.9.1",
     "pocketbase": "~0.21.3",
+		"priority-queue-typed": "^1.52.1",
     "vite": "^5.3.3",
     "vite-express": "^0.17.0",
     "winston": "^3.13.1",
