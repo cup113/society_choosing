@@ -20,7 +20,7 @@ interface User {
     society: Society | null;
     first_choice: Society | null;
     second_choice: Society | null;
-    adjust_prior: Society[];
+    third_choice: Society | null;
     submit: Date;
 }
 
@@ -49,11 +49,11 @@ router.post('/choosing', async function (req, res) {
 
         let first_choice = null as Society | null;
         let second_choice = null as Society | null;
-        let adjust_prior: Society[] = [];
+        let third_choice = null as Society | null;
         if (chosen) {
             first_choice = societiesMap.get(choosingData.first_choice)!;
             second_choice = societiesMap.get(choosingData.second_choice)!;
-            adjust_prior = (choosingData.adjust_prior as string[]).map(id => societiesMap.get(id)!);
+            third_choice = societiesMap.get(choosingData.third_choice)!;
         }
 
         return {
@@ -63,7 +63,7 @@ router.post('/choosing', async function (req, res) {
             society: null,
             first_choice,
             second_choice,
-            adjust_prior,
+            third_choice,
             submit: new Date(choosingData?.created ?? 0),
         };
     }).sort((a, b) => {
@@ -81,7 +81,7 @@ router.post('/choosing', async function (req, res) {
         mapClasses.set(user.classNo, []);
     }
 
-    for (const key of ["first_choice", "second_choice"] as const) {
+    for (const key of ["first_choice", "second_choice", "third_choice"] as const) {
         for (const user of users) {
             if (user.society !== null) {
                 continue;
@@ -102,31 +102,8 @@ router.post('/choosing', async function (req, res) {
         }
     }
 
-    // adjust (prior batch)
+    // adjust
     let societiesPQ = new PriorityQueue<Society>(
-        new Array(...societiesMap.values()).filter(s => s.countMembers < s.cap),
-        {
-            comparator: (a: Society, b: Society) => a.countMembers / a.cap - b.countMembers / b.cap
-        }
-    );
-    while (true) {
-        const society = societiesPQ.poll();
-        if (society === undefined) {
-            break;
-        }
-        const firstUser = users.find(user => user.adjust_prior.includes(society) && user.society === null);
-        if (firstUser === undefined) {
-            continue;
-        }
-        firstUser.society = society;
-        society.countMembers++;
-        if (society.countMembers < society.cap) {
-            societiesPQ.add(society);
-        }
-    }
-
-    // adjust (last batch)
-    societiesPQ = new PriorityQueue<Society>(
         new Array(...societiesMap.values()).filter(s => s.countMembers < s.cap),
         {
             comparator: (a: Society, b: Society) => a.countMembers / a.cap - b.countMembers / b.cap

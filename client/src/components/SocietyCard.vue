@@ -1,8 +1,4 @@
 <script lang="ts" setup>
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-
-import { useUserStore } from '@/stores/user';
 import { computed } from 'vue';
 
 const props = defineProps<{
@@ -13,35 +9,14 @@ const props = defineProps<{
   }
 }>();
 
-const store = useUserStore();
-
 const society = computed(() => props.society);
-
-if (store.choice[society.value.id] === undefined) {
-  store.choice[society.value.id] = 'default';
-}
 </script>
 
 <template>
-  <Card class="h-fit">
-    <CardHeader>
-      <CardTitle>{{ society.name }}</CardTitle>
-      <CardDescription class="text-lg">上限人数：<b>{{ society.cap }}</b></CardDescription>
-    </CardHeader>
-    <CardContent>
-    </CardContent>
-    <CardFooter>
-      <Select v-model="store.choice[society.id]">
-        <SelectTrigger class="bg-cream">
-          <SelectValue placeholder="选择为..."></SelectValue>
-        </SelectTrigger>
-        <SelectContent class="bg-cream">
-          <SelectItem value="first_choice">第一志愿</SelectItem>
-          <SelectItem value="second_choice">第二志愿</SelectItem>
-          <SelectItem value="adjust_prior">优先调剂</SelectItem>
-          <SelectItem value="default">不选择</SelectItem>
-        </SelectContent>
-      </Select>
-    </CardFooter>
-  </Card>
+  <div class="flex justify-between items-center border-2 border-slate-200 rounded-md shadow-md px-2 py-1 max-w-96 min-w-64">
+    <span class="font-bold text-2xl">{{ society.name }}</span>
+    <span>
+      <span>限额: <b>{{ society.cap }}</b> 人</span>
+    </span>
+  </div>
 </template>

@@ -4,7 +4,10 @@
   "private": true,
   "scripts": {},
   "dependencies": {
+    "@types/compression": "^1.7.5",
     "body-parser": "^1.20.2",
+    "compression": "^1.7.4",
+    "connect-timeout": "^1.9.0",
     "debug": "~2.6.9",
     "dotenv": "^16.4.5",
     "express": "~4.16.1",
@@ -13,7 +16,7 @@
     "jszip": "^3.10.1",
     "morgan": "~1.9.1",
     "pocketbase": "~0.21.3",
-		"priority-queue-typed": "^1.52.1",
+    "priority-queue-typed": "^1.52.1",
     "vite": "^5.3.3",
     "vite-express": "^0.17.0",
     "winston": "^3.13.1",
@@ -22,6 +25,7 @@
   },
   "devDependencies": {
     "@types/body-parser": "^1.19.5",
+    "@types/connect-timeout": "^0.0.39",
     "@types/express": "^4.17.21",
     "@types/morgan": "^1.9.9"
   }

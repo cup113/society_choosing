@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.post('/', async function (req, res) {
   logger.info(`Received choose request from ${req.ip}: ${JSON.stringify(req.body)}`);
-  const { token, user, first_choice, second_choice, adjust_prior } = req.body;
+  const { token, user, first_choice, second_choice, third_choice } = req.body;
   const pb = get_pb();
   pb.authStore.save(token);
   if (!pb.authStore.isValid) {
@@ -17,7 +17,7 @@ router.post('/', async function (req, res) {
     user,
     first_choice,
     second_choice,
-    adjust_prior,
+    third_choice,
   };
   try {
     const dbRes = await pb.collection('choosing_24B').create(data);

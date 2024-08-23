@@ -1,6 +1,8 @@
 import express from 'express';
 import logger from 'morgan';
 import bodyParser from 'body-parser';
+import timeout from 'connect-timeout';
+import compression from 'compression';
 import 'express-async-errors';
 
 import indexRouter from './routes/choose.mjs';
@@ -15,6 +17,13 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(timeout(30 * 1000));
+app.use((req, res, next) => {
+    if (!req.timedout) {
+        next();
+    }
+});
+app.use(compression());
 
 app.use('/', indexRouter);
 app.use('/api/societies', societiesRouter);

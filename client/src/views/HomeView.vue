@@ -52,15 +52,21 @@ function login() {
           </div>
         </CardContent>
         <CardFooter class="text-center">
-          <Button @click="login" class="text-lg w-full bg-orange-500 hover:bg-orange-600">登录</Button>
+          <Button @click="login" class="login-btn mt-3 relative text-lg w-full bg-amber-500 hover:bg-amber-600">登录</Button>
         </CardFooter>
       </Card>
     </form>
-    <div>
-      <img :width="width * 0.6" class="mx-auto select-none" src="/img/homepage-bird.jpg">
-    </div>
-    <div></div>
   </div>
 </template>
 
-<style></style>
+<style>
+.login-btn::before {
+  @apply block absolute right-0 bg-contain;
+  width: 130px;
+  height: 36.5px;
+  top: -36.5px;
+  transform: rotateY(180deg);
+  background-image: url('/img/homepage-bird.jpg');
+  content: '';
+}
+</style>

@@ -23,11 +23,11 @@ function clear_local_storage_cache() {
 </script>
 
 <template>
-  <div class="flex flex-col min-h-screen gap-4 bg-cream">
-    <header class="flex items-center bg-amber-700 text-white p-2">
-      <span>华二宝山选课系统</span>
-      <NavigationMenu class="mx-auto">
-        <NavigationMenuList>
+  <div class="flex flex-col min-h-screen gap-4">
+    <header class="flex flex-col md:flex-row gap-2 justify-between items-center bg-amber-700 text-amber-700 p-2">
+      <h1 class="border text-2xl border-gray-300 rounded-md px-4 py-1 bg-white font-bold">华二宝山选课系统</h1>
+      <NavigationMenu>
+        <NavigationMenuList class="flex-wrap gap-2">
           <NavigationMenuItem :class="navigationMenuTriggerStyle()">
             <RouterLink to="/">{{ loginNavText }}</RouterLink>
           </NavigationMenuItem>
