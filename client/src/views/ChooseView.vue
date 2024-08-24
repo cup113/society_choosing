@@ -78,7 +78,7 @@ function submit() {
         <div class="flex flex-col md:flex-row md:flex-wrap md:gap-x-8 md:justify-center lg:flex-nowrap gap-1">
           <ChoiceComboBox v-for="batch in userStore.batches" :key="batch.key" :batch="batch"></ChoiceComboBox>
         </div>
-        <Button @click="submit()" class="submit-btn relative w-20 my-8 bg-amber-700">提交</Button>
+        <Button @click="submit()" class="submit-btn relative w-20 my-8 bg-amber-700 hover:bg-amber-800">提交</Button>
       </div>
     </div>
     <Waiting :show="waiting">

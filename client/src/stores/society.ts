@@ -24,13 +24,20 @@ export const useSocietyStore = defineStore('society', () => {
     }>(),
   });
 
+  const timeStatus = ref<{ open: true } | { open: false, estimated: Date } | null>(null);
+
   const societyDone = fetch('/api/societies/list').then(response => response.json()).then(data => {
-    societies.value = data.map((society: Omit<Society, 'index'>, index: number) => {
+    societies.value = data.societies.map((society: Omit<Society, 'index'>, index: number) => {
       return {
         ...society,
         index: (index + 1 < 10 ? '0' : '') + (index + 1).toString(),
       };
     });
+    if (data.timeStatus.open) {
+      timeStatus.value = { open: true };
+    } else {
+      timeStatus.value = { open: false, estimated: new Date(Date.now() + data.timeStatus.eta) };
+    }
   });
 
   function refresh_society_history() {
@@ -87,6 +94,7 @@ export const useSocietyStore = defineStore('society', () => {
   return {
     societies,
     historyChoices,
+    timeStatus,
     get_society,
     get_society_id,
     refresh_society_history,

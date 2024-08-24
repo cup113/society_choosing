@@ -41,6 +41,9 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.4)
+      vaul-vue:
+        specifier: ^0.2.0
+        version: 0.2.0(radix-vue@1.9.1(vue@3.4.31(typescript@5.4.5)))(vue@3.4.31(typescript@5.4.5))
       vue:
         specifier: ^3.4.29
         version: 3.4.31(typescript@5.4.5)
@@ -1384,6 +1387,12 @@ packages:
 
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
+
+  vaul-vue@0.2.0:
+    resolution: {integrity: sha512-YV0zqxc8NiVzr1z/Awwbaty0UDDchxj5BfhFbLiYu+Uz0rCfSaDK2zwmuXZvejBJKLGbWw9I5GLHJRse14lQew==}
+    peerDependencies:
+      radix-vue: ^1.4.0
+      vue: ^3.3.0
 
   vite-node@1.6.0:
     resolution: {integrity: sha512-de6HJgzC+TFzOu0NTC4RAIsyf/DY/ibWDYQUcuEA84EMHhcefTUGkjFHKKEJhQN4A+6I0u++kr3l36ZF2d7XRw==}
@@ -2782,6 +2791,14 @@ snapshots:
       requires-port: 1.0.0
 
   util-deprecate@1.0.2: {}
+
+  vaul-vue@0.2.0(radix-vue@1.9.1(vue@3.4.31(typescript@5.4.5)))(vue@3.4.31(typescript@5.4.5)):
+    dependencies:
+      '@vueuse/core': 10.11.0(vue@3.4.31(typescript@5.4.5))
+      radix-vue: 1.9.1(vue@3.4.31(typescript@5.4.5))
+      vue: 3.4.31(typescript@5.4.5)
+    transitivePeerDependencies:
+      - '@vue/composition-api'
 
   vite-node@1.6.0(@types/node@20.14.9):
     dependencies:

@@ -89,17 +89,15 @@ router.post('/choosing', async function (req, res) {
                 continue;
             }
             const society = user[key];
-            if (society !== null && society.countMembers >= society.cap) {
-                continue;
-            }
             if (society === null) {
                 continue;
             }
-            mapSocieties.get(society.name)!.push(user);
-            if (society !== null) {
-                society.countMembers++;
+            if (society.countMembers >= society.cap) {
+                continue;
             }
+            society.countMembers++;
             user.society = society;
+            mapSocieties.get(society.name)!.push(user);
             mapClasses.get(user.classNo)!.push(user);
         }
     }
@@ -111,12 +109,15 @@ router.post('/choosing', async function (req, res) {
             comparator: (a: Society, b: Society) => a.countMembers / a.cap - b.countMembers / b.cap
         }
     );
-    for (const society of societiesPQ) {
+    while (true) {
         const firstUser = users.find(user => user.society === null);
-        if (firstUser === undefined) {
+        const society = societiesPQ.poll();
+        if (firstUser === undefined || society === undefined) {
             break;
         }
         firstUser.society = society;
+        mapSocieties.get(society.name)!.push(firstUser);
+        mapClasses.get(firstUser.classNo)!.push(firstUser);
         society.countMembers++;
         if (society.countMembers < society.cap) {
             societiesPQ.add(society);
