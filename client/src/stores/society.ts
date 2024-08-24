@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { ref, reactive } from "vue";
 import { useUserStore } from "./user";
+import { custom_fetch, json_response } from "@/lib/fetch";
 
 export interface Society {
   id: string;
@@ -26,7 +27,10 @@ export const useSocietyStore = defineStore('society', () => {
 
   const timeStatus = ref<{ open: true } | { open: false, estimated: Date } | null>(null);
 
-  const societyDone = fetch('/api/societies/list').then(response => response.json()).then(data => {
+  const societyDone = json_response(custom_fetch({
+    url: '/api/societies/list',
+    method: 'GET',
+  })).then(data => {
     societies.value = data.societies.map((society: Omit<Society, 'index'>, index: number) => {
       return {
         ...society,
@@ -41,17 +45,10 @@ export const useSocietyStore = defineStore('society', () => {
   });
 
   function refresh_society_history() {
-    const userStore = useUserStore();
-
-    fetch('/api/history', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        token: userStore.token,
-      }),
-    }).then(response => response.json()).then((data: {
+    json_response(custom_fetch({
+      'url': '/api/history',
+      'method': 'GET',
+    })).then((data: {
       totalItems: number, items: {
         first_choice: string;
         second_choice: string;
@@ -77,10 +74,9 @@ export const useSocietyStore = defineStore('society', () => {
 
   societyDone.then(() => {
     const userStore = useUserStore();
-    if (userStore.token.length === 0) {
-      return;
+    if (userStore.token.length !== 0) {
+      refresh_society_history();
     }
-    refresh_society_history();
   });
 
   const get_society = (id: string) => {

@@ -10,6 +10,7 @@ import ChoiceComboBox from '@/components/ChoiceComboBox.vue';
 import Waiting from '@/components/Waiting.vue';
 
 import router from '@/router';
+import { custom_fetch, json_response } from '@/lib/fetch';
 
 const userStore = useUserStore();
 const societyStore = useSocietyStore();
@@ -37,31 +38,17 @@ function submit() {
     return;
   }
   waiting.value = true;
-  const data = {
-    token: userStore.token,
-    first_choice: userStore.choice.first_choice,
-    second_choice: userStore.choice.second_choice,
-    third_choice: userStore.choice.third_choice,
-  };
-  fetch('/api/choose', {
+  json_response(custom_fetch({
+    url: '/api/choose',
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  }).then(response => {
-    if (response.ok) {
-      return response.json();
-    } else {
-      waiting.value = false;
-      throw new Error('提交失败: ' + response.status.toString());
-    }
-  }).then(data => {
+    data: JSON.stringify(userStore.choice),
+  })).then(data => {
     waiting.value = false;
     societyStore.refresh_society_history();
     console.log(data);
     router.replace('/thanks');
   }).catch(error => {
+    waiting.value = false;
     console.error(error);
     alert(error.message);
   })

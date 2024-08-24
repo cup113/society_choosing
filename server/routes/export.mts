@@ -7,6 +7,7 @@ import { mkdirSync } from 'node:fs';
 
 import get_pb from '../src/database.mjs';
 import logger from '../src/logger.mjs';
+import { auth } from '../src/authorization.mjs';
 
 const router = express.Router();
 
@@ -27,15 +28,15 @@ interface User {
 }
 
 router.post('/choosing', async function (req, res) {
-    logger.info(`Received exporting choosing data request from ${req.ip}: ${req.body.token}`);
+    logger.info(`Received exporting choosing data request from ${req.ip}.`);
 
     const pb = get_pb();
-    pb.authStore.save(req.body.token);
-    if (!pb.authStore.isValid) {
-        res.status(401).json({ error: "Invalid token" });
+    const authResult = await auth(req, pb);
+    if (!authResult.success) {
+        logger.error(`Unauthorized to export: ${authResult.error}`);
+        res.status(authResult.code).json({ error: authResult.error });
         return;
     }
-    pb.collection('users').authRefresh();
 
     const choosingRaw = (await pb.collection('choosing_24B').getFullList());
     const usersRaw = await pb.collection('users').getFullList();
@@ -66,7 +67,8 @@ router.post('/choosing', async function (req, res) {
             first_choice,
             second_choice,
             third_choice,
-            submit: new Date(choosingData?.created ?? 0),
+            // if not chosen, let the submit time be the latest.
+            submit: new Date(choosingData?.created ?? Date.now()),
         };
     }).sort((a, b) => {
         return a.submit.getTime() - b.submit.getTime();

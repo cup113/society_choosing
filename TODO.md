@@ -8,5 +8,6 @@
 ### Frontend
 
 1. [ ] 美化确认、错误界面
+2. [ ] request types
 
 ## Demand

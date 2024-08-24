@@ -4,7 +4,8 @@ import { createReusableTemplate } from '@vueuse/core';
 
 import { useUserStore } from '@/stores/user';
 import { useSocietyStore } from '@/stores/society';
-import router from '../router';
+import router from '@/router';
+import { json_response, custom_fetch } from '@/lib/fetch';
 
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -27,20 +28,11 @@ function login() {
     username: username.value,
     password: password.value,
   };
-  fetch('/api/login', {
+  json_response(custom_fetch({
+    url: '/api/login',
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  }).then(async response => {
-    return [response.status, await response.text()] as [number, string];
-  }).then(([status, text]) => {
-    loginLoading.value = false;
-    if (status >= 400) {
-      throw new Error(`发生错误 ${status}: ${text}。请检查密码是否正确。`);
-    }
-    const data = JSON.parse(text);
+    data: JSON.stringify(data),
+  })).then(data => {
     userStore.userID = data.userID;
     userStore.token = data.token;
     userStore.userInformation = data.userInformation;
