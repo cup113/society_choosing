@@ -23,7 +23,7 @@ def general_popen(
 
 
 def init_database():
-    return general_popen("node", ROOT / "server/dist/script/init_database.mjs")
+    return general_popen("node", ROOT / "server/dist/script/database_init.mjs")
 
 
 def build_ts():
@@ -51,7 +51,9 @@ def all_wait(*wait_list: Popen[bytes]):
 
 def run_express_server(node_env: str = "development"):
     pocket_base = run_pocket_base()
-    all_wait(build_ts(), build_client())
+    if node_env == "production":
+        build_client().wait()
+    build_ts().wait()
     sleep(1) # To make sure pocket base is ready to serve
     return (
         pocket_base,
@@ -73,6 +75,7 @@ def main():
     args = parser.parse_args()
 
     if args.init_database:
+        build_ts().wait()
         init_database().wait()
     else:
         pocket_base, express_server = run_express_server(

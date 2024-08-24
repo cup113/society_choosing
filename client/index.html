@@ -5,15 +5,45 @@
     <link rel="icon" href="/favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>社团选课系统</title>
+    <style>
+      #initial-loading {
+        width: calc(100vw - 16px);
+        height: calc(100vh - 16px);
+        background-color: #fef8d8;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 5vw;
+      }
+    </style>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <div id="initial-loading">
+        <span>Loading...</span>
+        <span>...</span>
+      </div>
+    </div>
     <!--[if IE]>
       <div class="browser-support">
         <h1>您的浏览器版本过低</h1>
         <p>为了正常加载 UI 界面，请不要使用 IE 浏览器。建议使用 Chrome、Edge 等浏览器最新版。</p>
       </div>
     <![endif]-->
+    <script>
+      var initialDate = Date.now();
+      var handle = setInterval(() => {
+        var timeEl = document.querySelector('#initial-loading span:last-child');
+        if (timeEl === null) {
+          clearInterval(handle);
+          return;
+        }
+        var diff = Date.now() - initialDate;
+        timeEl.textContent = diff.toString() + 'ms';
+        timeEl.style.opacity = (0.6 + 0.4 * Math.sin(diff / 200)).toString();
+      }, 50);
+    </script>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

@@ -9,6 +9,7 @@ import indexRouter from './routes/choose.mjs';
 import societiesRouter from './routes/societies.mjs';
 import loginRouter from './routes/login.mjs';
 import chooseRouter from './routes/choose.mjs';
+import historyRouter from './routes/history.mjs';
 import exportRouter from './routes/export.mjs';
 
 var app = express();
@@ -29,6 +30,7 @@ app.use('/', indexRouter);
 app.use('/api/societies', societiesRouter);
 app.use('/api/login', loginRouter);
 app.use('/api/choose', chooseRouter);
+app.use('/api/history', historyRouter);
 app.use('/api/export', exportRouter);
 
 export default app;

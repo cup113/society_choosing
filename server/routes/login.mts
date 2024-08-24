@@ -8,20 +8,24 @@ router.post('/', async function (req, res) {
   const { username, password } = req.body;
 
   const pb = get_pb();
-  const auth = await pb.collection('users').authWithPassword(username, password);
-  await pb.collection('users').authRefresh();
+  try {
+    const auth = await pb.collection('users').authWithPassword(username, password);
+    await pb.collection('users').authRefresh();
 
-  console.log(auth);
-  res.json({
-    success: true,
-    userID: auth.record.id,
-    token: auth.token,
-    userInformation: {
-      name: auth.record.name,
-      role: auth.record.role,
-      username: auth.record.username,
-    }
-  });
+    console.log(auth);
+    res.json({
+      success: true,
+      userID: auth.record.id,
+      token: auth.token,
+      userInformation: {
+        name: auth.record.name,
+        role: auth.record.role,
+        username: auth.record.username,
+      }
+    });
+  } catch (error) {
+    res.status(401).send('用户名或密码错误');
+  }
 });
 
 export default router;

@@ -48,7 +48,11 @@ function clear_local_storage_cache() {
     </header>
 
     <div class="flex-grow">
-      <RouterView />
+      <RouterView v-slot="{ Component }">
+        <Transition name="fade" mode="out-in">
+          <component :is="Component"></component>
+        </Transition>
+      </RouterView>
     </div>
 
     <footer class="p-4 text-center">
@@ -57,4 +61,14 @@ function clear_local_storage_cache() {
   </div>
 </template>
 
-<style></style>
+<style>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease-in-out;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

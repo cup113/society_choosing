@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useElementSize } from '@vueuse/core';
 
 import { useUserStore } from '@/stores/user';
+import { useSocietyStore } from '@/stores/society';
 import router from '../router';
 
 import { Button } from '@/components/ui/button';
@@ -10,13 +10,16 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 
+import Waiting from '@/components/Waiting.vue';
+
 const username = ref('');
 const password = ref('');
-const store = useUserStore();
-const form_el = ref(null as HTMLFormElement | null);
-const { width } = useElementSize(form_el);
+const userStore = useUserStore();
+const societyStore = useSocietyStore();
+const loginLoading = ref(false);
 
 function login() {
+  loginLoading.value = true;
   const data = {
     username: username.value,
     password: password.value,
@@ -27,35 +30,70 @@ function login() {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(data),
-  }).then(response => response.json()).then(data => {
-    store.userID = data.userID;
-    store.token = data.token;
-    store.userInformation = data.userInformation;
-    router.push(store.userInformation.role === 'student' ? '/choose' : '/export');
+  }).then(async response => {
+    return [response.status, await response.text()] as [number, string];
+  }).then(([status, text]) => {
+    loginLoading.value = false;
+    if (status >= 400) {
+      throw new Error(`发生错误 ${status}: ${text}。请检查密码是否正确。`);
+    }
+    const data = JSON.parse(text);
+    userStore.userID = data.userID;
+    userStore.token = data.token;
+    userStore.userInformation = data.userInformation;
+    societyStore.refresh_society_history();
+    router.push(userStore.userInformation.role === 'student' ? '/choose' : '/export');
+  }).catch(error => {
+    console.error(error);
+    alert(error.message);
   });
 }
 </script>
 
 <template>
-  <div class="flex flex-col gap-y-8 min-h-[70vh] justify-center px-6">
-    <form @submit.prevent class="max-w-96 flex mx-auto flex-col gap-8" ref="form_el">
+  <div class="flex flex-col gap-y-8 min-h-[70vh] justify-center items-center px-6 py-8">
+    <form @submit.prevent class="max-w-96 flex flex-col gap-8">
       <Card class="shadow-lg border-4">
         <CardHeader></CardHeader>
         <CardContent class="flex flex-col gap-4">
           <div class="flex items-center gap-2">
             <Label for="username" class="text-xl w-24">用户名</Label>
-            <Input type="text" name="username" id="username" v-model="username" placeholder="Username" class="bg-cream"></Input>
+            <Input type="text" name="username" id="username" v-model="username" placeholder="Username"
+              class="bg-cream"></Input>
           </div>
           <div class="flex items-center gap-2">
             <Label for="password" class="text-xl w-24">密码</Label>
-            <Input type="password" name="password" id="password" v-model="password" placeholder="Password" class="bg-cream"></Input>
+            <Input type="password" name="password" id="password" v-model="password" placeholder="Password"
+              class="bg-cream"></Input>
           </div>
         </CardContent>
         <CardFooter class="text-center">
-          <Button @click="login" class="login-btn mt-3 relative text-lg w-full bg-amber-500 hover:bg-amber-600">登录</Button>
+          <Button @click="login" class="login-btn mt-5 relative text-lg w-full bg-amber-500 hover:bg-amber-600">
+            登录
+          </Button>
         </CardFooter>
       </Card>
     </form>
+    <div>
+      <p v-if="societyStore.historyChoices.count === 0">还没有选课记录哦，快去选课吧！</p>
+      <div v-else class="flex flex-col gap-3">
+        <div class="text-xl">选课次数：{{ societyStore.historyChoices.count }}</div>
+        <ul class="flex flex-col gap-2">
+          <li v-for="choice, index in societyStore.historyChoices.choices" :key="choice.id" class="flex flex-col gap-1">
+            <span>最近第 {{ index + 1 }} 次选课（{{ new Date(choice.created).toLocaleString() }}, IP {{ choice.ip ?? '未知'
+              }}）</span>
+            <span class="flex flex-col gap-1 pl-8">
+              <span>第一志愿：{{ choice.first_choice }}</span>
+              <span>第二志愿：{{ choice.second_choice }}</span>
+              <span>第三志愿：{{ choice.third_choice }}</span>
+            </span>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <Waiting :show="loginLoading">
+      <template #default>正在登录...</template>
+    </Waiting>
   </div>
 </template>
 

@@ -1,10 +1,12 @@
 import express from 'express';
-import get_pb from '../src/database.mjs';
 import XLSX from 'xlsx';
 import { execSync } from 'child_process';
-import { join } from 'node:path';
-import logger from '../src/logger.mjs';
 import { PriorityQueue } from 'priority-queue-typed';
+import { join } from 'node:path';
+import { mkdirSync } from 'node:fs';
+
+import get_pb from '../src/database.mjs';
+import logger from '../src/logger.mjs';
 
 const router = express.Router();
 
@@ -121,6 +123,10 @@ router.post('/choosing', async function (req, res) {
         }
     }
 
+    const timestamp = Date.now();
+    const folder = `./instances/exports/${timestamp}`
+    mkdirSync(folder, { recursive: true });
+
     {
         const workbook = XLSX.utils.book_new();
         for (const [name, users] of mapSocieties.entries()) {
@@ -133,7 +139,7 @@ router.post('/choosing', async function (req, res) {
             }));
             XLSX.utils.book_append_sheet(workbook, worksheet, name);
         }
-        XLSX.writeFile(workbook, "instances/exports/按社团分.xlsx");
+        XLSX.writeFile(workbook, `${folder}/按社团分.xlsx`);
     }
     {
         const workbook = XLSX.utils.book_new();
@@ -146,11 +152,12 @@ router.post('/choosing', async function (req, res) {
             }));
             XLSX.utils.book_append_sheet(workbook, worksheet, name)
         }
-        XLSX.writeFile(workbook, "instances/exports/按班级分.xlsx");
+        XLSX.writeFile(workbook, `${folder}/按班级分.xlsx`);
     }
-    execSync("7z a ./instances/exports/导出数据.zip ./instances/exports/按社团分.xlsx ./instances/exports/按班级分.xlsx");
 
-    res.sendFile(join(process.cwd(), "instances/exports/导出数据.zip"));
+    execSync(`7z a ${folder}/导出数据.zip ${folder}/按社团分.xlsx ${folder}/按班级分.xlsx`);
+
+    res.sendFile(join(process.cwd(), `${folder}/导出数据.zip`));
 });
 
 export default router;
