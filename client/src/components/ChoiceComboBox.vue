@@ -31,19 +31,20 @@ const open = ref(false);
 
 const name = computed({
   get() {
-    return societyStore.get_society(userStore.choice[props.batch.key] ?? '')?.name;
+    const society = societyStore.get_society(userStore.choice[props.batch.key] ?? '');
+    return society ? `${society.index} ${society.name}` : undefined;
   },
   set(value: string | undefined) {
     if (value === undefined) {
       userStore.choice[props.batch.key] = undefined;
     } else {
-      userStore.choice[props.batch.key] = societyStore.get_society_id(value)!;
+      userStore.choice[props.batch.key] = societyStore.get_society_id(value.slice(3))!;
     }
   },
 });
 
 const nameDisplayed = computed(() => {
-  return name.value ?? '请选择社团';
+  return name.value?.slice(3) ?? '请选择社团';
 });
 </script>
 
@@ -64,10 +65,10 @@ const nameDisplayed = computed(() => {
             <CommandEmpty>没有包含该名称的社团。</CommandEmpty>
             <CommandList>
               <CommandGroup>
-                <CommandItem v-for="society in societyStore.societies" :key="society.id" :value="society.name"
+                <CommandItem v-for="society in societyStore.societies" :key="society.id" :value="society.index + ' ' + society.name"
                   @select="open = false">
                   <Check class="mr-2 h-2 w-4" :class="{ 'opacity-0': society.name !== name }"></Check>
-                  {{ society.name }}
+                  {{ society.index }} {{ society.name }}
                 </CommandItem>
               </CommandGroup>
             </CommandList>

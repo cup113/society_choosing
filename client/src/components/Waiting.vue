@@ -21,6 +21,7 @@ let handle = null as number | null;
 watch(computed(() => props.show), value => {
   if (value) {
     start.value = Date.now();
+    now.value = start.value;
     handle = setInterval(() => {
       now.value = Date.now();
     }, 50);
@@ -39,10 +40,9 @@ watch(computed(() => props.show), value => {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>正在加载中...</DialogTitle>
-          <DialogDescription>请稍候...</DialogDescription>
+          <DialogDescription><slot name="default"></slot></DialogDescription>
         </DialogHeader>
-        <slot name="default"></slot>
-        <p>已消耗时间: {{ time }}ms</p>
+        <p>已等待: {{ time }}ms</p>
       </DialogContent>
     </Dialog>
   </div>

@@ -70,11 +70,11 @@ function submit() {
 
 <template>
   <main class="flex flex-col gap-4">
-    <div class="flex flex-wrap justify-center grow p-8 mb-64 gap-2 md:w-[640px] lg:w-[900px] mx-auto">
+    <div class="flex flex-wrap justify-center grow py-8 px-2 mb-64 gap-y-4 gap-x-8 md:w-[640px] lg:w-[900px] mx-auto">
       <SocietyCard v-for="society in societyStore.societies" :key="society.id" :society="society" />
     </div>
     <div>
-      <div class="fixed bottom-0 border-2 shadow-lg bg-cream w-full flex items-center justify-center pt-4 pb-2 gap-4 md:gap-8 lg:gap-12 md:px-8">
+      <div class="fixed bottom-0 border-2 shadow-lg bg-[#fde1ba] w-full flex items-center justify-center pt-4 pb-2 gap-4 md:gap-8 lg:gap-12 md:px-8 bg-amber-300">
         <div class="flex flex-col md:flex-row md:flex-wrap md:gap-x-8 md:justify-center lg:flex-nowrap gap-1">
           <ChoiceComboBox v-for="batch in userStore.batches" :key="batch.key" :batch="batch"></ChoiceComboBox>
         </div>

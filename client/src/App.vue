@@ -6,7 +6,6 @@ import {
   NavigationMenu,
   NavigationMenuList,
   NavigationMenuItem,
-  navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
 
 import { useUserStore } from './stores/user';
@@ -24,23 +23,23 @@ function clear_local_storage_cache() {
 
 <template>
   <div class="flex flex-col min-h-screen gap-4">
-    <header class="flex flex-col md:flex-row gap-2 justify-between items-center bg-amber-700 text-amber-700 p-2">
-      <h1 class="border text-2xl border-gray-300 rounded-md px-4 py-1 bg-white font-bold">华二宝山选课系统</h1>
+    <header class="flex flex-col md:flex-row gap-2 justify-between items-center bg-amber-700 text-amber-700 pl-2">
+      <h1 class="border text-2xl border-gray-300 rounded-md bg-white font-bold px-4 py-2">华二宝山选课系统</h1>
       <NavigationMenu>
-        <NavigationMenuList class="flex-wrap gap-2">
-          <NavigationMenuItem :class="navigationMenuTriggerStyle()">
+        <NavigationMenuList class="flex-wrap py-4 gap-2 md:gap-0 text-white">
+          <NavigationMenuItem class="py-1 px-3 min-w-20 text-center md:border-l-2 border-white border-dashed bg-amber-600 rounded-md md:bg-transparent md:rounded-none">
             <RouterLink to="/">{{ loginNavText }}</RouterLink>
           </NavigationMenuItem>
-          <NavigationMenuItem :class="navigationMenuTriggerStyle()" v-if="role === 'student'">
+          <NavigationMenuItem class="py-1 px-3 min-w-20 text-center md:border-l-2 border-white border-dashed bg-amber-600 rounded-md md:bg-transparent md:rounded-none" v-if="role === 'student'">
             <RouterLink to="/choose" class="font-bold">选课</RouterLink>
           </NavigationMenuItem>
-          <NavigationMenuItem :class="navigationMenuTriggerStyle()" v-if="role === 'teacher'">
+          <NavigationMenuItem class="py-1 px-3 min-w-20 text-center md:border-l-2 border-white border-dashed bg-amber-600 rounded-md md:bg-transparent md:rounded-none" v-if="role === 'teacher'">
             <RouterLink to="/export">导出数据</RouterLink>
           </NavigationMenuItem>
-          <NavigationMenuItem :class="navigationMenuTriggerStyle()">
+          <NavigationMenuItem class="py-1 px-3 min-w-20 text-center md:border-l-2 border-white border-dashed bg-amber-600 rounded-md md:bg-transparent md:rounded-none">
             <RouterLink to="/about">关于此网站</RouterLink>
           </NavigationMenuItem>
-          <NavigationMenuItem :class="navigationMenuTriggerStyle()">
+          <NavigationMenuItem class="py-1 px-3 min-w-20 text-center md:border-l-2 border-white border-dashed bg-amber-600 rounded-md md:bg-transparent md:rounded-none">
             <button @click="clear_local_storage_cache">清除缓存</button>
           </NavigationMenuItem>
         </NavigationMenuList>

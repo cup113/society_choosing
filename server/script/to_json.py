@@ -6,6 +6,8 @@ from dataclasses import dataclass
 class Student:
     no: str
     name: str
+    className: str
+    password: str
 
 
 @dataclass
@@ -25,8 +27,8 @@ def students_txt_to_json():
         for line in f:
             if line.strip() == "":
                 continue
-            no, name = line.strip().split("\t")
-            students.append(Student(no, name))
+            no, name, className, id_card = line.strip().split("\t")
+            students.append(Student(no, name, className, f"{no[-6:]}@{id_card}"))
 
     # write json
 

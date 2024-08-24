@@ -56,15 +56,21 @@ function login() {
       <Card class="shadow-lg border-4">
         <CardHeader></CardHeader>
         <CardContent class="flex flex-col gap-4">
-          <div class="flex items-center gap-2">
-            <Label for="username" class="text-xl w-24">用户名</Label>
-            <Input type="text" name="username" id="username" v-model="username" placeholder="Username"
-              class="bg-cream"></Input>
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center gap-2">
+              <Label for="username" class="text-xl w-24">用户名</Label>
+              <Input type="text" name="username" id="username" v-model="username" placeholder="Username"
+                class="bg-cream"></Input>
+            </div>
+            <div class="text-gray-500 text-right text-sm">9位学号，如320270501。</div>
           </div>
-          <div class="flex items-center gap-2">
-            <Label for="password" class="text-xl w-24">密码</Label>
-            <Input type="password" name="password" id="password" v-model="password" placeholder="Password"
-              class="bg-cream"></Input>
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center gap-2">
+              <Label for="password" class="text-xl w-24">密码</Label>
+              <Input type="password" name="password" id="password" v-model="password" placeholder="Password"
+                class="bg-cream"></Input>
+            </div>
+            <div class="text-gray-500 text-right text-sm">密码为学号后6位@身份证后6位<br>（如有X，要大写），如270501@12345X</div>
           </div>
         </CardContent>
         <CardFooter class="text-center">

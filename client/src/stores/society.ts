@@ -4,6 +4,7 @@ import { useUserStore } from "./user";
 
 export interface Society {
   id: string;
+  index: string;
   name: string;
   cap: number;
 }
@@ -24,7 +25,12 @@ export const useSocietyStore = defineStore('society', () => {
   });
 
   const societyDone = fetch('/api/societies/list').then(response => response.json()).then(data => {
-    societies.value = data;
+    societies.value = data.map((society: Omit<Society, 'index'>, index: number) => {
+      return {
+        ...society,
+        index: (index + 1 < 10 ? '0' : '') + (index + 1).toString(),
+      };
+    });
   });
 
   function refresh_society_history() {
