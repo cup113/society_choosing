@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
-import { useMediaQuery } from '@vueuse/core';
+import { useMediaQuery, createReusableTemplate } from '@vueuse/core';
 
 import { useUserStore, type Batch } from '@/stores/user';
 import { useSocietyStore } from '@/stores/society';
@@ -31,6 +31,7 @@ const societyStore = useSocietyStore();
 
 const open = ref(false);
 const isDesktop = useMediaQuery('(min-width: 1024px)');
+const [UseCommandTemplate, CommandTemplate] = createReusableTemplate();
 
 const name = computed({
   get() {
@@ -53,7 +54,22 @@ const nameDisplayed = computed(() => {
 
 <template>
   <div class="flex items-center gap-2">
-    <div>{{ batch.name }}</div>
+    <UseCommandTemplate>
+      <Command v-model="name">
+        <CommandInput placeholder="搜索社团名称..."></CommandInput>
+        <CommandEmpty>没有包含该名称的社团。</CommandEmpty>
+        <CommandList>
+          <CommandGroup>
+            <CommandItem v-for="society in societyStore.societies" :key="society.id"
+              :value="society.index + ' ' + society.name" @select="open = false">
+              <Check class="mr-2 h-2 w-4" :class="{ 'opacity-0': society.name !== name }"></Check>
+              {{ society.index }} {{ society.name }}
+            </CommandItem>
+          </CommandGroup>
+        </CommandList>
+      </Command>
+    </UseCommandTemplate>
+    <div class="text-lg font-bold">{{ batch.name }}</div>
     <div v-if="isDesktop">
       <Popover v-model:open="open">
         <PopoverTrigger as-child>
@@ -63,19 +79,7 @@ const nameDisplayed = computed(() => {
           </Button>
         </PopoverTrigger>
         <PopoverContent side="top">
-          <Command v-model="name">
-            <CommandInput placeholder="搜索社团名称..."></CommandInput>
-            <CommandEmpty>没有包含该名称的社团。</CommandEmpty>
-            <CommandList>
-              <CommandGroup>
-                <CommandItem v-for="society in societyStore.societies" :key="society.id"
-                  :value="society.index + ' ' + society.name" @select="open = false">
-                  <Check class="mr-2 h-2 w-4" :class="{ 'opacity-0': society.name !== name }"></Check>
-                  {{ society.index }} {{ society.name }}
-                </CommandItem>
-              </CommandGroup>
-            </CommandList>
-          </Command>
+          <CommandTemplate></CommandTemplate>
         </PopoverContent>
       </Popover>
     </div>
@@ -88,19 +92,7 @@ const nameDisplayed = computed(() => {
           </Button>
         </DrawerTrigger>
         <DrawerContent>
-          <Command v-model="name">
-            <CommandInput placeholder="搜索社团名称..."></CommandInput>
-            <CommandEmpty>没有包含该名称的社团。</CommandEmpty>
-            <CommandList>
-              <CommandGroup>
-                <CommandItem v-for="society in societyStore.societies" :key="society.id"
-                  :value="society.index + ' ' + society.name" @select="open = false">
-                  <Check class="mr-2 h-2 w-4" :class="{ 'opacity-0': society.name !== name }"></Check>
-                  {{ society.index }} {{ society.name }}
-                </CommandItem>
-              </CommandGroup>
-            </CommandList>
-          </Command>
+          <CommandTemplate></CommandTemplate>
         </DrawerContent>
       </Drawer>
     </div>

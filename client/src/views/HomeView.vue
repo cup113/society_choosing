@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { createReusableTemplate } from '@vueuse/core';
 
 import { useUserStore } from '@/stores/user';
 import { useSocietyStore } from '@/stores/society';
@@ -9,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible'
 
 import Waiting from '@/components/Waiting.vue';
 
@@ -17,6 +19,7 @@ const password = ref('');
 const userStore = useUserStore();
 const societyStore = useSocietyStore();
 const loginLoading = ref(false);
+const [UseTemplate, LoginCard] = createReusableTemplate();
 
 function login() {
   loginLoading.value = true;
@@ -52,34 +55,47 @@ function login() {
 
 <template>
   <div class="flex flex-col gap-y-8 min-h-[70vh] justify-center items-center px-6 py-8">
-    <form @submit.prevent class="max-w-96 flex flex-col gap-8">
-      <Card class="shadow-lg border-4">
-        <CardHeader></CardHeader>
-        <CardContent class="flex flex-col gap-4">
-          <div class="flex flex-col gap-2">
-            <div class="flex items-center gap-2">
-              <Label for="username" class="text-xl w-24">用户名</Label>
-              <Input type="text" name="username" id="username" v-model="username" placeholder="Username"
-                class="bg-cream"></Input>
+    <UseTemplate>
+      <form @submit.prevent>
+        <Card>
+          <CardHeader></CardHeader>
+          <CardContent class="flex flex-col gap-4">
+            <div class="flex flex-col gap-2">
+              <div class="flex items-center gap-2">
+                <Label for="username" class="text-xl w-24">用户名</Label>
+                <Input type="text" name="username" id="username" v-model="username" placeholder="Username"
+                  class="bg-cream"></Input>
+              </div>
+              <div class="text-gray-500 text-right text-sm">9位学号，如320270501。</div>
             </div>
-            <div class="text-gray-500 text-right text-sm">9位学号，如320270501。</div>
-          </div>
-          <div class="flex flex-col gap-2">
-            <div class="flex items-center gap-2">
-              <Label for="password" class="text-xl w-24">密码</Label>
-              <Input type="password" name="password" id="password" v-model="password" placeholder="Password"
-                class="bg-cream"></Input>
+            <div class="flex flex-col gap-2">
+              <div class="flex items-center gap-2">
+                <Label for="password" class="text-xl w-24">密码</Label>
+                <Input type="password" name="password" id="password" v-model="password" placeholder="Password"
+                  class="bg-cream"></Input>
+              </div>
+              <div class="text-gray-500 text-right text-sm">密码为学号后6位@身份证后6位<br>（如有X，要大写），如270501@12345X</div>
             </div>
-            <div class="text-gray-500 text-right text-sm">密码为学号后6位@身份证后6位<br>（如有X，要大写），如270501@12345X</div>
-          </div>
-        </CardContent>
-        <CardFooter class="text-center">
-          <Button @click="login" class="login-btn mt-5 relative text-lg w-full bg-amber-500 hover:bg-amber-600">
-            登录
-          </Button>
-        </CardFooter>
-      </Card>
-    </form>
+          </CardContent>
+          <CardFooter class="text-center">
+            <Button @click="login" class="login-btn mt-5 relative text-lg w-full bg-amber-500 hover:bg-amber-600">
+              登录
+            </Button>
+          </CardFooter>
+        </Card>
+      </form>
+    </UseTemplate>
+    <div class="max-w-96 flex flex-col gap-8 shadow-lg border-4">
+      <LoginCard v-if="userStore.token.length === 0"></LoginCard>
+      <div v-else>
+        <Collapsible :default-open="false">
+          <CollapsibleTrigger class="font-bold text-center px-4 py-2">您已登录，点此展开重新登录。</CollapsibleTrigger>
+          <CollapsibleContent>
+            <LoginCard></LoginCard>
+          </CollapsibleContent>
+        </Collapsible>
+      </div>
+    </div>
     <div>
       <p v-if="societyStore.historyChoices.count === 0">还没有选课记录哦，快去选课吧！</p>
       <div v-else class="flex flex-col gap-3">
