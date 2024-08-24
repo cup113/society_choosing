@@ -16,7 +16,7 @@ const now = ref(Date.now());
 const time = computed(() => {
   return now.value - start.value;
 });
-let handle = null as number | null;
+let handle = null as ReturnType<typeof setInterval> | null;
 
 watch(computed(() => props.show), value => {
   if (value) {

@@ -75,8 +75,12 @@ def main():
     args = parser.parse_args()
 
     if args.init_database:
-        build_ts().wait()
-        init_database().wait()
+        pocket_base = run_pocket_base()
+        try:
+            build_ts().wait()
+            init_database().wait()
+        finally:
+            pocket_base.terminate()
     else:
         pocket_base, express_server = run_express_server(
             "production" if args.production else "development"
