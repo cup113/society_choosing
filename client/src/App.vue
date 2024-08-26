@@ -9,8 +9,12 @@ import {
 } from '@/components/ui/navigation-menu';
 
 import { useUserStore } from './stores/user';
+import { useSocietyStore } from './stores/society';
+import { useNow } from '@vueuse/core';
 
 const userStore = useUserStore();
+const societyStore = useSocietyStore();
+
 const name = computed(() => userStore.userInformation.name);
 const role = computed(() => userStore.userInformation.role);
 const loginNavText = computed(() => name.value ? `账号 (${name.value})` : '登录')
@@ -19,27 +23,73 @@ function clear_local_storage_cache() {
   localStorage.clear();
   location.reload();
 }
+
+const now = useNow({
+  interval: 50,
+});
+
+const closed = computed(() => societyStore.timeStatus?.open === false);
+
+const estimated = computed(() => societyStore.timeStatus?.open === false ? new Date(societyStore.timeStatus.estimated).toLocaleString() : undefined);
+
+const eta = computed(() => {
+  if (societyStore.timeStatus?.open !== false) {
+    return 0;
+  }
+  const ms = societyStore.timeStatus.estimated.getTime() - now.value.getTime();
+  if (ms <= 0) {
+    societyStore.timeStatus = { open: true };
+  }
+  if (ms < 1000) {
+    return `${ms}毫秒`
+  }
+  if (ms < 10000) {
+    return `${(ms / 1000).toFixed(1)}秒`
+  }
+  if (ms < 60000) {
+    return `${(ms / 1000).toFixed(0)}秒`
+  }
+  let sec = Math.floor(ms / 1000);
+  let min = Math.floor(sec / 60);
+  let hour = Math.floor(min / 60);
+  sec = sec % 60;
+  min = min % 60;
+  if (ms < 60000 * 60) {
+    return `${min}分钟 ${sec}秒`
+  }
+  return `${hour}小时 ${min}分钟 ${sec}秒`
+})
 </script>
 
 <template>
   <div class="flex flex-col min-h-screen gap-4">
+    <p v-if="closed" class="text-center p-2 bg-amber-300">
+      <span class="font-bold text-red-800 text-2xl">选课时间还未到。<u>{{ eta }}</u> 后到达开始时间 {{ estimated }}（本地电脑时间），到时间后<u>无需</u>刷新页面。您可以先在浏览器上进行选择，开始后即可提交。</span>
+    </p>
     <header class="flex flex-col md:flex-row gap-2 justify-between items-center bg-amber-700 text-amber-700 pl-2">
       <h1 class="border text-2xl border-gray-300 rounded-md bg-white font-bold px-4 py-2">华二宝山选课系统</h1>
       <NavigationMenu>
         <NavigationMenuList class="flex-wrap py-4 gap-2 md:gap-0 text-white">
-          <NavigationMenuItem class="py-1 px-3 min-w-20 text-center md:border-l-2 border-white border-dashed bg-amber-600 rounded-md md:bg-transparent md:rounded-none">
+          <NavigationMenuItem
+            class="py-1 px-3 min-w-20 text-center md:border-l-2 border-white border-dashed bg-amber-600 rounded-md md:bg-transparent md:rounded-none">
             <RouterLink to="/">{{ loginNavText }}</RouterLink>
           </NavigationMenuItem>
-          <NavigationMenuItem class="py-1 px-3 min-w-20 text-center md:border-l-2 border-white border-dashed bg-amber-600 rounded-md md:bg-transparent md:rounded-none" v-if="role === 'student'">
+          <NavigationMenuItem
+            class="py-1 px-3 min-w-20 text-center md:border-l-2 border-white border-dashed bg-amber-600 rounded-md md:bg-transparent md:rounded-none"
+            v-if="role === 'student'">
             <RouterLink to="/choose" class="font-bold">选课</RouterLink>
           </NavigationMenuItem>
-          <NavigationMenuItem class="py-1 px-3 min-w-20 text-center md:border-l-2 border-white border-dashed bg-amber-600 rounded-md md:bg-transparent md:rounded-none" v-if="role === 'teacher'">
+          <NavigationMenuItem
+            class="py-1 px-3 min-w-20 text-center md:border-l-2 border-white border-dashed bg-amber-600 rounded-md md:bg-transparent md:rounded-none"
+            v-if="role === 'teacher'">
             <RouterLink to="/export">导出数据</RouterLink>
           </NavigationMenuItem>
-          <NavigationMenuItem class="py-1 px-3 min-w-20 text-center md:border-l-2 border-white border-dashed bg-amber-600 rounded-md md:bg-transparent md:rounded-none">
+          <NavigationMenuItem
+            class="py-1 px-3 min-w-20 text-center md:border-l-2 border-white border-dashed bg-amber-600 rounded-md md:bg-transparent md:rounded-none">
             <RouterLink to="/about">关于此网站</RouterLink>
           </NavigationMenuItem>
-          <NavigationMenuItem class="py-1 px-3 min-w-20 text-center md:border-l-2 border-white border-dashed bg-amber-600 rounded-md md:bg-transparent md:rounded-none">
+          <NavigationMenuItem
+            class="py-1 px-3 min-w-20 text-center md:border-l-2 border-white border-dashed bg-amber-600 rounded-md md:bg-transparent md:rounded-none">
             <button @click="clear_local_storage_cache">清除缓存</button>
           </NavigationMenuItem>
         </NavigationMenuList>

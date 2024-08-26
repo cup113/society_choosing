@@ -1,28 +1,17 @@
-import express from 'express';
-import get_pb from '../src/database.mjs';
-import logger from '../src/logger.mjs';
-import { auth } from '../src/authorization.mjs';
-const router = express.Router();
+import RequestHandler from "../services/request-handler.mjs";
 
-router.get('/', async function (req, res) {
-  logger.info(`Received history request from ${req.ip}`);
-  const pb = get_pb();
-  const authResult = await auth(req, pb);
-  if (!authResult.success) {
-    logger.error(`Unauthorized to get history: ${authResult.error}`);
-    res.status(authResult.code).json({ error: authResult.error });
-    return;
+class HistoryRouter extends RequestHandler {
+  static method = RequestHandler.GET;
+  static path = "/";
+
+  public async handle_core(): Promise<object | undefined> {
+    await this.authorize();
+    const items = (await this.check_response(this.databaseService.list_choices())).choices;
+    return {
+      totalItems: items.length,
+      items,
+    };
+  }
 }
 
-  try {
-    const result = await pb.collection('choosing_24B').getList(1, 5, {
-      sort: '-created'
-    });
-    res.json(result);
-  } catch (err) {
-    logger.error(`Unauthorized to get history: ${err}`);
-    res.status(401).json({ error: err });
-  }
-});
-
-export default router;
+export default RequestHandler.inject(HistoryRouter);

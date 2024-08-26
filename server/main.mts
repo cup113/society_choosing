@@ -1,5 +1,5 @@
 import ViteExpress from "vite-express";
-import logger from "./src/logger.mjs";
+import logger from "./services/logger.mjs";
 import app from "./app.mjs";
 
 const isProduction = process.env["NODE_ENV"]?.startsWith("production") ? true : false;

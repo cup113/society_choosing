@@ -1,4 +1,4 @@
-export const startTime = new Date('2024-09-02T00:00:00.000+08:00'); // TODO change it
+export const startTime = new Date('2024-08-26T21:08:00.000+08:00'); // TODO change it
 
 export function get_time_status() {
     const now = new Date();

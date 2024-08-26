@@ -14,6 +14,8 @@ import exportRouter from './routes/export.mjs';
 
 var app = express();
 
+logger.token('ip', (req) => req.headers['x-forwarded-for']?.toString() ?? req.socket.remoteAddress ?? '-');
+logger.format('dev', ':method :url :status :response-time ms - :ip - :res[content-length]')
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(express.json());

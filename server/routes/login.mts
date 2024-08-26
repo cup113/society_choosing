@@ -1,31 +1,27 @@
-import express from 'express';
-import get_pb from '../src/database.mjs';
-import logger from '../src/logger.mjs';
-const router = express.Router();
+import RequestHandler from "../services/request-handler.mjs";
 
-router.post('/', async function (req, res) {
-  logger.info(`Received login request from ${req.ip}: username=${req.body.username}`)
-  const { username, password } = req.body;
+class LoginHandler extends RequestHandler {
+  static method = RequestHandler.POST;
+  static path = '/';
 
-  const pb = get_pb();
-  try {
-    const auth = await pb.collection('users').authWithPassword(username, password);
-    await pb.collection('users').authRefresh();
+  public async handle_core(): Promise<object | undefined> {
+    const { username, password } = this.req.body;
+    const authResult = await this.authorizationService.auth_with_password(username, password);
+    if (!authResult.success) {
+      throw new this.Terminate(authResult.code, authResult.error);
+    }
+    const authData = authResult.authData;
 
-    console.log(auth);
-    res.json({
-      success: true,
-      userID: auth.record.id,
-      token: auth.token,
+    return {
+      userID: authData.record.id,
+      token: authData.token,
       userInformation: {
-        name: auth.record.name,
-        role: auth.record.role,
-        username: auth.record.username,
-      }
-    });
-  } catch (error) {
-    res.status(401).send('用户名或密码错误');
+        name: authData.record.name,
+        role: authData.record.role,
+        username: authData.record.username,
+      },
+    }
   }
-});
+}
 
-export default router;
+export default RequestHandler.inject(LoginHandler);

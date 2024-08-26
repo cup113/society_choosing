@@ -1,9 +1,13 @@
-import express from 'express';
-const router = express.Router();
+import RequestHandler from "../services/request-handler.mjs";
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.redirect('/index.html');
-});
+class IndexHandler extends RequestHandler {
+  static method = RequestHandler.GET;
+  static path = '/';
 
-export default router;
+  protected async handle_core(): Promise<object | undefined> {
+    this.res.redirect('/index.html');
+    return;
+  }
+}
+
+export default RequestHandler.inject(IndexHandler);

@@ -1,15 +1,16 @@
-import express from 'express';
-import get_pb from '../src/database.mjs';
-import { get_time_status } from '../src/time.mjs';
-const router = express.Router();
+import RequestHandler from "../services/request-handler.mjs";
+import { get_time_status } from "../services/time.mjs";
 
-router.get('/list', async function (req, res, next) {
-    res.json({
-        societies: await get_pb().collection('societies').getFullList({
-            sort: '-created'
-        }),
-        timeStatus: get_time_status(),
-    });
-});
+class SocietiesRouter extends RequestHandler {
+    static method = RequestHandler.GET;
+    static path = "/list";
 
-export default router;
+    protected async handle_core(): Promise<object | undefined> {
+        return {
+            societies: (await this.check_response(this.databaseService.list_all_societies())).societies,
+            timeStatus: get_time_status(),
+        }
+    }
+}
+
+export default RequestHandler.inject(SocietiesRouter)

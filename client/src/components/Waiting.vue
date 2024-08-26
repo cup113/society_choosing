@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ref, computed, watch } from 'vue';
+import { useNow } from '@vueuse/core';
 
 import { Dialog, DialogHeader, DialogDescription, DialogTitle, DialogContent } from '@/components/ui/dialog';
 
@@ -12,23 +13,16 @@ const props = defineProps<{
 }>();
 
 const start = ref(Date.now());
-const now = ref(Date.now());
-const time = computed(() => {
-  return now.value - start.value;
+const now = useNow({
+  interval: 30,
 });
-let handle = null as ReturnType<typeof setInterval> | null;
+const time = computed(() => {
+  return now.value.getTime() - start.value;
+});
 
 watch(computed(() => props.show), value => {
   if (value) {
     start.value = Date.now();
-    now.value = start.value;
-    handle = setInterval(() => {
-      now.value = Date.now();
-    }, 50);
-  } else {
-    if (handle) {
-      clearInterval(handle);
-    }
   }
 }, { immediate: true });
 

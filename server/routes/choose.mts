@@ -1,38 +1,31 @@
-import express from 'express';
-import get_pb from '../src/database.mjs';
-import { auth } from '../src/authorization.mjs';
-import logger from '../src/logger.mjs';
-const router = express.Router();
+import RequestHandler from "../services/request-handler.mjs";
+import { get_time_status } from "../services/time.mjs";
 
-router.post('/', async function (req, res) {
-  logger.info(`Received choose request from ${req.ip}: ${JSON.stringify(req.body)}`);
+class ChooseRouter extends RequestHandler {
+  static method = RequestHandler.POST;
+  static path = "/";
 
-  const { first_choice, second_choice, third_choice } = req.body;
-  const pb = get_pb();
-  const authResult = await auth(req, pb);
-  if (!authResult.success) {
-    logger.error(`Unauthorized to choose societies: ${authResult.error}`);
-    res.status(401).json({ error: authResult.error });
-    return;
+  public async handle_core(): Promise<object | undefined> {
+    const timeStatus = get_time_status();
+    if (!timeStatus.open) {
+      this.res.status(403).send("Time is not open for choosing.");
+    }
+    const authData = await this.authorize();
+    const { first_choice, second_choice, third_choice } = this.req.body;
+    const userID = authData.record.id;
+    const data = {
+      userID,
+      ip: this.req.ip,
+      first_choice,
+      second_choice,
+      third_choice,
+    };
+    await this.check_response(this.databaseService.create_choosing(data));
+
+    return {
+      success: true,
+    }
   }
+}
 
-  const authData = authResult.authData;
-  const user = authData.record.id;
-
-  const data = {
-    user,
-    ip: req.ip,
-    first_choice,
-    second_choice,
-    third_choice,
-  };
-  try {
-    await pb.collection('choosing_24B').create(data);
-    res.json({ success: true });
-  } catch (err) {
-    logger.error(`Unauthorized to choose societies: ${err}`);
-    res.status(401).json({ error: err });
-  }
-});
-
-export default router;
+export default RequestHandler.inject(ChooseRouter);
