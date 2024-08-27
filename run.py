@@ -23,7 +23,7 @@ def general_popen(
 
 
 def init_database():
-    return general_popen("node", ROOT / "server/dist/script/database_init.mjs")
+    return general_popen("node", ROOT / "server/dist/server/script/database_init.mjs")
 
 
 def build_ts():
@@ -39,6 +39,18 @@ def build_client():
 
 
 def run_pocket_base():
+    pnpx = which("pnpx")
+    assert pnpx is not None, "PNPX not found"
+    all_wait(
+        general_popen(
+            pnpx,
+            "pocketbase-typegen",
+            "--db",
+            ROOT / "pb_data" / "data.db",
+            "--out",
+            ROOT / "types" / "pocketbase-types.d.ts",
+        )
+    )
     return general_popen(ROOT / "pocketbase.exe", "serve")
 
 
@@ -54,11 +66,13 @@ def run_express_server(node_env: str = "development"):
     if node_env == "production":
         build_client().wait()
     build_ts().wait()
-    sleep(1) # To make sure pocket base is ready to serve
+    sleep(1)  # To make sure pocket base is ready to serve
     return (
         pocket_base,
         general_popen(
-            "node", ROOT / "server" / "dist" / "main.mjs", env_add={"NODE_ENV": node_env}
+            "node",
+            ROOT / "server" / "dist" / "server" / "main.mjs",
+            env_add={"NODE_ENV": node_env},
         ),
     )
 
@@ -67,6 +81,11 @@ def main():
     parser = ArgumentParser()
     parser.add_argument(
         "--init-database", action="store_true", help="Initialize the database"
+    )
+    parser.add_argument(
+        "--gen-type",
+        action="store_true",
+        help="Generate TypeScript types for PocketBase",
     )
     parser.add_argument(
         "--production", "--prod", action="store_true", help="Run in production mode"
@@ -81,6 +100,9 @@ def main():
             init_database().wait()
         finally:
             pocket_base.terminate()
+    elif args.gen_type:
+        pocket_base = run_pocket_base()
+        pocket_base.terminate()
     else:
         pocket_base, express_server = run_express_server(
             "production" if args.production else "development"

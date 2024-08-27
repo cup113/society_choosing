@@ -5,7 +5,7 @@ import { createReusableTemplate } from '@vueuse/core';
 import { useUserStore } from '@/stores/user';
 import { useSocietyStore } from '@/stores/society';
 import router from '@/router';
-import { json_response, custom_fetch } from '@/lib/fetch';
+import { Fetcher } from '@/lib/fetch';
 
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -14,11 +14,16 @@ import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible'
 
 import Waiting from '@/components/Waiting.vue';
+import ChoiceShow from '@/components/ChoiceShow.vue';
+
+import type { LoginResponse } from '../../../types/types.d.ts';
+import { useErrorStore } from '@/stores/error.js';
 
 const username = ref('');
 const password = ref('');
 const userStore = useUserStore();
 const societyStore = useSocietyStore();
+const errorStore = useErrorStore();
 const loginLoading = ref(false);
 const [UseTemplate, LoginCard] = createReusableTemplate();
 
@@ -28,19 +33,20 @@ function login() {
     username: username.value,
     password: password.value,
   };
-  json_response(custom_fetch({
+  new Fetcher<LoginResponse>({
     url: '/api/login',
     method: 'POST',
     data: JSON.stringify(data),
-  })).then(data => {
+  }).fetch_json().then(data => {
     userStore.userID = data.userID;
     userStore.token = data.token;
     userStore.userInformation = data.userInformation;
     societyStore.refresh_society_history();
     router.push(userStore.userInformation.role === 'student' ? '/choose' : '/export');
   }).catch(error => {
+    loginLoading.value = false;
     console.error(error);
-    alert(error.message);
+    errorStore.add_error(`登录失败，请按照输入框下的提示检查用户名和密码是否正确：${error.toString()}`);
   });
 }
 </script>
@@ -56,7 +62,7 @@ function login() {
               <div class="flex items-center gap-2">
                 <Label for="username" class="text-xl w-24">用户名</Label>
                 <Input type="text" name="username" id="username" v-model="username" placeholder="Username"
-                  class="bg-cream"></Input>
+                  class="bg-amber-100"></Input>
               </div>
               <div class="text-gray-500 font-bold text-right text-sm">9位学号，如320270501。</div>
             </div>
@@ -64,7 +70,7 @@ function login() {
               <div class="flex items-center gap-2">
                 <Label for="password" class="text-xl w-24">密码</Label>
                 <Input type="password" name="password" id="password" v-model="password" placeholder="Password"
-                  class="bg-cream"></Input>
+                  class="bg-amber-100"></Input>
               </div>
               <div class="text-gray-500 font-bold text-right text-sm">密码为学号后6位@身份证后6位<br>（如有X，要大写），如270501@12345X</div>
             </div>
@@ -77,7 +83,7 @@ function login() {
         </Card>
       </form>
     </UseTemplate>
-    <div class="max-w-96 flex flex-col gap-8 shadow-lg border-4">
+    <div class="max-w-96 flex flex-col gap-8 shadow-lg rounded-lg border-4">
       <LoginCard v-if="userStore.token.length === 0"></LoginCard>
       <div v-else>
         <Collapsible :default-open="false">
@@ -90,17 +96,22 @@ function login() {
     </div>
     <div>
       <p v-if="societyStore.historyChoices.count === 0">还没有选课记录哦，快去选课吧！</p>
-      <div v-else class="flex flex-col gap-3">
+      <div v-else class="flex flex-col gap-3 items-center">
         <div class="text-xl">选课次数：{{ societyStore.historyChoices.count }}</div>
         <ul class="flex flex-col gap-2">
           <li v-for="choice, index in societyStore.historyChoices.choices" :key="choice.id" class="flex flex-col gap-1">
-            <span>最近第 {{ index + 1 }} 次选课（{{ new Date(choice.created).toLocaleString() }}, IP {{ choice.ip ?? '未知'
-              }}）</span>
-            <span class="flex flex-col gap-1 pl-8">
-              <span>第一志愿：{{ choice.first_choice }}</span>
-              <span>第二志愿：{{ choice.second_choice }}</span>
-              <span>第三志愿：{{ choice.third_choice }}</span>
-            </span>
+            <ChoiceShow :choice="choice">
+              <template #title>
+                第 {{ societyStore.historyChoices.count - index }} 次选课
+                <span v-if="index === 0" class="text-amber-700 text-lg">（以此次为准）</span>
+              </template>
+              <template #description>
+                <div class="flex flex-col pl-8">
+                  <span>时间: {{ choice.created.toLocaleString() }}</span>
+                  <span v-if="choice.ip">请求来自 IP {{ choice.ip }}</span>
+                </div>
+              </template>
+            </ChoiceShow>
           </li>
         </ul>
       </div>

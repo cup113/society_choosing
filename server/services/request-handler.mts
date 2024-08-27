@@ -2,6 +2,7 @@ import type { Request, Response, Router } from 'express';
 import express from 'express';
 import { PocketBaseService, type DatabaseService } from './database.mjs'
 import { PocketBaseAuthorizationService, type AuthorizationService } from './authorization.mjs'
+import { CodeType, to_status } from '../../types/codes.js'
 
 import logger from './logger.mjs';
 
@@ -14,10 +15,12 @@ interface InjectableRequestHandler {
 }
 
 class Terminate {
-    public code: number;
+    public statusCode: number;
+    public code: string;
     public reason: string;
 
-    constructor(code: number, reason: string) {
+    constructor(statusCode: number, code: string, reason: string) {
+        this.statusCode = statusCode;
         this.code = code;
         this.reason = reason;
     }
@@ -55,7 +58,7 @@ export default abstract class RequestHandler {
     protected async authorize() {
         const authResult = await this.authorizationService.authorize(this.req.headers.authorization);
         if (!authResult.success) {
-            throw new Terminate(authResult.code, authResult.error);
+            throw new Terminate(to_status(authResult.code), CodeType.AuthFailed, authResult.error);
         }
         return authResult.authData;
     }
@@ -64,7 +67,7 @@ export default abstract class RequestHandler {
         try {
             return await response;
         } catch (err) {
-            throw new Terminate(500, err instanceof Error ? err.message : new String(err).valueOf());
+            throw new Terminate(500, CodeType.InternalError, err instanceof Error ? err.message : new String(err).valueOf());
         }
       }
 
@@ -78,8 +81,11 @@ export default abstract class RequestHandler {
             }
         } catch (error) {
             if (error instanceof Terminate) {
-                this.logger.info(`Request terminated ${error.code}: ${error.reason}`);
-                this.res.status(error.code).send(error.reason);
+                this.logger.info(`Request terminated ${error.statusCode}: ${error.reason}`);
+                this.res.status(error.statusCode).send({
+                    type: error.code,
+                    message: error.reason,
+                });
             } else {
                 this.logger.error(`Request failed: ${error}`);
                 this.res.sendStatus(500);

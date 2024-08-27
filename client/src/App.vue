@@ -8,12 +8,16 @@ import {
   NavigationMenuItem,
 } from '@/components/ui/navigation-menu';
 
+import { AlertDialog, AlertDialogHeader, AlertDialogTitle, AlertDialogContent, AlertDialogFooter, AlertDialogAction } from '@/components/ui/alert-dialog';
+
 import { useUserStore } from './stores/user';
 import { useSocietyStore } from './stores/society';
 import { useNow } from '@vueuse/core';
+import { useErrorStore } from './stores/error';
 
 const userStore = useUserStore();
 const societyStore = useSocietyStore();
+const errorStore = useErrorStore();
 
 const name = computed(() => userStore.userInformation.name);
 const role = computed(() => userStore.userInformation.role);
@@ -63,9 +67,6 @@ const eta = computed(() => {
 
 <template>
   <div class="flex flex-col min-h-screen gap-4">
-    <p v-if="closed" class="text-center p-2 bg-amber-300">
-      <span class="font-bold text-red-800 text-2xl">选课时间还未到。<u>{{ eta }}</u> 后到达开始时间 {{ estimated }}（本地电脑时间），到时间后<u>无需</u>刷新页面。您可以先在浏览器上进行选择，开始后即可提交。</span>
-    </p>
     <header class="flex flex-col md:flex-row gap-2 justify-between items-center bg-amber-700 text-amber-700 pl-2">
       <h1 class="border text-2xl border-gray-300 rounded-md bg-white font-bold px-4 py-2">华二宝山选课系统</h1>
       <NavigationMenu>
@@ -96,6 +97,10 @@ const eta = computed(() => {
       </NavigationMenu>
     </header>
 
+    <p v-if="closed" class="text-center p-2 bg-amber-300">
+      <span class="text-red-800 text-2xl font-semibold">选课时间还未到。<u>{{ eta }}</u> 后到达开始时间 {{ estimated }}，到时间后<u>无需</u>刷新页面。您可以<u>先在浏览器上对社团进行预览、选择</u>，开始后会自动出现“提交”按钮。</span>
+    </p>
+
     <div class="flex-grow">
       <RouterView v-slot="{ Component }">
         <Transition name="fade" mode="out-in">
@@ -103,6 +108,20 @@ const eta = computed(() => {
         </Transition>
       </RouterView>
     </div>
+
+    <AlertDialog class="bg-red-200" :open="errorStore.errorWindowOpen">
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>错误</AlertDialogTitle>
+        </AlertDialogHeader>
+        <div v-for="message in errorStore.errorMessages" class="text-red-800">
+          <div>{{ message }}</div>
+        </div>
+        <AlertDialogFooter>
+          <AlertDialogAction @click="errorStore.clear_error()">确认并关闭</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
 
     <footer class="p-4 text-center">
       <img src="/img/logo.png" width="323" class="inline-block">

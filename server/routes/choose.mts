@@ -1,5 +1,6 @@
 import RequestHandler from "../services/request-handler.mjs";
 import { get_time_status } from "../services/time.mjs";
+import type { CreateChoosingData } from '../../types/types.d.ts';
 
 class ChooseRouter extends RequestHandler {
   static method = RequestHandler.POST;
@@ -11,10 +12,10 @@ class ChooseRouter extends RequestHandler {
       this.res.status(403).send("Time is not open for choosing.");
     }
     const authData = await this.authorize();
-    const { first_choice, second_choice, third_choice } = this.req.body;
-    const userID = authData.record.id;
+    const { first_choice, second_choice, third_choice } = this.req.body as CreateChoosingData;
+    const user = authData.record.id;
     const data = {
-      userID,
+      user,
       ip: this.req.ip,
       first_choice,
       second_choice,

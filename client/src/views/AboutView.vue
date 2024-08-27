@@ -10,10 +10,10 @@ function go_home() {
 <template>
   <div class="flex flex-col gap-y-4 max-w-72 sm:max-w-96 mx-auto my-4 p-4 rounded-2xl bg-amber-100">
     <h1 class="text-2xl font-bold">贡献者 / Contributors</h1>
-    <ul>
-      <li>前后端程序开发: 2604 李牧</li>
-      <li>UI 设计 / 绘画: 2604 罗睿淇</li>
-      <li>需求沟通: 金典（老师）、王玉璇（老师）</li>
+    <ul class="text-lg">
+      <li>前后端程序开发: <b>2604 李牧</b></li>
+      <li>UI 设计 / 绘画: <b>2604 罗睿淇</b></li>
+      <li>需求沟通: <b>金典</b>（老师）、<b>王玉璇</b>（老师）</li>
     </ul>
     <h1 class="text-2xl font-bold">服务 / Services</h1>
     <ul>

@@ -41,9 +41,6 @@ importers:
       morgan:
         specifier: ~1.9.1
         version: 1.9.1
-      pocketbase:
-        specifier: ~0.21.3
-        version: 0.21.3
       priority-queue-typed:
         specifier: ^1.52.1
         version: 1.52.1
@@ -719,9 +716,6 @@ packages:
 
   picocolors@1.0.1:
     resolution: {integrity: sha512-anP1Z8qwhkbmu7MFP5iTt+wQKXgwzf7zTyGlcdzabySa9vd0Xt392U0rVmz9poOaBj0uHJKyyo9/upk0HrEQew==}
-
-  pocketbase@0.21.3:
-    resolution: {integrity: sha512-bsQRZ1mj4dhPJ4P5iSrDqWQtBX2NtuBkf6IOZwTv27zZOw6zrISgo963i5JD/99qKKD5aMSMDPGk1BE9ZyI7Cg==}
 
   postcss@8.4.39:
     resolution: {integrity: sha512-0vzE+lAiG7hZl1/9I8yzKLx3aR9Xbof3fBHKunvMfOCYAtMhrsnccJY2iTURb9EZd5+pLuiNV9/c/GZJOHsgIw==}
@@ -1513,8 +1507,6 @@ snapshots:
   path-to-regexp@0.1.7: {}
 
   picocolors@1.0.1: {}
-
-  pocketbase@0.21.3: {}
 
   postcss@8.4.39:
     dependencies:

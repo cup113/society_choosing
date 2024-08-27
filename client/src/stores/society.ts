@@ -1,14 +1,11 @@
 import { defineStore } from "pinia";
 import { ref, reactive } from "vue";
 import { useUserStore } from "./user";
-import { custom_fetch, json_response } from "@/lib/fetch";
+import { useErrorStore } from "./error";
+import { Fetcher } from "@/lib/fetch";
+import type { ListHistoryResponse, ListSocietyResponse, Society as _Society } from "../../../types/types.d.ts";
 
-export interface Society {
-  id: string;
-  index: string;
-  name: string;
-  cap: number;
-}
+export type Society = _Society & { index: string };
 
 export const useSocietyStore = defineStore('society', () => {
   const societies = ref(new Array<Society>());
@@ -18,7 +15,7 @@ export const useSocietyStore = defineStore('society', () => {
     choices: new Array<{
       id: string;
       ip?: string;
-      created: string;
+      created: Date;
       first_choice?: string;
       second_choice?: string;
       third_choice?: string;
@@ -27,10 +24,10 @@ export const useSocietyStore = defineStore('society', () => {
 
   const timeStatus = ref<{ open: true } | { open: false, estimated: Date } | null>(null);
 
-  const societyDone = json_response(custom_fetch({
+  const societyDone = new Fetcher<ListSocietyResponse>({
     url: '/api/societies/list',
     method: 'GET',
-  })).then(data => {
+  }).fetch_json().then(data => {
     societies.value = data.societies.map((society: Omit<Society, 'index'>, index: number) => {
       return {
         ...society,
@@ -42,33 +39,33 @@ export const useSocietyStore = defineStore('society', () => {
     } else {
       timeStatus.value = { open: false, estimated: new Date(Date.now() + data.timeStatus.eta) };
     }
+  }).catch(error => {
+    const errorStore = useErrorStore();
+    console.error(error);
+    errorStore.add_error(`获取社团失败，请稍后再试或联系管理员: ${error.toString()}`);
   });
 
   function refresh_society_history() {
-    json_response(custom_fetch({
+    new Fetcher<ListHistoryResponse>({
       'url': '/api/history',
       'method': 'GET',
-    })).then((data: {
-      totalItems: number, items: {
-        first_choice: string;
-        second_choice: string;
-        third_choice: string;
-        created: string;
-        id: string;
-        ip: string;
-      }[]
-    }) => {
+    }).fetch_json().then((data) => {
       historyChoices.count = data.totalItems;
       historyChoices.choices = data.items.map(item => {
+        const ip = item.ip ? (item.ip.length > 0 ? item.ip : undefined) : undefined;
         return {
           first_choice: get_society(item.first_choice)?.name,
           second_choice: get_society(item.second_choice)?.name,
           third_choice: get_society(item.third_choice)?.name,
-          created: item.created,
+          created: new Date(item.created),
           id: item.id,
-          ip: item.ip.length > 0 ? item.ip : undefined,
+          ip,
         }
       });
+    }).catch(error => {
+      const errorStore = useErrorStore();
+      console.error(error);
+      errorStore.add_error(`获取历史记录失败，请稍后再试或联系管理员: ${error.toString()}`);
     });
   }
 

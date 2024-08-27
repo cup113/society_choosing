@@ -1,8 +1,9 @@
 import type PocketBase from "pocketbase";
 import type { RecordAuthResponse, RecordModel } from "pocketbase";
 import { PocketBaseService, type DatabaseService } from './database.mjs';
+import { CodeType } from "../../types/codes.js";
 
-type AuthorizationResult = { success: true, authData: RecordAuthResponse<RecordModel> } | { success: false, code: number, error: string };
+type AuthorizationResult = { success: true, authData: RecordAuthResponse<RecordModel> } | { success: false, code: CodeType, error: string };
 
 export abstract class AuthorizationService {
   public databaseService: DatabaseService;
@@ -28,11 +29,11 @@ export class PocketBaseAuthorizationService extends AuthorizationService {
 
   public async authorize(authorization: string): Promise<AuthorizationResult> {
     if (!authorization) {
-      return { success: false, code: 401, error: 'Unauthorized' };
+      return { success: false, code: CodeType.Unauthorized, error: 'Unauthorized' };
     }
     const authorization_split = authorization.split(' ');
     if (authorization_split[0] !== 'Bearer' || authorization_split.length !== 2) {
-      return { success: false, code: 401, error: 'Invalid authorization header' };
+      return { success: false, code: CodeType.Unauthorized, error: 'Invalid authorization header' };
     }
     const token = authorization_split[1];
     this.pb.authStore.save(token);
@@ -40,10 +41,10 @@ export class PocketBaseAuthorizationService extends AuthorizationService {
     try {
       authData = await this.pb.collection('users').authRefresh();
     } catch (error) {
-      return { success: false, code: 401, error: 'Invalid token' };
+      return { success: false, code: CodeType.AuthFailed, error: 'Invalid token' };
     }
     if (!this.pb.authStore.isValid) {
-      return { success: false, code: 401, error: 'Invalid token' };
+      return { success: false, code: CodeType.AuthFailed, error: 'Invalid token' };
     }
     return { success: true, authData };
   }
@@ -57,11 +58,11 @@ export class PocketBaseAuthorizationService extends AuthorizationService {
       }
       return { success: true, authData };
     } catch (error) {
-      return { success: false, code: 401, error: 'Invalid username or password' };
+      return { success: false, code: CodeType.AuthFailed, error: 'Invalid username or password' };
     }
   }
 
   public async auth_admin(email: string, password: string): Promise<void> {
-    const authResult = await this.pb.admins.authWithPassword(email, password);
+    await this.pb.admins.authWithPassword(email, password);
   }
 }

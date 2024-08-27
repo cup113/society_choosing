@@ -4,6 +4,7 @@ import { execSync } from 'child_process';
 import { PriorityQueue } from 'priority-queue-typed';
 import { join } from 'node:path';
 import { mkdirSync } from 'node:fs';
+import type { User as RawUser, Choice } from '../../types/types.d.ts';
 
 import RequestHandler from '../services/request-handler.mjs';
 
@@ -29,7 +30,7 @@ class ExportHandler extends RequestHandler {
   static path = "/choosing";
 
   private async get_society_map(): Promise<Map<string, Society>> {
-    const societies = (await this.check_response(this.databaseService.list_all_societies())).societies
+    const societies = await this.check_response(this.databaseService.list_all_societies());
     return new Map(societies.map(s => [s.id, {
       name: s.name,
       cap: s.cap,
@@ -37,23 +38,9 @@ class ExportHandler extends RequestHandler {
     }]));
   }
 
-  private get_sorted_users(usersRaw: {
-    id: string;
-    name: string;
-    number: string;
-    role: "student" | "teacher";
-    class: string;
-    created: Date;
-  }[], choosingRaw: {
-    id: string;
-    userID: string;
-    first_choice: string;
-    second_choice: string;
-    third_choice: string;
-    created: string;
-  }[], societiesMap: Map<string, Society>): User[] {
+  private get_sorted_users(usersRaw: RawUser[], choosingRaw: Choice[], societiesMap: Map<string, Society>): User[] {
     return usersRaw.filter(user => user.role === "student").map(user => {
-      const choosingData = choosingRaw.findLast(data => data.userID === user.id);
+      const choosingData = choosingRaw.findLast(data => data.user === user.id);
       const chosen = choosingData !== undefined;
 
       let first_choice = null as Society | null;
@@ -68,7 +55,7 @@ class ExportHandler extends RequestHandler {
       return {
         waiting: true,
         name: user.name,
-        number: user.number.slice(3),
+        number: user.username.slice(3),
         class: user.class,
         society: null,
         first_choice,
@@ -114,8 +101,8 @@ class ExportHandler extends RequestHandler {
 
   public async handle_core(): Promise<object | undefined> {
     await this.authorize();
-    const choosingRaw = (await this.check_response(this.databaseService.list_choices())).choices;
-    const usersRaw = (await this.check_response(this.databaseService.list_users())).users;
+    const choosingRaw = await this.check_response(this.databaseService.list_choices());
+    const usersRaw = await this.check_response(this.databaseService.list_users());
     const societiesMap = await this.get_society_map();
     let users: User[] = this.get_sorted_users(usersRaw, choosingRaw, societiesMap);
 

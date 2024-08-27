@@ -19,6 +19,9 @@ const now = useNow({
 const time = computed(() => {
   return now.value.getTime() - start.value;
 });
+const opacity = computed(() => {
+  return (0.6 + 0.4 * Math.sin(time.value / 200)).toString();
+})
 
 watch(computed(() => props.show), value => {
   if (value) {
@@ -36,7 +39,7 @@ watch(computed(() => props.show), value => {
           <DialogTitle>正在加载中...</DialogTitle>
           <DialogDescription><slot name="default"></slot></DialogDescription>
         </DialogHeader>
-        <p>已等待: {{ time }}ms</p>
+        <p class="text-center text-xl" :style="{ opacity }">已等待: {{ time }}ms</p>
       </DialogContent>
     </Dialog>
   </div>

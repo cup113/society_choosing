@@ -1,17 +1,23 @@
 <script lang="ts" setup>
 import Button from '@/components/ui/button/Button.vue';
-import { custom_fetch, blob_response } from '@/lib/fetch';
+import { Fetcher } from '@/lib/fetch';
+import { useErrorStore } from '@/stores/error';
+
+const errorStore = useErrorStore();
 
 function export_data() {
-  blob_response(custom_fetch({
+  new Fetcher({
     url: "/api/export/choosing",
     method: "POST",
-  })).then(blob => {
+  }).fetch_blob().then(blob => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download = "社团选课数据导出.zip";
     a.click();
+  }).catch(error => {
+    console.log(error);
+    errorStore.add_error(`导出数据失败: ${error.toString()}`)
   });
 }
 </script>

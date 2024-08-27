@@ -11,6 +11,7 @@
 		"start": "vite build client && SET NODE_ENV=production && start pnpm run serve-pocket && start pnpm run serve-express"
 	},
 	"dependencies": {
+		"pocketbase": "^0.21.4",
 		"tailwindcss": "^3.4.4",
 		"tailwindcss-animate": "^1.0.7"
 	}
