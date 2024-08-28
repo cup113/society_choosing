@@ -99,6 +99,92 @@ class ExportHandler extends RequestHandler {
     XLSX.writeFile(workbook, `${folder}/按班级分.xlsx`);
   }
 
+  private export_summary(societiesMap: Map<string, Society>, mapSocieties: Map<string, User[]>, folder: string) {
+    const workbook = XLSX.utils.book_new();
+    const usersData = new Array<{
+      "班级": string;
+      "姓名": string;
+      "学号": string;
+      "第一志愿": string;
+      "第二志愿": string;
+      "第三志愿": string;
+      "录取批次": "第一志愿" | "第二志愿" | "第三志愿" | "调剂" | "未录取",
+      "录取社团": string,
+      "提交时间": Date,
+    }>();
+    const societyHeatMap = new Map<string, {
+      "社团名称": string;
+      "限额": number;
+      "录取人数": number;
+      "总报名人数": number;
+      "第一志愿报名人数": number;
+      "第二志愿报名人数": number;
+      "第三志愿报名人数": number;
+      "第一志愿录取人数": number;
+      "第二志愿录取人数": number;
+      "第三志愿录取人数": number;
+      "调剂人数": number;
+    }>();
+    societiesMap.forEach((society) => {
+      societyHeatMap.set(society.name, {
+        "社团名称": society.name,
+        "限额": society.cap,
+        "录取人数": society.countMembers,
+        "总报名人数": 0,
+        "第一志愿报名人数": 0,
+        "第二志愿报名人数": 0,
+        "第三志愿报名人数": 0,
+        "第一志愿录取人数": 0,
+        "第二志愿录取人数": 0,
+        "第三志愿录取人数": 0,
+        "调剂人数": 0,
+      })
+    });
+
+    [...mapSocieties.values()].flat().forEach(user => {
+      const society = user.society;
+      const batch = society === null ? "未录取" : (society === user.first_choice ? "第一志愿" : (society === user.second_choice ? "第二志愿" : (society === user.third_choice ? "第三志愿" : "调剂")));
+      const first_choice = user.first_choice?.name ?? "未选择";
+      const second_choice = user.second_choice?.name ?? "未选择";
+      const third_choice = user.third_choice?.name ?? "未选择";
+
+      usersData.push({
+        "班级": user.class,
+        "姓名": user.name,
+        "学号": user.number,
+        "第一志愿": first_choice,
+        "第二志愿": second_choice,
+        "第三志愿": third_choice,
+        "录取批次": batch,
+        "录取社团": society?.name ?? "未录取",
+        "提交时间": user.submit,
+      });
+
+      if (society?.name) {
+        const finalSociety = societyHeatMap.get(society.name);
+        if (!finalSociety) {
+          return;
+        }
+        finalSociety["总报名人数"]++;
+        finalSociety[batch === "第一志愿" ? "第一志愿录取人数" : (batch === "第二志愿" ? "第二志愿录取人数" : (batch === "第三志愿" ? "第三志愿录取人数" : "调剂人数"))]++;
+
+        ([["第一志愿报名人数", first_choice], ["第二志愿报名人数", second_choice], ["第三志愿报名人数", third_choice]] as const).forEach(([batchKey, society]) => {
+          if (society === "未选择") {
+            return;
+          }
+
+          const finalSociety = societyHeatMap.get(society)!;
+          finalSociety[batchKey]++;
+          finalSociety["总报名人数"]++;
+        });
+      }
+    });
+
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(usersData), "学生原始数据");
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(Array.from(societyHeatMap.values())), "社团热度数据");
+    XLSX.writeFile(workbook, `${folder}/导出汇总.xlsx`);
+  }
+
   public async handle_core(): Promise<object | undefined> {
     await this.authorize();
     const choosingRaw = await this.check_response(this.databaseService.list_choices());
@@ -166,8 +252,9 @@ class ExportHandler extends RequestHandler {
 
     this.export_xlsx_societies(mapSocieties, folder);
     this.export_xlsx_classes(mapClasses, folder);
+    this.export_summary(societiesMap, mapSocieties, folder);
 
-    execSync(`7z a ${folder}/导出数据.zip ${folder}/按社团分.xlsx ${folder}/按班级分.xlsx`);
+    execSync(`7z a ${folder}/导出数据.zip ${folder}/按社团分.xlsx ${folder}/按班级分.xlsx ${folder}/导出汇总.xlsx`);
 
     this.res.sendFile(join(process.cwd(), `${folder}/导出数据.zip`));
     return;
