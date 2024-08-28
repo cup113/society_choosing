@@ -1,4 +1,3 @@
-import express from 'express';
 import XLSX from 'xlsx';
 import { execSync } from 'child_process';
 import { PriorityQueue } from 'priority-queue-typed';
@@ -22,6 +21,7 @@ interface User {
   first_choice: Society | null;
   second_choice: Society | null;
   third_choice: Society | null;
+  answer?: string;
   submit: Date;
 }
 
@@ -46,10 +46,12 @@ class ExportHandler extends RequestHandler {
       let first_choice = null as Society | null;
       let second_choice = null as Society | null;
       let third_choice = null as Society | null;
+      let answer: string | undefined = undefined;
       if (chosen) {
         first_choice = societiesMap.get(choosingData.first_choice)!;
         second_choice = societiesMap.get(choosingData.second_choice)!;
         third_choice = societiesMap.get(choosingData.third_choice)!;
+        answer = choosingData.answer;
       }
 
       return {
@@ -61,6 +63,7 @@ class ExportHandler extends RequestHandler {
         first_choice,
         second_choice,
         third_choice,
+        answer,
         // if not chosen, let the submit time be the latest.
         submit: new Date(choosingData?.created ?? Date.now()),
       };
@@ -110,23 +113,12 @@ class ExportHandler extends RequestHandler {
       "第三志愿": string;
       "录取批次": "第一志愿" | "第二志愿" | "第三志愿" | "调剂" | "未录取",
       "录取社团": string,
+      "附加问题答案": string,
       "提交时间": Date,
     }>();
-    const societyHeatMap = new Map<string, {
-      "社团名称": string;
-      "限额": number;
-      "录取人数": number;
-      "总报名人数": number;
-      "第一志愿报名人数": number;
-      "第二志愿报名人数": number;
-      "第三志愿报名人数": number;
-      "第一志愿录取人数": number;
-      "第二志愿录取人数": number;
-      "第三志愿录取人数": number;
-      "调剂人数": number;
-    }>();
-    societiesMap.forEach((society) => {
-      societyHeatMap.set(society.name, {
+    const societyHeatMap = new Map(
+    [...societiesMap.entries()].map(([_, society]) => {
+      return [society.name, {
         "社团名称": society.name,
         "限额": society.cap,
         "录取人数": society.countMembers,
@@ -138,8 +130,8 @@ class ExportHandler extends RequestHandler {
         "第二志愿录取人数": 0,
         "第三志愿录取人数": 0,
         "调剂人数": 0,
-      })
-    });
+      }];
+    }));
 
     [...mapSocieties.values()].flat().forEach(user => {
       const society = user.society;
@@ -157,6 +149,7 @@ class ExportHandler extends RequestHandler {
         "第三志愿": third_choice,
         "录取批次": batch,
         "录取社团": society?.name ?? "未录取",
+        "附加问题答案": user.answer ?? "/",
         "提交时间": user.submit,
       });
 
