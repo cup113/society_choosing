@@ -36,6 +36,7 @@ export type AuthSystemFields<T = never> = {
 // Record types for each collection
 
 export type Choosing24bRecord = {
+	answer?: string
 	first_choice: RecordIdString
 	ip?: string
 	second_choice: RecordIdString
@@ -49,6 +50,7 @@ export type SocietiesRecord = {
 	description: string
 	limit?: string
 	name: string
+	question?: string
 	teacher: string
 }
 

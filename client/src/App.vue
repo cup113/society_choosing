@@ -68,7 +68,7 @@ const eta = computed(() => {
 <template>
   <div class="flex flex-col min-h-screen gap-4">
     <header class="flex flex-col md:flex-row gap-2 justify-between items-center bg-amber-700 text-amber-700 pl-2">
-      <h1 class="border text-2xl border-gray-300 rounded-md bg-white font-bold px-4 py-2">华二宝山选课系统</h1>
+      <h1 class="border text-2xl border-gray-300 rounded-md bg-white font-bold px-4 py-2">华二宝山社团选课系统</h1>
       <NavigationMenu>
         <NavigationMenuList class="flex-wrap py-4 gap-2 md:gap-0 text-white">
           <NavigationMenuItem
@@ -97,8 +97,15 @@ const eta = computed(() => {
       </NavigationMenu>
     </header>
 
+    <p class="bg-amber-300 p-2 text-center">
+      <span class="text-red-800 md:text-lg">当前为公测阶段，所选择的社团<b>不计入</b>最终选课结果。最终选课时间预计在9月进行，届时参与测试的同学还需重新提交。<br><b>报告问题或
+          bug</b>，或是想要为自己的社团<b>撰写简介</b>，请通过邮件联系 <a href="mailto:cup11jason@qq.com"
+          class="text-blue-600 hover:text-blue-800 underline">cup11jason@qq.com</a>，或直接在群内发言。</span>
+    </p>
+
     <p v-if="closed" class="text-center p-2 bg-amber-300">
-      <span class="text-red-800 text-2xl font-semibold">选课时间还未到。<u>{{ eta }}</u> 后到达开始时间 {{ estimated }}，到时间后<u>无需</u>刷新页面。您可以<u>先在浏览器上对社团进行预览、选择</u>，开始后会自动出现“提交”按钮。</span>
+      <span class="text-red-800 text-lg md:text-2xl font-semibold">选课时间还未到。<b>{{ eta }}</b> 后到达开始时间 {{ estimated
+        }}，到时间后<b>无需</b>刷新页面。您可以<b>先在浏览器上对社团进行预览、选择</b>，开始后会自动出现“提交”按钮。</span>
     </p>
 
     <div class="flex-grow">

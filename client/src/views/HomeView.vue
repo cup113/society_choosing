@@ -28,6 +28,10 @@ const loginLoading = ref(false);
 const [UseTemplate, LoginCard] = createReusableTemplate();
 
 function login() {
+  if (!username.value || !password.value) {
+    errorStore.add_error('请填写用户名、密码');
+    return;
+  }
   loginLoading.value = true;
   const data = {
     username: username.value,

@@ -12,7 +12,7 @@ class ChooseRouter extends RequestHandler {
       this.res.status(403).send("Time is not open for choosing.");
     }
     const authData = await this.authorize();
-    const { first_choice, second_choice, third_choice } = this.req.body as CreateChoosingData;
+    const { first_choice, second_choice, third_choice, answer } = this.req.body as CreateChoosingData;
     const user = authData.record.id;
     const data = {
       user,
@@ -20,6 +20,7 @@ class ChooseRouter extends RequestHandler {
       first_choice,
       second_choice,
       third_choice,
+      answer,
     };
     await this.check_response(this.databaseService.create_choosing(data));
 

@@ -17,6 +17,7 @@ class Society:
     cap: int
     limit: str
     teacher: str
+    question: str
 
 
 def students_txt_to_json():
@@ -50,8 +51,8 @@ def society_txt_to_json():
         for line in f:
             if line.strip() == "":
                 continue
-            name, description, cap, limit, teacher = line.strip().split("\t")
-            societies.append(Society(name, description, int(cap), limit, teacher))
+            name, description, cap, limit, teacher, question = line.strip().split("\t")
+            societies.append(Society(name, description, int(cap), limit, teacher, question))
 
     # write json
 

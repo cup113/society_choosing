@@ -13,6 +13,8 @@
       #initial-loading {
         width: calc(100vw - 16px);
         height: calc(100vh - 16px);
+        padding: 16px;
+        box-sizing: border-box;
         background-color: #fde1ba;
         display: flex;
         flex-direction: column;
@@ -26,6 +28,7 @@
     <div id="app">
       <div id="initial-loading">
         <span>Loading...</span>
+        <span style="display: none;">请耐心等待。若此页面长时间不消失，可以尝试更换浏览器（禁止使用IE，尽量不要用手机系统自带浏览器）、检查网络、联系管理员等。</span>
         <span>...</span>
       </div>
     </div>
@@ -44,6 +47,9 @@
           return;
         }
         var diff = Date.now() - initialDate;
+        if (diff > 3000) {
+          document.querySelector('#initial-loading span:nth-child(2)').style.display = 'block';
+        }
         timeEl.textContent = diff.toString() + 'ms';
         timeEl.style.opacity = (0.6 + 0.4 * Math.sin(diff / 200)).toString();
       }, 50);

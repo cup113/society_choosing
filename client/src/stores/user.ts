@@ -19,6 +19,7 @@ export const useUserStore = defineStore('user', () => {
     'second_choice': undefined as string | undefined,
     'third_choice': undefined as string | undefined,
   });
+  const answer = useLocalStorage('SC_answer', '');
 
   const batches: Batch[] = [
     {
@@ -35,5 +36,5 @@ export const useUserStore = defineStore('user', () => {
     }
   ];
 
-  return { userID, token, userInformation, choice, batches }
+  return { userID, token, userInformation, choice, batches, answer }
 })
