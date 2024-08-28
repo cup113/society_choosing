@@ -7,6 +7,4 @@
 
 ### Frontend
 
-1. [ ] 器乐社添加问题
-
 ## Demand

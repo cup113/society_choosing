@@ -98,8 +98,8 @@ const eta = computed(() => {
     </header>
 
     <p class="bg-amber-300 p-2 text-center">
-      <span class="text-red-800 md:text-lg">当前为公测阶段，所选择的社团<b>不计入</b>最终选课结果。最终选课时间预计在9月进行，届时参与测试的同学还需重新提交。<br><b>报告问题或
-          bug</b>，或是想要为自己的社团<b>撰写简介</b>，请通过邮件联系 <a href="mailto:cup11jason@qq.com"
+      <span class="text-red-800 md:text-lg">当前为公测阶段，所选择的社团<b>不计入</b>最终选课结果。最终选课时间预计在9月进行，届时参与测试的同学还需重新提交。<br><b>若要报告问题或
+          bug</b>，请通过邮件联系 <a href="mailto:cup11jason@qq.com"
           class="text-blue-600 hover:text-blue-800 underline">cup11jason@qq.com</a>，或直接在群内发言。</span>
     </p>
 
