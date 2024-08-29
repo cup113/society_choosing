@@ -86,6 +86,11 @@ const eta = computed(() => {
             <RouterLink to="/export">导出数据</RouterLink>
           </NavigationMenuItem>
           <NavigationMenuItem
+            class="py-1 px-3 min-w-20 text-center md:border-l-2 border-white border-dashed bg-amber-600 rounded-md md:bg-transparent md:rounded-none"
+            v-if="role === 'teacher'">
+            <a href="/admin/_/" target="_blank">数据库管理</a>
+          </NavigationMenuItem>
+          <NavigationMenuItem
             class="py-1 px-3 min-w-20 text-center md:border-l-2 border-white border-dashed bg-amber-600 rounded-md md:bg-transparent md:rounded-none">
             <RouterLink to="/about">关于此网站</RouterLink>
           </NavigationMenuItem>

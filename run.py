@@ -77,6 +77,11 @@ def run_express_server(node_env: str = "development"):
     )
 
 
+def run_nginx():
+    all_wait(general_popen("nginx", "-s", "stop"))
+    return general_popen("nginx", "-p", ".", "-c", "./conf/nginx.conf", cwd=ROOT / "nginx")
+
+
 def main():
     parser = ArgumentParser()
     parser.add_argument(
@@ -104,16 +109,16 @@ def main():
         pocket_base = run_pocket_base()
         pocket_base.terminate()
     else:
-        pocket_base, express_server = run_express_server(
-            "production" if args.production else "development"
-        )
+        processes = run_express_server("production" if args.production else "development")
+        if args.production:
+            processes.append(run_nginx())
         try:
-            all_wait(pocket_base, express_server)
+            all_wait(*processes)
         except KeyboardInterrupt:
             pass
         finally:
-            pocket_base.terminate()
-            express_server.terminate()
+            for process in processes:
+                process.terminate()
 
 
 if __name__ == "__main__":

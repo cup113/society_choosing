@@ -51,6 +51,7 @@ export type SocietiesRecord = {
 	limit?: string
 	name: string
 	question?: string
+	rejects?: RecordIdString[]
 	teacher: string
 }
 

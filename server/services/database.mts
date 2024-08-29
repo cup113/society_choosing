@@ -47,6 +47,6 @@ export class PocketBaseService extends DatabaseService {
   }
 
   public async list_choices(): Promise<Choice[]> {
-    return await this.pb.collection("choosing_24B").getFullList({ requestKey: null });
+    return await this.pb.collection("choosing_24B").getFullList({  sort: "-created", requestKey: null });
   }
 }

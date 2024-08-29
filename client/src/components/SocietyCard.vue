@@ -35,7 +35,7 @@ const society = computed(() => props.society);
       </div>
     </div>
     <CollapsibleContent>
-      <div class="flex justify-between items-center px-2 py-1 indent-8 border-t border-gray-500">{{ society.description }}。</div>
+      <div class="flex justify-between items-center px-2 py-1 indent-8 border-t border-gray-500">{{ society.description }}</div>
     </CollapsibleContent>
   </Collapsible>
 </template>

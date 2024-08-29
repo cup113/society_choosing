@@ -29,6 +29,7 @@ export type CreateChoosingData = Omit<Choosing24bRecord, "ip" | "user">;
 export type ListSocietyResponse = {
     societies: Society[];
     timeStatus: TimeStatus;
+    ip?: string;
 }
 
 export type ListHistoryResponse = {

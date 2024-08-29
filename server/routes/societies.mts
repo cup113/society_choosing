@@ -7,9 +7,11 @@ class SocietiesRouter extends RequestHandler {
     static path = "/list";
 
     protected async handle_core(): Promise<ListSocietyResponse> {
+        const ip = (this.req.headers['x-forwarded-for'] as string) ?? this.req.ip;
         return {
             societies: await this.check_response(this.databaseService.list_all_societies()),
             timeStatus: get_time_status(),
+            ip,
         }
     }
 }

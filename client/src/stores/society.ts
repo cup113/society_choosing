@@ -24,6 +24,8 @@ export const useSocietyStore = defineStore('society', () => {
 
   const timeStatus = ref<{ open: true } | { open: false, estimated: Date } | null>(null);
 
+  const localIP = ref("");
+
   const societyDone = new Fetcher<ListSocietyResponse>({
     url: '/api/societies/list',
     method: 'GET',
@@ -39,6 +41,7 @@ export const useSocietyStore = defineStore('society', () => {
     } else {
       timeStatus.value = { open: false, estimated: new Date(Date.now() + data.timeStatus.eta) };
     }
+    localIP.value = data.ip ?? "";
   }).catch(error => {
     const errorStore = useErrorStore();
     console.error(error);
@@ -88,6 +91,7 @@ export const useSocietyStore = defineStore('society', () => {
     societies,
     historyChoices,
     timeStatus,
+    localIP,
     get_society,
     get_society_id,
     refresh_society_history,
