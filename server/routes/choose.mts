@@ -14,9 +14,10 @@ class ChooseRouter extends RequestHandler {
     const authData = await this.authorize();
     const { first_choice, second_choice, third_choice, answer } = this.req.body as CreateChoosingData;
     const user = authData.record.id;
+    const ip = (this.req.headers['x-forwarded-for'] as string) ?? this.req.ip;
     const data = {
       user,
-      ip: this.req.ip,
+      ip,
       first_choice,
       second_choice,
       third_choice,

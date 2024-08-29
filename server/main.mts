@@ -12,4 +12,4 @@ ViteExpress.config({
     },
     mode: isProduction ? "production" : "development",
 })
-ViteExpress.listen(app, isProduction? 80 : 3000, () => logger.info("Server is listening..."));
+ViteExpress.listen(app, isProduction? 8080 : 3000, () => logger.info("Server is listening..."));
