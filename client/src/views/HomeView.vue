@@ -42,11 +42,15 @@ function login() {
     method: 'POST',
     data: JSON.stringify(data),
   }).fetch_json().then(data => {
+    const isOldUser = data.userID.length > 0;
     userStore.userID = data.userID;
     userStore.token = data.token;
     userStore.userInformation = data.userInformation;
     societyStore.refresh_society_history();
     router.push(userStore.userInformation.role === 'student' ? '/choose' : '/export');
+    if (isOldUser) {
+      setTimeout(() => location.reload(), 400);
+    }
   }).catch(error => {
     loginLoading.value = false;
     console.error(error);
