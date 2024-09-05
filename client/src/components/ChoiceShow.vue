@@ -4,6 +4,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 const slots = defineSlots<{
   title(props: {}): any,
   description(props: {}): any,
+  extra?(props: {}): any,
   footer?(props: {}): any,
 }>();
 
@@ -32,6 +33,7 @@ const props = defineProps<{
         <p>第一志愿: <b>{{ props.choice.first_choice }}</b></p>
         <p>第二志愿: <b>{{ props.choice.second_choice }}</b></p>
         <p>第三志愿: <b>{{ props.choice.third_choice }}</b></p>
+        <slot name="extra"></slot>
       </div>
     </CardContent>
     <CardFooter v-if="slots.footer">

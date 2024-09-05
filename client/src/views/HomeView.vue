@@ -68,7 +68,7 @@ function login() {
                 <Input type="text" name="username" id="username" v-model="username" placeholder="Username"
                   class="bg-amber-100"></Input>
               </div>
-              <div class="text-gray-500 font-bold text-right text-sm">9位学号，如320270501。</div>
+              <div class="text-gray-500 font-bold text-right text-sm">9位学号，如320270101。</div>
             </div>
             <div class="flex flex-col gap-2">
               <div class="flex items-center gap-2">
@@ -76,7 +76,7 @@ function login() {
                 <Input type="password" name="password" id="password" v-model="password" placeholder="Password"
                   class="bg-amber-100"></Input>
               </div>
-              <div class="text-gray-500 font-bold text-right text-sm">密码为学号后6位@身份证后6位<br>（如有X，要大写），如270501@12345X</div>
+              <div class="text-gray-500 font-bold text-right text-sm">密码为学号后6位@身份证后6位<br>（如有X，要大写），如270101@12345X。</div>
             </div>
           </CardContent>
           <CardFooter class="text-center">

@@ -1,11 +1,14 @@
 import { defineStore } from "pinia";
-import { ref, reactive } from "vue";
+import { ref, reactive, computed } from "vue";
+import { createShuffle } from 'fast-shuffle';
+import { alea } from 'seedrandom';
+
 import { useUserStore } from "./user";
 import { useErrorStore } from "./error";
 import { Fetcher } from "@/lib/fetch";
 import type { ListHistoryResponse, ListSocietyResponse, Society as _Society } from "../../../types/types.d.ts";
 
-export type Society = _Society & { index: string };
+export type Society = _Society & { index: string, isCoreMember: boolean };
 
 export const useSocietyStore = defineStore('society', () => {
   const societies = ref(new Array<Society>());
@@ -30,11 +33,20 @@ export const useSocietyStore = defineStore('society', () => {
     url: '/api/societies/list',
     method: 'GET',
   }).fetch_json().then(data => {
-    societies.value = data.societies.map((society: Omit<Society, 'index'>, index: number) => {
+    const userID = useUserStore().userID;
+    const societiesData = data.societies.map((society: Omit<Society, 'index' | 'isCoreMember'>, index: number) => {
       return {
         ...society,
-        index: (index + 1 < 10 ? '0' : '') + (index + 1).toString(),
+        isCoreMember: society.coreMembers?.includes(userID) ?? false,
       };
+    });
+    societies.value = createShuffle(alea(userID).int32(), societiesData).sort((a, b) => {
+      return a.isCoreMember ? 0 : 1 - (b.isCoreMember ? 0 : 1);
+    }).map((society, index) => {
+      return {
+        ...society,
+        index: (index < 9 ? '0' : '') + (index + 1).toString(),
+      }
     });
     if (data.timeStatus.open) {
       timeStatus.value = { open: true };
@@ -55,7 +67,10 @@ export const useSocietyStore = defineStore('society', () => {
     }).fetch_json().then((data) => {
       historyChoices.count = data.totalItems;
       historyChoices.choices = data.items.map(item => {
-        const ip = item.ip ? (item.ip.length > 0 ? item.ip : undefined) : undefined;
+        let ip = item.ip ? (item.ip.length > 0 ? item.ip : undefined) : undefined;
+        if (ip !== undefined && ip.startsWith("::ffff:")) {
+          ip = ip.slice(7);
+        }
         return {
           first_choice: get_society(item.first_choice)?.name,
           second_choice: get_society(item.second_choice)?.name,
@@ -87,11 +102,25 @@ export const useSocietyStore = defineStore('society', () => {
     return societies.value.find(society => society.name === name)?.id;
   }
 
+  const question = computed(() => {
+    const userStore = useUserStore();
+    return userStore.batches.map(batch => {
+      const society = get_society(userStore.choice[batch.key] ?? '');
+      const q = society?.question;
+      if (!q) {
+        return false;
+      } else {
+        return `(来自${society.name}) ${q}`
+      }
+    }).filter(Boolean).join('；');
+  });
+
   return {
     societies,
     historyChoices,
     timeStatus,
     localIP,
+    question,
     get_society,
     get_society_id,
     refresh_society_history,

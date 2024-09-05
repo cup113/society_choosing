@@ -11,8 +11,13 @@
 		"start": "vite build client && SET NODE_ENV=production && start pnpm run serve-pocket && start pnpm run serve-express"
 	},
 	"dependencies": {
+		"fast-shuffle": "^6.1.0",
 		"pocketbase": "^0.21.4",
+		"seedrandom": "^3.0.5",
 		"tailwindcss": "^3.4.4",
 		"tailwindcss-animate": "^1.0.7"
+	},
+	"devDependencies": {
+		"@types/seedrandom": "^3.0.8"
 	}
 }

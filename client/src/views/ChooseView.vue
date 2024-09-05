@@ -19,18 +19,6 @@ const userStore = useUserStore();
 const societyStore = useSocietyStore();
 const errorStore = useErrorStore();
 
-const question = computed(() => {
-  return userStore.batches.map(batch => {
-    const society = societyStore.get_society(userStore.choice[batch.key] ?? '');
-    const q = society?.question;
-    if (!q) {
-      return false;
-    } else {
-      return `(来自${society.name}) ${q}`
-    }
-  }).filter(Boolean).join('；');
-})
-
 const waiting = ref(false);
 const waiting_confirm = ref(false);
 
@@ -49,8 +37,8 @@ function submit() {
   if (userStore.choice.third_choice === undefined) {
     errors.push('未选择第三志愿，请选择后提交。');
   }
-  if (question.value.length > 0 && userStore.answer.length === 0) {
-    errors.push(`您选择的社团需要您回答问题，请填写答案。问题为：${question.value}`);
+  if (societyStore.question.length > 0 && userStore.answer.length === 0) {
+    errors.push(`您选择的社团需要您回答问题，请填写答案。问题为：${societyStore.question}`);
   }
   if (userStore.choice.first_choice === userStore.choice.second_choice || userStore.choice.first_choice === userStore.choice.third_choice || userStore.choice.second_choice === userStore.choice.third_choice) {
     if (errors.length === 0) {
@@ -114,10 +102,10 @@ const choiceName = computed(() => {
           class="submit-btn relative w-20 my-8 bg-amber-700 hover:bg-amber-800">提交</Button>
       </div>
       <div>
-        <div class="px-4 flex flex-col md:flex-row gap-2" v-if="question.length > 0">
+        <div class="px-4 flex flex-col md:flex-row gap-2" v-if="societyStore.question.length > 0">
           <div>
             <p><b>附加问题：</b></p>
-            <p>{{ question }}</p>
+            <p>{{ societyStore.question }}</p>
           </div>
           <Textarea class="max-w-80" v-model="userStore.answer" placeholder="请输入答案..."></Textarea>
         </div>

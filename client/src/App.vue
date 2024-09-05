@@ -102,12 +102,6 @@ const eta = computed(() => {
       </NavigationMenu>
     </header>
 
-    <p class="bg-amber-300 p-2 text-center">
-      <span class="text-red-800 md:text-lg">当前为公测阶段，所选择的社团<b>不计入</b>最终选课结果。最终选课时间预计在9月进行，届时参与测试的同学还需重新提交。<br><b>若要报告问题或
-          bug</b>，请通过邮件联系 <a href="mailto:cup11jason@qq.com"
-          class="text-blue-600 hover:text-blue-800 underline">cup11jason@qq.com</a>，或直接在群内发言。</span>
-    </p>
-
     <p v-if="closed" class="text-center p-2 bg-amber-300">
       <span class="text-red-800 text-lg md:text-2xl font-semibold">选课时间还未到。<b>{{ eta }}</b> 后到达开始时间 {{ estimated
         }}，到时间后<b>无需</b>刷新页面。您可以<b>先在浏览器上对社团进行预览、选择</b>，开始后会自动出现“提交”按钮。</span>
