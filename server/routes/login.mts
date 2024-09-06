@@ -10,7 +10,7 @@ class LoginHandler extends RequestHandler {
     const { username, password } = this.req.body;
     const authResult = await this.authorizationService.auth_with_password(username, password);
     if (!authResult.success) {
-      throw new this.Terminate(to_status(authResult.code), authResult.code, authResult.error);
+      throw new this.Terminate(authResult.code, authResult.error);
     }
     const authData = authResult.authData;
 

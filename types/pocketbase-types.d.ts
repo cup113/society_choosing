@@ -39,12 +39,14 @@ export type Choosing24bRecord = {
 	answer?: string
 	first_choice: RecordIdString
 	ip?: string
+	rejects?: RecordIdString[]
 	second_choice: RecordIdString
 	third_choice: RecordIdString
 	user: RecordIdString
 }
 
 export type SocietiesRecord = {
+	adjustThreshold?: number
 	cap: number
 	coreMembers?: RecordIdString[]
 	description: string

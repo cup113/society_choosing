@@ -1,141 +1,131 @@
 import XLSX from 'xlsx';
 import { execSync } from 'child_process';
-import { PriorityQueue } from 'priority-queue-typed';
 import { join } from 'node:path';
 import { mkdirSync } from 'node:fs';
-import type { User as RawUser, Choice } from '../../types/types.d.ts';
+import type { Request, Response } from 'express';
 
 import RequestHandler from '../services/request-handler.mjs';
+import AssignService from '../services/assign.mjs';
+import { to_status, CodeType } from '../../types/codes.js';
 
-interface Society {
-  name: string;
-  cap: number;
-  countMembers: number;
+interface SummaryUserData {
+  "班级": string;
+  "姓名": string;
+  "学号": string;
+  "第一志愿": string;
+  "第二志愿": string;
+  "第三志愿": string;
+  "录取批次": "第一志愿" | "第二志愿" | "第三志愿" | "调剂" | "未录取",
+  "录取社团": string,
+  "附加问题答案": string,
+  "提交时间": Date,
 }
 
-interface User {
-  number: string;
-  name: string;
-  class: string;
-  society: Society | null;
-  first_choice: Society | null;
-  second_choice: Society | null;
-  third_choice: Society | null;
-  answer?: string;
-  submit: Date;
+interface SocietyUserData {
+  "序号": number,
+  "姓名": string,
+  "班级": string,
+  "录取批次": string,
+}
+
+interface ClassUserData {
+  "学号": string,
+  "姓名": string,
+  "社团": string,
 }
 
 class ExportHandler extends RequestHandler {
   static method = RequestHandler.POST;
   static path = "/choosing";
 
-  private async get_society_map(): Promise<Map<string, Society>> {
-    const societies = await this.check_response(this.databaseService.list_all_societies());
-    return new Map(societies.map(s => [s.id, {
-      name: s.name,
-      cap: s.cap,
-      countMembers: 0,
-    }]));
+  public folder: string;
+  public assignService: AssignService | undefined;
+
+  constructor(req: Request, res: Response) {
+    super(req, res);
+    const timestamp = Date.now();
+    this.folder = `./instances/exports/${timestamp}`
+    mkdirSync(this.folder, { recursive: true });
   }
 
-  private get_sorted_users(usersRaw: RawUser[], choosingRaw: Choice[], societiesMap: Map<string, Society>): User[] {
-    return usersRaw.filter(user => user.role === "student").map(user => {
-      const choosingData = choosingRaw.findLast(data => data.user === user.id);
-      const chosen = choosingData !== undefined;
-
-      let first_choice = null as Society | null;
-      let second_choice = null as Society | null;
-      let third_choice = null as Society | null;
-      let answer: string | undefined = undefined;
-      if (chosen) {
-        first_choice = societiesMap.get(choosingData.first_choice)!;
-        second_choice = societiesMap.get(choosingData.second_choice)!;
-        third_choice = societiesMap.get(choosingData.third_choice)!;
-        answer = choosingData.answer;
-      }
-
-      return {
-        waiting: true,
-        name: user.name,
-        number: user.username.slice(3),
-        class: user.class,
-        society: null,
-        first_choice,
-        second_choice,
-        third_choice,
-        answer,
-        // if not chosen, let the submit time be the latest.
-        submit: new Date(choosingData?.created ?? Date.now()),
-      };
-    }).sort((a, b) => {
-      return a.submit.getTime() - b.submit.getTime();
+  private export_xlsx_societies() {
+    if (this.assignService === undefined) {
+      throw new this.Terminate(CodeType.InternalError, "AssignService uninitialized")
+    }
+    const workbook = XLSX.utils.book_new();
+    const data = new Map([...this.assignService.societiesIdMap.values()].map(society => [society.name, new Array<SocietyUserData>()]))
+    data.set("未分配", []);
+    this.assignService.users.forEach(user => {
+      const students = data.get(user.society?.name ?? "未分配")!;
+      students.push({
+        "序号": students.length + 1,
+        "姓名": user.name,
+        "班级": user.class,
+        "录取批次": { "first_choice": "第一志愿", "second_choice": "第二志愿", "third_choice": "第三志愿", "adjust": "调剂", "not_accepted": "未录取" }[user.batch ?? "not_accepted"],
+      });
     });
-  }
-
-  private export_xlsx_societies(mapSocieties: Map<string, User[]>, folder: string) {
-    const workbook = XLSX.utils.book_new();
-    for (const [name, users] of mapSocieties.entries()) {
-      const worksheet = XLSX.utils.json_to_sheet(users.map((user, i) => {
-        return {
-          "序号": i + 1,
-          "姓名": user.name,
-          "班级": user.class,
-        };
-      }));
-      XLSX.utils.book_append_sheet(workbook, worksheet, name);
-    }
-    XLSX.writeFile(workbook, `${folder}/按社团分.xlsx`);
-  }
-
-  private export_xlsx_classes(mapClasses: Map<string, User[]>, folder: string) {
-    const workbook = XLSX.utils.book_new();
-    for (const [name, users] of mapClasses.entries()) {
-      const worksheet = XLSX.utils.json_to_sheet(users.sort((a, b) => a.number.localeCompare(b.number)).map(user => {
-        return {
-          "学号": user.number,
-          "姓名": user.name,
-          "社团": user.society?.name ?? "未选择",
-        };
-      }));
+    new Array(...data.entries()).forEach(([name, users]) => {
+      const worksheet = XLSX.utils.json_to_sheet(users);
       XLSX.utils.book_append_sheet(workbook, worksheet, name)
-    }
-    XLSX.writeFile(workbook, `${folder}/按班级分.xlsx`);
+    });
+    return workbook;
   }
 
-  private export_summary(societiesMap: Map<string, Society>, mapSocieties: Map<string, User[]>, folder: string) {
+  private export_xlsx_classes() {
+    if (this.assignService === undefined) {
+      throw new this.Terminate(CodeType.InternalError, "AssignService uninitialized")
+    }
     const workbook = XLSX.utils.book_new();
-    const usersData = new Array<{
-      "班级": string;
-      "姓名": string;
-      "学号": string;
-      "第一志愿": string;
-      "第二志愿": string;
-      "第三志愿": string;
-      "录取批次": "第一志愿" | "第二志愿" | "第三志愿" | "调剂" | "未录取",
-      "录取社团": string,
-      "附加问题答案": string,
-      "提交时间": Date,
-    }>();
-    const societyHeatMap = new Map(
-    [...societiesMap.entries()].map(([_, society]) => {
-      return [society.name, {
-        "社团名称": society.name,
-        "限额": society.cap,
-        "录取人数": society.countMembers,
-        "总报名人数": 0,
-        "第一志愿报名人数": 0,
-        "第二志愿报名人数": 0,
-        "第三志愿报名人数": 0,
-        "第一志愿录取人数": 0,
-        "第二志愿录取人数": 0,
-        "第三志愿录取人数": 0,
-        "调剂人数": 0,
-      }];
-    }));
+    const data = new Map<string, Array<ClassUserData>>();
+    this.assignService.users.forEach(user => data.set(user.class, []));
+    this.assignService.users.forEach(user => {
+      data.get(user.class)!.push({
+        "学号": user.number,
+        "姓名": user.name,
+        "社团": user.society?.name ?? "未分配",
+      });
+    });
+    new Array(...data.entries()).sort((a, b) => a[0].localeCompare(b[0])).forEach(([name, users]) => {
+      const worksheet = XLSX.utils.json_to_sheet(users.sort((a, b) => a["学号"].localeCompare(b["学号"])));
+      XLSX.utils.book_append_sheet(workbook, worksheet, name)
+    });
 
-    [...mapSocieties.values()].flat().forEach(user => {
+    return workbook;
+  }
+
+  private export_summary() {
+    if (this.assignService === undefined) {
+      throw new this.Terminate(CodeType.InternalError, "AssignService uninitialized")
+    }
+    const workbook = XLSX.utils.book_new();
+    const usersData = new Array<SummaryUserData>();
+    const societySummary = new Map(
+      [...this.assignService.societiesIdMap.entries()].map(([_, society]) => {
+        return [society.name, {
+          "社团名称": society.name,
+          "限额": society.cap,
+          "录取人数": society.countMembers,
+          "总报名人数": 0,
+          "第一志愿报名人数": 0,
+          "第二志愿报名人数": 0,
+          "第三志愿报名人数": 0,
+          "第一志愿录取人数": 0,
+          "第二志愿录取人数": 0,
+          "第三志愿录取人数": 0,
+          "调剂人数": 0,
+        }];
+      }));
+
+    this.assignService.users.forEach(user => {
       const society = user.society;
-      const batch = society === null ? "未录取" : (society === user.first_choice ? "第一志愿" : (society === user.second_choice ? "第二志愿" : (society === user.third_choice ? "第三志愿" : "调剂")));
+      const batch = ({
+        "first_choice": "第一志愿",
+        "second_choice": "第二志愿",
+        "third_choice": "第三志愿",
+        "adjust": "调剂",
+        "not_accepted": "未录取",
+      } as const)[user.batch ?? "not_accepted"];
+
       const first_choice = user.first_choice?.name ?? "未选择";
       const second_choice = user.second_choice?.name ?? "未选择";
       const third_choice = user.third_choice?.name ?? "未选择";
@@ -154,19 +144,23 @@ class ExportHandler extends RequestHandler {
       });
 
       if (society?.name) {
-        const finalSociety = societyHeatMap.get(society.name);
+        const finalSociety = societySummary.get(society.name);
         if (!finalSociety) {
           return;
         }
-        finalSociety["总报名人数"]++;
-        finalSociety[batch === "第一志愿" ? "第一志愿录取人数" : (batch === "第二志愿" ? "第二志愿录取人数" : (batch === "第三志愿" ? "第三志愿录取人数" : "调剂人数"))]++;
+        finalSociety[({
+          "first_choice": "第一志愿录取人数",
+          "second_choice": "第二志愿录取人数",
+          "third_choice": "第三志愿录取人数",
+          "adjust": "调剂人数",
+        } as const)[user.batch!]]++;
 
         ([["第一志愿报名人数", first_choice], ["第二志愿报名人数", second_choice], ["第三志愿报名人数", third_choice]] as const).forEach(([batchKey, society]) => {
           if (society === "未选择") {
             return;
           }
 
-          const finalSociety = societyHeatMap.get(society)!;
+          const finalSociety = societySummary.get(society)!;
           finalSociety[batchKey]++;
           finalSociety["总报名人数"]++;
         });
@@ -174,82 +168,34 @@ class ExportHandler extends RequestHandler {
     });
 
     XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(usersData), "学生原始数据");
-    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(Array.from(societyHeatMap.values())), "社团热度数据");
-    XLSX.writeFile(workbook, `${folder}/导出汇总.xlsx`);
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(Array.from(societySummary.values())), "社团热度数据");
+    return workbook;
   }
 
   public async handle_core(): Promise<object | undefined> {
     await this.authorize();
-    const choosingRaw = await this.check_response(this.databaseService.list_choices());
     const usersRaw = await this.check_response(this.databaseService.list_users());
-    const societiesMap = await this.get_society_map();
-    let users: User[] = this.get_sorted_users(usersRaw, choosingRaw, societiesMap);
+    const societiesRaw = await this.check_response(this.databaseService.list_all_societies());
+    const choosingRaw = await this.check_response(this.databaseService.list_choices());
 
-    const mapSocieties = new Map<string, User[]>();
-    const mapClasses = new Map<string, User[]>();
+    this.assignService = new AssignService(usersRaw, societiesRaw, choosingRaw);
+    this.assignService.assign();
 
-    for (const society of societiesMap.values()) {
-      mapSocieties.set(society.name, []);
-    }
+    const workbooks = [
+      ["按社团分", this.export_xlsx_societies()],
+      ["按班级分", this.export_xlsx_classes()],
+      ["导出汇总", this.export_summary()],
+    ] as const;
 
-    for (const user of users) {
-      if (mapClasses.get(user.class) === undefined) {
-        mapClasses.set(user.class, []);
-      }
-      mapClasses.get(user.class)!.push(user);
-    }
+    workbooks.forEach(([name, workbook]) => {
+      XLSX.writeFile(workbook, join(this.folder, `${name}.xlsx`));
+    });
+    const paths = workbooks.map(([name, _]) => `${this.folder}/${name}.xlsx`).join(" ");
+    const exportPath = join(this.folder, "导出数据.zip");
 
-    for (const key of ["first_choice", "second_choice", "third_choice"] as const) {
-      for (const user of users) {
-        if (user.society !== null) {
-          continue;
-        }
-        const society = user[key];
-        if (society === null) {
-          continue;
-        }
-        if (society.countMembers >= society.cap) {
-          continue;
-        }
-        society.countMembers++;
-        user.society = society;
-        mapSocieties.get(society.name)!.push(user);
-      }
-    }
+    execSync(`7z a ${exportPath} ${paths}`);
 
-    // adjust
-    users = users.reverse();
-    let societiesPQ = new PriorityQueue<Society>(
-      new Array(...societiesMap.values()).filter(s => s.countMembers < s.cap),
-      {
-        comparator: (a: Society, b: Society) => a.countMembers / a.cap - b.countMembers / b.cap
-      }
-    );
-    while (true) {
-      const firstUser = users.find(user => user.society === null);
-      const society = societiesPQ.poll();
-      if (firstUser === undefined || society === undefined) {
-        break;
-      }
-      firstUser.society = society;
-      mapSocieties.get(society.name)!.push(firstUser);
-      society.countMembers++;
-      if (society.countMembers < society.cap) {
-        societiesPQ.add(society);
-      }
-    }
-
-    const timestamp = Date.now();
-    const folder = `./instances/exports/${timestamp}`
-    mkdirSync(folder, { recursive: true });
-
-    this.export_xlsx_societies(mapSocieties, folder);
-    this.export_xlsx_classes(mapClasses, folder);
-    this.export_summary(societiesMap, mapSocieties, folder);
-
-    execSync(`7z a ${folder}/导出数据.zip ${folder}/按社团分.xlsx ${folder}/按班级分.xlsx ${folder}/导出汇总.xlsx`);
-
-    this.res.sendFile(join(process.cwd(), `${folder}/导出数据.zip`));
+    this.res.sendFile(exportPath, { root: "." });
     return;
   }
 }

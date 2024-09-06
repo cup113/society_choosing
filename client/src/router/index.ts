@@ -4,6 +4,7 @@ import ThanksView from '@/views/ThanksView.vue';
 import ChooseView from '@/views/ChooseView.vue';
 import AboutView from '@/views/AboutView.vue';
 import ExportView from '../views/ExportView.vue';
+import ReviewView from '@/views/ReviewView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -32,6 +33,11 @@ const router = createRouter({
       path: '/export',
       name: 'export',
       component: ExportView,
+    },
+    {
+      path: '/review',
+      name: 'review',
+      component: ReviewView,
     }
   ]
 })

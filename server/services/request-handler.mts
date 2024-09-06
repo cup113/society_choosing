@@ -19,8 +19,8 @@ class Terminate {
     public code: string;
     public reason: string;
 
-    constructor(statusCode: number, code: string, reason: string) {
-        this.statusCode = statusCode;
+    constructor(code: CodeType, reason: string) {
+        this.statusCode = to_status(code);
         this.code = code;
         this.reason = reason;
     }
@@ -33,9 +33,11 @@ export default abstract class RequestHandler {
     static method: 'get' | 'post';
     static path: string;
 
-    static inject(injectable: InjectableRequestHandler): Router {
+    static inject(...handlers: InjectableRequestHandler[]): Router {
         const router = express.Router();
-        router[injectable.method](injectable.path, (req, res) => new injectable(req, res).handle());
+        for (const handler of handlers) {
+            router[handler.method](handler.path, (req, res) => new handler(req, res).handle());
+        }
         return router;
     }
 
@@ -58,7 +60,7 @@ export default abstract class RequestHandler {
     protected async authorize() {
         const authResult = await this.authorizationService.authorize(this.req.headers.authorization);
         if (!authResult.success) {
-            throw new Terminate(to_status(authResult.code), CodeType.AuthFailed, authResult.error);
+            throw new Terminate(CodeType.AuthFailed, authResult.error);
         }
         return authResult.authData;
     }
@@ -67,9 +69,9 @@ export default abstract class RequestHandler {
         try {
             return await response;
         } catch (err) {
-            throw new Terminate(500, CodeType.InternalError, err instanceof Error ? err.message : new String(err).valueOf());
+            throw new Terminate(CodeType.InternalError, err instanceof Error ? err.message : new String(err).valueOf());
         }
-      }
+    }
 
     protected abstract handle_core(): Promise<object | undefined>;
 
@@ -89,6 +91,9 @@ export default abstract class RequestHandler {
             } else {
                 this.logger.error(`Request failed: ${error}`);
                 this.res.sendStatus(500);
+                if (error instanceof Error) {
+                    this.logger.error(error.stack);
+                }
             }
         }
     }

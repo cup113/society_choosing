@@ -47,6 +47,7 @@ function login() {
     userStore.userInformation = data.userInformation;
     societyStore.refresh_society_history();
     router.push(userStore.userInformation.role === 'student' ? '/choose' : '/export');
+    societyStore.refresh();
   }).catch(error => {
     loginLoading.value = false;
     console.error(error);
@@ -98,7 +99,7 @@ function login() {
         </Collapsible>
       </div>
     </div>
-    <div>
+    <div v-if="userStore.userInformation.role === 'student'">
       <p v-if="societyStore.historyChoices.count === 0">还没有选课记录哦，快去选课吧！</p>
       <div v-else class="flex flex-col gap-3 items-center">
         <div class="text-xl">选课次数：{{ societyStore.historyChoices.count }}</div>

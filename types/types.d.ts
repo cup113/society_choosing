@@ -46,3 +46,7 @@ export type LoginResponse = {
         role: string;
     }
 }
+
+export type ListSocietyUser = User & Pick<Choice, 'answer'> & { rejected: boolean };
+
+export type ListSocietyUserResponse = Record<'first_choice' | 'second_choice' | 'third_choice', ListSocietyUser[]>

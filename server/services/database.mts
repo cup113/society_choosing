@@ -13,6 +13,7 @@ export abstract class DatabaseService {
   // Choosing
   public abstract create_choosing(data: Choosing24bRecord): Promise<void>;
   public abstract list_choices(): Promise<Choice[]>;
+  public abstract toggle_choice_reject(userID: string, societyID: string, reject: boolean): Promise<void>;
 }
 
 export class PocketBaseService extends DatabaseService {
@@ -48,5 +49,26 @@ export class PocketBaseService extends DatabaseService {
 
   public async list_choices(): Promise<Choice[]> {
     return await this.pb.collection("choosing_24B").getFullList({  sort: "-created", requestKey: null });
+  }
+
+  public async toggle_choice_reject(userID: string, societyID: string, reject: boolean): Promise<void> {
+    const choice = (await this.pb.collection("choosing_24B").getList(1, 1, {
+      requestKey: null,
+      filter: `user.id = "${userID}"`,
+    })).items[0];
+
+    if (!choice) {
+      throw new Error("Choice not found");
+    }
+
+    const rejects = choice.rejects;
+    if (reject) {
+      rejects.push(societyID);
+    } else {
+      rejects.splice(rejects.indexOf(societyID), 1);
+    }
+    await this.pb.collection("choosing_24B").update(choice.id, {
+      rejects,
+    });
   }
 }

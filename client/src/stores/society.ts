@@ -29,36 +29,38 @@ export const useSocietyStore = defineStore('society', () => {
 
   const localIP = ref("");
 
-  const societyDone = new Fetcher<ListSocietyResponse>({
-    url: '/api/societies/list',
-    method: 'GET',
-  }).fetch_json().then(data => {
-    const userID = useUserStore().userID;
-    const societiesData = data.societies.map((society: Omit<Society, 'index' | 'isCoreMember'>, index: number) => {
-      return {
-        ...society,
-        isCoreMember: society.coreMembers?.includes(userID) ?? false,
-      };
-    });
-    societies.value = createShuffle(alea(userID).int32(), societiesData).sort((a, b) => {
-      return a.isCoreMember ? 0 : 1 - (b.isCoreMember ? 0 : 1);
-    }).map((society, index) => {
-      return {
-        ...society,
-        index: (index < 9 ? '0' : '') + (index + 1).toString(),
+  async function refresh_society_basic() {
+    return new Fetcher<ListSocietyResponse>({
+      url: '/api/societies/list',
+      method: 'GET',
+    }).fetch_json().then(data => {
+      const userID = useUserStore().userID;
+      const societiesData = data.societies.map((society: Omit<Society, 'index' | 'isCoreMember'>, index: number) => {
+        return {
+          ...society,
+          isCoreMember: society.coreMembers?.includes(userID) ?? false,
+        };
+      });
+      societies.value = createShuffle(alea(userID).int32(), societiesData).sort((a, b) => {
+        return a.isCoreMember ? 0 : 1 - (b.isCoreMember ? 0 : 1);
+      }).map((society, index) => {
+        return {
+          ...society,
+          index: (index < 9 ? '0' : '') + (index + 1).toString(),
+        }
+      });
+      if (data.timeStatus.open) {
+        timeStatus.value = { open: true };
+      } else {
+        timeStatus.value = { open: false, estimated: new Date(Date.now() + data.timeStatus.eta) };
       }
+      localIP.value = data.ip ?? "";
+    }).catch(error => {
+      const errorStore = useErrorStore();
+      console.error(error);
+      errorStore.add_error(`获取社团失败，请稍后再试或联系管理员: ${error.toString()}`);
     });
-    if (data.timeStatus.open) {
-      timeStatus.value = { open: true };
-    } else {
-      timeStatus.value = { open: false, estimated: new Date(Date.now() + data.timeStatus.eta) };
-    }
-    localIP.value = data.ip ?? "";
-  }).catch(error => {
-    const errorStore = useErrorStore();
-    console.error(error);
-    errorStore.add_error(`获取社团失败，请稍后再试或联系管理员: ${error.toString()}`);
-  });
+  }
 
   function refresh_society_history() {
     new Fetcher<ListHistoryResponse>({
@@ -87,12 +89,16 @@ export const useSocietyStore = defineStore('society', () => {
     });
   }
 
-  societyDone.then(() => {
-    const userStore = useUserStore();
-    if (userStore.token.length !== 0) {
-      refresh_society_history();
-    }
-  });
+  function refresh() {
+    refresh_society_basic().then(() => {
+      const userStore = useUserStore();
+      if (userStore.token.length !== 0) {
+        refresh_society_history();
+      }
+    });
+  }
+
+  refresh();
 
   const get_society = (id: string) => {
     return societies.value.find(society => society.id === id);
@@ -123,6 +129,7 @@ export const useSocietyStore = defineStore('society', () => {
     question,
     get_society,
     get_society_id,
+    refresh,
     refresh_society_history,
   }
 });

@@ -11,6 +11,7 @@ import loginRouter from './routes/login.mjs';
 import chooseRouter from './routes/choose.mjs';
 import historyRouter from './routes/history.mjs';
 import exportRouter from './routes/export.mjs';
+import reviewRouter from './routes/review.mjs';
 
 var app = express();
 
@@ -34,5 +35,6 @@ app.use('/api/login', loginRouter);
 app.use('/api/choose', chooseRouter);
 app.use('/api/history', historyRouter);
 app.use('/api/export', exportRouter);
+app.use('/api/review', reviewRouter);
 
 export default app;
