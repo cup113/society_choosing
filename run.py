@@ -109,7 +109,7 @@ def main():
         pocket_base = run_pocket_base()
         pocket_base.terminate()
     else:
-        processes = run_express_server("production" if args.production else "development")
+        processes = list(run_express_server("production" if args.production else "development"))
         if args.production:
             processes.append(run_nginx())
         try:
