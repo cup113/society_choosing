@@ -1,5 +1,6 @@
 import PocketBase from 'pocketbase';
 import type { Choice, CreateSocietyInner, CreateUserInner, Society, TypedPocketBase, User, Choosing24bRecord } from '../../types/types.d.ts';
+import logger from './logger.mjs';
 
 export abstract class DatabaseService {
   // Users
@@ -14,6 +15,7 @@ export abstract class DatabaseService {
   public abstract create_choosing(data: Choosing24bRecord): Promise<void>;
   public abstract list_choices(): Promise<Choice[]>;
   public abstract toggle_choice_reject(userID: string, societyID: string, reject: boolean): Promise<void>;
+  public abstract delete_duplicated_choices(): Promise<void>;
 }
 
 export class PocketBaseService extends DatabaseService {
@@ -70,5 +72,28 @@ export class PocketBaseService extends DatabaseService {
     await this.pb.collection("choosing_24B").update(choice.id, {
       rejects,
     });
+  }
+
+  public async delete_duplicated_choices(): Promise<void> {
+    // delete duplicated choices, keep the earliest one
+    const choices = await this.pb.collection("choosing_24B").getFullList({
+      requestKey: null,
+      sort: "+created",
+    });
+    const choiceIdMap = new Map<string, string>();
+
+    const duplicatedChoices = choices.filter(choice => {
+      const key = `${choice.user}-${choice.first_choice}-${choice.second_choice}-${choice.third_choice}`;
+      if (choiceIdMap.has(key)) {
+        return true;
+      }
+      choiceIdMap.set(key, choice.id);
+      return false;
+    });
+
+    await Promise.all(duplicatedChoices.map(choice => {
+      this.pb.collection("choosing_24B").delete(choice.id, { requestKey: choice.id });
+      logger.info(`Deleted duplicated choice (uid=${choice.user}, id=${choice.id})`)
+    }));
   }
 }

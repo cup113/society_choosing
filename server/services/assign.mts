@@ -1,6 +1,7 @@
 import { PriorityQueue } from 'priority-queue-typed';
 import type { User as RawUser, Society as RawSociety, Choice } from '../../types/types.d.ts';
 import logger from './logger.mjs';
+import { startTime } from './time.mjs';
 
 interface Society {
     name: string;
@@ -8,6 +9,8 @@ interface Society {
     coreMembers: string[];
     countMembers: number;
     adjustThreshold: number;
+    lastBatch: "first_choice" | "second_choice" | "third_choice" | "adjust" | null;
+    lastTime: Date | null;
 }
 
 interface User {
@@ -86,6 +89,8 @@ export default class AssignService {
             cap: s.cap,
             countMembers: 0,
             adjustThreshold: s.adjustThreshold ?? 0,
+            lastBatch: null,
+            lastTime: null,
         }]));
     }
 
@@ -121,7 +126,12 @@ export default class AssignService {
             society.countMembers++;
             user.user.society = society;
             user.user.batch = batch;
-            logger.info(`User ${user.user.name} assigned to ${society.name} in batch ${batch}.`)
+            logger.info(`User ${user.user.name} assigned to ${society.name} in batch ${batch}.`);
+            if (society.countMembers === society.cap) {
+                society.lastBatch = batch;
+                // if the last user is core, assign start time immediately after the start of the batch, since anyone after them will be rejected.
+                society.lastTime = user.isCore ? startTime : user.user.submit;
+            }
         }
     }
 
@@ -146,6 +156,9 @@ export default class AssignService {
             firstUser.batch = "adjust";
             if (society.countMembers < society.cap) {
                 societiesPQ.add(society);
+            } else {
+                society.lastBatch = "adjust";
+                society.lastTime = firstUser.submit;
             }
         }
     }

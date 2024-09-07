@@ -6,7 +6,8 @@ import type { Request, Response } from 'express';
 
 import RequestHandler from '../services/request-handler.mjs';
 import AssignService from '../services/assign.mjs';
-import { to_status, CodeType } from '../../types/codes.js';
+import { CodeType } from '../../types/codes.js';
+import { startTime } from '../services/time.mjs';
 
 interface SummaryUserData {
   "班级": string;
@@ -18,7 +19,7 @@ interface SummaryUserData {
   "录取批次": "第一志愿" | "第二志愿" | "第三志愿" | "调剂" | "未录取",
   "录取社团": string,
   "附加问题答案": string,
-  "提交时间": Date,
+  "提交时间": number,
 }
 
 interface SocietyUserData {
@@ -37,6 +38,15 @@ interface ClassUserData {
 class ExportHandler extends RequestHandler {
   static method = RequestHandler.POST;
   static path = "/choosing";
+
+  static BATCH_RECORD = {
+    "first_choice": "第一志愿",
+    "second_choice": "第二志愿",
+    "third_choice": "第三志愿",
+    "adjust": "调剂",
+    "not_accepted": "未录取",
+    "not_full": "未满",
+  } as const;
 
   public folder: string;
   public assignService: AssignService | undefined;
@@ -61,7 +71,7 @@ class ExportHandler extends RequestHandler {
         "序号": students.length + 1,
         "姓名": user.name,
         "班级": user.class,
-        "录取批次": { "first_choice": "第一志愿", "second_choice": "第二志愿", "third_choice": "第三志愿", "adjust": "调剂", "not_accepted": "未录取" }[user.batch ?? "not_accepted"],
+        "录取批次": ExportHandler.BATCH_RECORD[user.batch ?? "not_accepted"],
       });
     });
     new Array(...data.entries()).forEach(([name, users]) => {
@@ -101,6 +111,7 @@ class ExportHandler extends RequestHandler {
     const usersData = new Array<SummaryUserData>();
     const societySummary = new Map(
       [...this.assignService.societiesIdMap.entries()].map(([_, society]) => {
+        const lastTime = society.lastTime;
         return [society.name, {
           "社团名称": society.name,
           "限额": society.cap,
@@ -113,18 +124,14 @@ class ExportHandler extends RequestHandler {
           "第二志愿录取人数": 0,
           "第三志愿录取人数": 0,
           "调剂人数": 0,
+          "批次线": ExportHandler.BATCH_RECORD[society.lastBatch ?? "not_full"],
+          "时间线": lastTime ? ((lastTime.getTime() - startTime.getTime()) / 1000) : null,
         }];
       }));
 
     this.assignService.users.forEach(user => {
       const society = user.society;
-      const batch = ({
-        "first_choice": "第一志愿",
-        "second_choice": "第二志愿",
-        "third_choice": "第三志愿",
-        "adjust": "调剂",
-        "not_accepted": "未录取",
-      } as const)[user.batch ?? "not_accepted"];
+      const batch = ExportHandler.BATCH_RECORD[user.batch ?? "not_accepted"];
 
       const first_choice = user.first_choice?.name ?? "未选择";
       const second_choice = user.second_choice?.name ?? "未选择";
@@ -140,7 +147,7 @@ class ExportHandler extends RequestHandler {
         "录取批次": batch,
         "录取社团": society?.name ?? "未录取",
         "附加问题答案": user.answer ?? "/",
-        "提交时间": user.submit,
+        "提交时间": (user.submit.getTime() - startTime.getTime()) / 1000,
       });
 
       if (society?.name) {
@@ -174,6 +181,7 @@ class ExportHandler extends RequestHandler {
 
   public async handle_core(): Promise<object | undefined> {
     await this.authorize();
+    await this.databaseService.delete_duplicated_choices();
     const usersRaw = await this.check_response(this.databaseService.list_users());
     const societiesRaw = await this.check_response(this.databaseService.list_all_societies());
     const choosingRaw = await this.check_response(this.databaseService.list_choices());
