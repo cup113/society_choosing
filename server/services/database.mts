@@ -1,5 +1,5 @@
 import PocketBase from 'pocketbase';
-import type { Choice, CreateSocietyInner, CreateUserInner, Society, TypedPocketBase, User, Choosing24bRecord } from '../../types/types.d.ts';
+import type { Choice, CreateSocietyInner, CreateUserInner, Society, TypedPocketBase, User, Choosing24bRecord, DatesRecord } from '../../types/types.d.ts';
 import logger from './logger.mjs';
 
 export abstract class DatabaseService {
@@ -16,6 +16,9 @@ export abstract class DatabaseService {
   public abstract list_choices(): Promise<Choice[]>;
   public abstract toggle_choice_reject(userID: string, societyID: string, reject: boolean): Promise<void>;
   public abstract delete_duplicated_choices(): Promise<void>;
+
+  // Dates
+  public abstract get_date(id: string): Promise<DatesRecord>;
 }
 
 export class PocketBaseService extends DatabaseService {
@@ -95,5 +98,9 @@ export class PocketBaseService extends DatabaseService {
       this.pb.collection("choosing_24B").delete(choice.id, { requestKey: choice.id });
       logger.info(`Deleted duplicated choice (uid=${choice.user}, id=${choice.id})`)
     }));
+  }
+
+  public async get_date(id: string): Promise<DatesRecord> {
+    return await this.pb.collection("dates").getOne(id);
   }
 }

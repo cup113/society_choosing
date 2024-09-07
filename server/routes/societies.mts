@@ -1,5 +1,5 @@
 import RequestHandler from "../services/request-handler.mjs";
-import { get_time_status } from "../services/time.mjs";
+import TimeService from "../services/time.mjs";
 import type { ListSocietyResponse } from "../../types/types.js";
 
 class SocietiesRouter extends RequestHandler {
@@ -10,7 +10,7 @@ class SocietiesRouter extends RequestHandler {
         const ip = (this.req.headers['x-forwarded-for'] as string) ?? this.req.ip;
         return {
             societies: await this.check_response(this.databaseService.list_all_societies()),
-            timeStatus: get_time_status(),
+            timeStatus: await new TimeService(this.databaseService).get_time_status(),
             ip,
         }
     }

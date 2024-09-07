@@ -1,5 +1,5 @@
 import RequestHandler from "../services/request-handler.mjs";
-import { get_time_status } from "../services/time.mjs";
+import TimeService from "../services/time.mjs";
 import type { CreateChoosingData } from '../../types/types.d.ts';
 
 class ChooseRouter extends RequestHandler {
@@ -7,7 +7,7 @@ class ChooseRouter extends RequestHandler {
   static path = "/";
 
   public async handle_core(): Promise<object | undefined> {
-    const timeStatus = get_time_status();
+    const timeStatus = await new TimeService(this.databaseService).get_time_status();
     if (!timeStatus.open) {
       this.res.status(403).send("Time is not open for choosing.");
     }

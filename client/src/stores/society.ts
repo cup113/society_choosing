@@ -2,11 +2,13 @@ import { defineStore } from "pinia";
 import { ref, reactive, computed } from "vue";
 import { createShuffle } from 'fast-shuffle';
 import { alea } from 'seedrandom';
+import dayjs from "dayjs";
 
 import { useUserStore } from "./user";
 import { useErrorStore } from "./error";
 import { Fetcher } from "@/lib/fetch";
 import type { ListHistoryResponse, ListSocietyResponse, Society as _Society } from "../../../types/types.d.ts";
+
 
 export type Society = _Society & { index: string, isCoreMember: boolean };
 
@@ -18,14 +20,21 @@ export const useSocietyStore = defineStore('society', () => {
     choices: new Array<{
       id: string;
       ip?: string;
-      created: Date;
+      created: dayjs.Dayjs;
       first_choice?: string;
       second_choice?: string;
       third_choice?: string;
     }>(),
   });
 
-  const timeStatus = ref<{ open: true } | { open: false, estimated: Date } | null>(null);
+  const timeStatus = ref<{
+    open: true,
+    estimatedMaintain?: dayjs.Dayjs,
+    estimatedEnd: dayjs.Dayjs,
+  } | ({ open: false } & ({
+    reason: 'not-started',
+    estimated: dayjs.Dayjs,
+  } | { reason: 'ended' | 'maintaining' })) | null>(null);
 
   const localIP = ref("");
 
@@ -35,7 +44,7 @@ export const useSocietyStore = defineStore('society', () => {
       method: 'GET',
     }).fetch_json().then(data => {
       const userID = useUserStore().userID;
-      const societiesData = data.societies.map((society: Omit<Society, 'index' | 'isCoreMember'>, index: number) => {
+      const societiesData = data.societies.map((society: Omit<Society, 'index' | 'isCoreMember'>) => {
         return {
           ...society,
           isCoreMember: society.coreMembers?.includes(userID) ?? false,
@@ -50,9 +59,18 @@ export const useSocietyStore = defineStore('society', () => {
         }
       });
       if (data.timeStatus.open) {
-        timeStatus.value = { open: true };
+        const estimatedMaintain = data.timeStatus.maintainEta ? dayjs().add(data.timeStatus.maintainEta) : undefined;
+        timeStatus.value = {
+          open: true,
+          estimatedMaintain,
+          estimatedEnd: dayjs().add(data.timeStatus.endEta)
+        };
       } else {
-        timeStatus.value = { open: false, estimated: new Date(Date.now() + data.timeStatus.eta) };
+        if (data.timeStatus.reason === 'not-started') {
+          timeStatus.value = { open: false, reason: 'not-started', estimated: dayjs().add(data.timeStatus.eta) };
+        } else {
+          timeStatus.value = { open: false, reason: data.timeStatus.reason };
+        }
       }
       localIP.value = data.ip ?? "";
     }).catch(error => {
@@ -77,7 +95,7 @@ export const useSocietyStore = defineStore('society', () => {
           first_choice: get_society(item.first_choice)?.name,
           second_choice: get_society(item.second_choice)?.name,
           third_choice: get_society(item.third_choice)?.name,
-          created: new Date(item.created),
+          created: dayjs(item.created),
           id: item.id,
           ip,
         }

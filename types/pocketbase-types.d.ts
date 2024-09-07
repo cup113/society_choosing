@@ -7,6 +7,7 @@ import type { RecordService } from 'pocketbase'
 
 export enum Collections {
 	Choosing24b = "choosing_24B",
+	Dates = "dates",
 	Societies = "societies",
 	Users = "users",
 }
@@ -45,6 +46,12 @@ export type Choosing24bRecord = {
 	user: RecordIdString
 }
 
+export type DatesRecord = {
+	end: IsoDateString
+	maintain?: IsoDateString
+	start: IsoDateString
+}
+
 export type SocietiesRecord = {
 	adjustThreshold?: number
 	cap: number
@@ -64,6 +71,7 @@ export type UsersRecord = {
 
 // Response types include system fields and match responses from the PocketBase API
 export type Choosing24bResponse<Texpand = unknown> = Required<Choosing24bRecord> & BaseSystemFields<Texpand>
+export type DatesResponse<Texpand = unknown> = Required<DatesRecord> & BaseSystemFields<Texpand>
 export type SocietiesResponse<Texpand = unknown> = Required<SocietiesRecord> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
 
@@ -71,12 +79,14 @@ export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSyste
 
 export type CollectionRecords = {
 	choosing_24B: Choosing24bRecord
+	dates: DatesRecord
 	societies: SocietiesRecord
 	users: UsersRecord
 }
 
 export type CollectionResponses = {
 	choosing_24B: Choosing24bResponse
+	dates: DatesResponse
 	societies: SocietiesResponse
 	users: UsersResponse
 }
@@ -86,6 +96,7 @@ export type CollectionResponses = {
 
 export type TypedPocketBase = PocketBase & {
 	collection(idOrName: 'choosing_24B'): RecordService<Choosing24bResponse>
+	collection(idOrName: 'dates'): RecordService<DatesResponse>
 	collection(idOrName: 'societies'): RecordService<SocietiesResponse>
 	collection(idOrName: 'users'): RecordService<UsersResponse>
 }

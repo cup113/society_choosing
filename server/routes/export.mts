@@ -3,11 +3,12 @@ import { execSync } from 'child_process';
 import { join } from 'node:path';
 import { mkdirSync } from 'node:fs';
 import type { Request, Response } from 'express';
+import dayjs from 'dayjs';
 
 import RequestHandler from '../services/request-handler.mjs';
 import AssignService from '../services/assign.mjs';
 import { CodeType } from '../../types/codes.js';
-import { startTime } from '../services/time.mjs';
+import TimeService from '../services/time.mjs';
 
 interface SummaryUserData {
   "班级": string;
@@ -50,6 +51,7 @@ class ExportHandler extends RequestHandler {
 
   public folder: string;
   public assignService: AssignService | undefined;
+  public startTime: dayjs.Dayjs | undefined;
 
   constructor(req: Request, res: Response) {
     super(req, res);
@@ -125,7 +127,7 @@ class ExportHandler extends RequestHandler {
           "第三志愿录取人数": 0,
           "调剂人数": 0,
           "批次线": ExportHandler.BATCH_RECORD[society.lastBatch ?? "not_full"],
-          "时间线": lastTime ? ((lastTime.getTime() - startTime.getTime()) / 1000) : null,
+          "时间线": lastTime ? lastTime.diff(this.startTime, 's', true) : null,
         }];
       }));
 
@@ -147,7 +149,7 @@ class ExportHandler extends RequestHandler {
         "录取批次": batch,
         "录取社团": society?.name ?? "未录取",
         "附加问题答案": user.answer ?? "/",
-        "提交时间": (user.submit.getTime() - startTime.getTime()) / 1000,
+        "提交时间": user.submit.diff(this.startTime, 's', true),
       });
 
       if (society?.name) {
@@ -186,7 +188,8 @@ class ExportHandler extends RequestHandler {
     const societiesRaw = await this.check_response(this.databaseService.list_all_societies());
     const choosingRaw = await this.check_response(this.databaseService.list_choices());
 
-    this.assignService = new AssignService(usersRaw, societiesRaw, choosingRaw);
+    this.startTime = dayjs(await new TimeService(this.databaseService).get_start_time());
+    this.assignService = new AssignService(usersRaw, societiesRaw, choosingRaw, this.startTime);
     this.assignService.assign();
 
     const workbooks = [

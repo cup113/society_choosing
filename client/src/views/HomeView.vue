@@ -112,7 +112,7 @@ function login() {
               </template>
               <template #description>
                 <div class="flex flex-col pl-8">
-                  <span>时间: {{ choice.created.toLocaleString() }}</span>
+                  <span>时间: {{ choice.created.format("MM-DD HH:mm:ss.SSS") }}</span>
                   <span v-if="choice.ip">
                     <span v-if="choice.ip === societyStore.localIP">请求来自本 IP</span>
                     <span v-else>请求来自 IP {{ choice.ip }}</span>

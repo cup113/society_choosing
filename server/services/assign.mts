@@ -1,7 +1,7 @@
 import { PriorityQueue } from 'priority-queue-typed';
 import type { User as RawUser, Society as RawSociety, Choice } from '../../types/types.d.ts';
 import logger from './logger.mjs';
-import { startTime } from './time.mjs';
+import dayjs from 'dayjs';
 
 interface Society {
     name: string;
@@ -10,7 +10,7 @@ interface Society {
     countMembers: number;
     adjustThreshold: number;
     lastBatch: "first_choice" | "second_choice" | "third_choice" | "adjust" | null;
-    lastTime: Date | null;
+    lastTime: dayjs.Dayjs | null;
 }
 
 interface User {
@@ -25,16 +25,18 @@ interface User {
     rejects: Society[];
     batch: "first_choice" | "second_choice" | "third_choice" | "adjust" | null;
     answer?: string;
-    submit: Date;
+    submit: dayjs.Dayjs;
 }
 
 export default class AssignService {
     public users: User[];
     public societiesIdMap: Map<string, Society>;
+    public startTime: dayjs.Dayjs;
 
-    constructor(usersRaw: RawUser[], societiesRaw: RawSociety[], choosingRaw: Choice[]) {
+    constructor(usersRaw: RawUser[], societiesRaw: RawSociety[], choosingRaw: Choice[], startTime: dayjs.Dayjs) {
         this.societiesIdMap = this.get_society_map(societiesRaw);
         this.users = this.get_users(usersRaw, choosingRaw);
+        this.startTime = startTime;
     }
 
     static society_compare(a: Society, b: Society) {
@@ -77,7 +79,7 @@ export default class AssignService {
                 answer,
                 rejects,
                 // if not chosen, let the submit time be the latest.
-                submit: new Date(choosingData?.created ?? Date.now()),
+                submit: dayjs(choosingData?.created),
             };
         });
     }
@@ -115,7 +117,7 @@ export default class AssignService {
             if (!a.isCore && b.isCore) {
                 return 1;
             }
-            return a.user.submit.getTime() - b.user.submit.getTime();
+            return a.user.submit.diff(b.user.submit);
         });
 
         for (const user of users) {
@@ -130,14 +132,14 @@ export default class AssignService {
             if (society.countMembers === society.cap) {
                 society.lastBatch = batch;
                 // if the last user is core, assign start time immediately after the start of the batch, since anyone after them will be rejected.
-                society.lastTime = user.isCore ? startTime : user.user.submit;
+                society.lastTime = user.isCore ? this.startTime : user.user.submit;
             }
         }
     }
 
     public assign_adjust() {
         this.users = this.users.sort((a, b) => {
-            return b.submit.getTime() - a.submit.getTime();
+            return b.submit.diff(a.submit);
         }); // make the latest submit assigned to the coldest society.
 
         let societiesPQ = new PriorityQueue<Society>(

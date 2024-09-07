@@ -6,13 +6,24 @@ import type {
     BaseSystemFields,
     AuthSystemFields,
     UsersRecord,
+    DatesRecord,
 } from "./pocketbase-types.d.ts";
 
-import type { get_time_status } from '../server/services/time.mjs';
+export { Collections, TypedPocketBase, Choosing24bRecord, DatesRecord };
 
-export { Collections, TypedPocketBase, Choosing24bRecord };
-
-export type TimeStatus = ReturnType<get_time_status>;
+export type TimeStatus = {
+    open: true;
+    maintainEta?: number;
+    endEta: number;
+} | ({
+    open: false;
+} & ({
+    reason: 'not-started',
+    eta: number;
+    endEta: number;
+} | {
+    reason: 'maintaining' | 'ended';
+}));
 
 export type CreateUserInner = UsersRecord & { username: string; password: string };
 

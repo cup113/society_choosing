@@ -11,6 +11,7 @@
 		"start": "vite build client && SET NODE_ENV=production && start pnpm run serve-pocket && start pnpm run serve-express"
 	},
 	"dependencies": {
+		"dayjs": "^1.11.13",
 		"fast-shuffle": "^6.1.0",
 		"pocketbase": "^0.21.4",
 		"seedrandom": "^3.0.5",

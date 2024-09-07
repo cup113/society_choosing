@@ -32,17 +32,28 @@ const now = useNow({
   interval: 50,
 });
 
-const closed = computed(() => societyStore.timeStatus?.open === false);
+const estimated = computed(() => societyStore.timeStatus?.open === false && societyStore.timeStatus.reason === 'not-started' ? societyStore.timeStatus.estimated.format("MM-DD HH:mm:ss") : undefined);
 
-const estimated = computed(() => societyStore.timeStatus?.open === false ? new Date(societyStore.timeStatus.estimated).toLocaleString() : undefined);
+const reason = computed(() => societyStore.timeStatus && !societyStore.timeStatus.open ? societyStore.timeStatus.reason : undefined);
+
+const remainingEta = computed(() => {
+  if (societyStore.timeStatus?.open !== true || societyStore.timeStatus.estimatedMaintain === undefined) {
+    return;
+  }
+  const s = societyStore.timeStatus.estimatedMaintain.diff(now.value.getTime(), 's');
+  if (s > 10 * 60) {
+    return;
+  }
+  return s.toFixed(0);
+})
 
 const eta = computed(() => {
-  if (societyStore.timeStatus?.open !== false) {
+  if (societyStore.timeStatus?.open !== false || societyStore.timeStatus.reason !== 'not-started') {
     return 0;
   }
-  const ms = societyStore.timeStatus.estimated.getTime() - now.value.getTime();
+  const ms = societyStore.timeStatus.estimated.diff(now.value.getTime());
   if (ms <= 0) {
-    societyStore.timeStatus = { open: true };
+    societyStore.timeStatus = { open: true, estimatedEnd: societyStore.timeStatus.estimated };
   }
   if (ms < 1000) {
     return `${ms}毫秒`
@@ -107,9 +118,12 @@ const eta = computed(() => {
       </NavigationMenu>
     </header>
 
-    <p v-if="closed" class="text-center p-2 bg-amber-300">
-      <span class="text-red-800 text-lg md:text-2xl font-semibold">选课时间还未到。<b>{{ eta }}</b> 后到达开始时间 {{ estimated
+    <p class="text-center p-2 bg-amber-300" v-if="reason || remainingEta">
+      <span class="text-red-800 text-lg md:text-2xl font-semibold" v-if="reason === 'not-started'">选课时间还未到。<b>{{ eta }}</b> 后到达开始时间 {{ estimated
         }}，到时间后<b>无需</b>刷新页面。您可以<b>先在浏览器上对社团进行预览、选择</b>，开始后会自动出现“提交”按钮。</span>
+      <span class="text-red-600 md:text-lg" v-else-if="reason === 'maintaining'">选课系统正在维护中，请耐心等待。</span>
+      <span class="text-red-600 md:text-lg" v-else-if="reason === 'ended'">选课时间已结束。</span>
+      <span v-else-if="remainingEta">选课系统即将维护，剩余时间 <b>{{ remainingEta }}</b> 秒。在维护开始后不保证能够收到选课请求。</span>
     </p>
 
     <div class="flex-grow">
