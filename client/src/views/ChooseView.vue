@@ -70,7 +70,7 @@ function submit_confirmed() {
   }).catch(error => {
     waiting.value = false;
     console.error(error);
-    errorStore.add_error(`提交选课失败，请稍后再试: ${error.message.toString()}`);
+    errorStore.add_error(`提交选课失败，请稍后再试或尝试重新登录: ${error.message.toString()}`);
   })
 }
 

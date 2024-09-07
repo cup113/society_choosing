@@ -103,7 +103,7 @@ export const useSocietyStore = defineStore('society', () => {
     }).catch(error => {
       const errorStore = useErrorStore();
       console.error(error);
-      errorStore.add_error(`获取历史记录失败，请稍后再试或联系管理员: ${error.toString()}`);
+      errorStore.add_error(`获取历史记录失败，请尝试关闭此窗口后重新登录: ${error.toString()}`);
     });
   }
 
