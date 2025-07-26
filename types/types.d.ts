@@ -13,7 +13,6 @@ export { Collections, TypedPocketBase, Choosing24bRecord, DatesRecord };
 
 export type TimeStatus = {
     open: true;
-    maintainEta?: number;
     endEta: number;
 } | ({
     open: false;
@@ -22,7 +21,7 @@ export type TimeStatus = {
     eta: number;
     endEta: number;
 } | {
-    reason: 'maintaining' | 'ended';
+    reason: 'ended';
 }));
 
 export type CreateUserInner = UsersRecord & { username: string; password: string };

@@ -34,7 +34,7 @@ export const useSocietyStore = defineStore('society', () => {
   } | ({ open: false } & ({
     reason: 'not-started',
     estimated: dayjs.Dayjs,
-  } | { reason: 'ended' | 'maintaining' })) | null>(null);
+  } | { reason: 'ended' })) | null>(null);
 
   const localIP = ref("");
 
@@ -59,10 +59,8 @@ export const useSocietyStore = defineStore('society', () => {
         }
       });
       if (data.timeStatus.open) {
-        const estimatedMaintain = data.timeStatus.maintainEta ? dayjs().add(data.timeStatus.maintainEta) : undefined;
         timeStatus.value = {
           open: true,
-          estimatedMaintain,
           estimatedEnd: dayjs().add(data.timeStatus.endEta)
         };
       } else {

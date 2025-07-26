@@ -10,7 +10,7 @@ export default class TimeService {
     }
 
     public async get_time_status(): Promise<TimeStatus> {
-        const { start, maintain, end } = await this.db.get_date("society_2024_09");
+        const { start, end } = await this.db.get_date("society_2025_09");
         const now = dayjs();
         const eta = dayjs(start).diff(now);
         const endEta = dayjs(end).diff(now);
@@ -32,24 +32,9 @@ export default class TimeService {
                 reason: 'ended',
             }
         }
-        if (!maintain) {
-            return {
-                open: true,
-                endEta,
-            };
-        }
 
-        const maintainEta = dayjs(maintain).diff(now);
-        if (maintainEta < 0) {
-            // event is under maintenance
-            return {
-                open: false,
-                reason: 'maintaining',
-            }
-        }
         return {
             open: true,
-            maintainEta,
             endEta,
         }
     }
