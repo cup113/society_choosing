@@ -10,7 +10,7 @@ export default class TimeService {
     }
 
     public async get_time_status(): Promise<TimeStatus> {
-        const { start, end } = await this.db.get_date("society_2025_09");
+        const { start, end } = await this.db.get_date("society20250907");
         const now = dayjs();
         const eta = dayjs(start).diff(now);
         const endEta = dayjs(end).diff(now);
