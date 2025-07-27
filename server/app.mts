@@ -3,7 +3,7 @@ import logger from 'morgan';
 import bodyParser from 'body-parser';
 import timeout from 'connect-timeout';
 import compression from 'compression';
-import logger_ from './services/logger.mjs';
+import history from 'connect-history-api-fallback';
 import 'express-async-errors';
 
 import societiesRouter from './routes/societies.mjs';
@@ -31,6 +31,7 @@ app.get("/", (req, res) => {
     res.redirect("/index.html");
 });
 app.use(compression());
+app.use(history());
 
 app.use('/api/societies', societiesRouter);
 app.use('/api/login', loginRouter);
