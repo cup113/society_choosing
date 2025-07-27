@@ -55,7 +55,7 @@ function submit() {
 function submit_confirmed() {
   waiting_confirm.value = false;
   waiting.value = true;
-  new Fetcher({
+  new Fetcher<{ success: true }>({
     url: '/api/choose',
     method: 'POST',
     data: JSON.stringify({

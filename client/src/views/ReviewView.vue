@@ -23,6 +23,8 @@ const users = ref({
   third_choice: [],
 } as ListSocietyUserResponse)
 
+// TODO temporarily unavailable
+
 watch(societyName, () => {
   if (!societyName.value) {
     return;

@@ -9,8 +9,6 @@ import 'express-async-errors';
 import societiesRouter from './routes/societies.mjs';
 import loginRouter from './routes/login.mjs';
 import chooseRouter from './routes/choose.mjs';
-import historyRouter from './routes/history.mjs';
-import exportRouter from './routes/export.mjs';
 import reviewRouter from './routes/review.mjs';
 
 var app = express();
@@ -35,8 +33,6 @@ app.use(compression());
 app.use('/api/societies', societiesRouter);
 app.use('/api/login', loginRouter);
 app.use('/api/choose', chooseRouter);
-app.use('/api/history', historyRouter);
-app.use('/api/export', exportRouter);
 app.use('/api/review', reviewRouter);
 app.use('/', express.static('./client/dist'))
 app.use(history());

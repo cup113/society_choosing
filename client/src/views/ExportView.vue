@@ -6,6 +6,7 @@ import { useErrorStore } from '@/stores/error';
 const errorStore = useErrorStore();
 
 function export_data() {
+  // TODO temporarily unavailable
   new Fetcher({
     url: "/api/export/choosing",
     method: "POST",

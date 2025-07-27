@@ -7,25 +7,17 @@ import dayjs from "dayjs";
 import { useUserStore } from "./user";
 import { useErrorStore } from "./error";
 import { Fetcher } from "@/lib/fetch";
-import type { ListHistoryResponse, ListSocietyResponse, Society as _Society } from "../../../types/types.d.ts";
+import type { HistoryChoiceResponse, Choice as _Choice, ListSocietyResponse, Society as _Society } from "../../../types/types.d.ts";
 
 
 export type Society = _Society & { index: string, isCoreMember: boolean };
 
+type Choice = Omit<_Choice, "created" | "updated"> & { updated: dayjs.Dayjs }
+
 export const useSocietyStore = defineStore('society', () => {
   const societies = ref(new Array<Society>());
 
-  const historyChoices = reactive({
-    count: 0,
-    choices: new Array<{
-      id: string;
-      ip?: string;
-      created: dayjs.Dayjs;
-      first_choice?: string;
-      second_choice?: string;
-      third_choice?: string;
-    }>(),
-  });
+  const historyChoice = ref<Choice | null>(null);
 
   const timeStatus = ref<{
     open: true,
@@ -79,25 +71,25 @@ export const useSocietyStore = defineStore('society', () => {
   }
 
   function refresh_society_history() {
-    new Fetcher<ListHistoryResponse>({
-      'url': '/api/history',
+    new Fetcher<HistoryChoiceResponse>({
+      'url': '/api/choose',
       'method': 'GET',
     }).fetch_json().then((data) => {
-      historyChoices.count = data.totalItems;
-      historyChoices.choices = data.items.map(item => {
-        let ip = item.ip ? (item.ip.length > 0 ? item.ip : undefined) : undefined;
+      if (data.result === null) {
+        historyChoice.value = null;
+      } else {
+        const { ip: _ip } = data.result;
+        let ip = _ip ? (_ip.length > 0 ? _ip : undefined) : undefined;
+
         if (ip !== undefined && ip.startsWith("::ffff:")) {
-          ip = ip.slice(7);
+          ip = ip.slice("::ffff:".length);
         }
-        return {
-          first_choice: get_society(item.first_choice)?.name,
-          second_choice: get_society(item.second_choice)?.name,
-          third_choice: get_society(item.third_choice)?.name,
-          created: dayjs(item.created),
-          id: item.id,
+        historyChoice.value = {
+          ...data.result,
+          updated: dayjs(data.result.created),
           ip,
         }
-      });
+      }
     }).catch(error => {
       const errorStore = useErrorStore();
       console.error(error);
@@ -139,7 +131,7 @@ export const useSocietyStore = defineStore('society', () => {
 
   return {
     societies,
-    historyChoices,
+    historyChoice,
     timeStatus,
     localIP,
     question,

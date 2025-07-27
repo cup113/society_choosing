@@ -1,5 +1,5 @@
 import { PriorityQueue } from 'priority-queue-typed';
-import type { User as RawUser, Society as RawSociety, Choice } from '../../types/types.d.ts';
+import type { User as RawUser, Society as RawSociety, Choice, Batch } from '../../types/types.js';
 import logger from './logger.mjs';
 import dayjs from 'dayjs';
 
@@ -9,7 +9,7 @@ interface Society {
     coreMembers: string[];
     countMembers: number;
     adjustThreshold: number;
-    lastBatch: "first_choice" | "second_choice" | "third_choice" | "adjust" | null;
+    lastBatch: Batch;
     lastTime: dayjs.Dayjs | null;
 }
 
@@ -19,16 +19,14 @@ interface User {
     name: string;
     class: string;
     society: Society | null;
-    first_choice: Society | null;
-    second_choice: Society | null;
-    third_choice: Society | null;
+    choices: Society[];
     rejects: Society[];
-    batch: "first_choice" | "second_choice" | "third_choice" | "adjust" | null;
+    batch: Batch;
     answer?: string;
     submit: dayjs.Dayjs;
 }
 
-export default class AssignService {
+export default class AdmissionService {
     public users: User[];
     public societiesIdMap: Map<string, Society>;
     public startTime: dayjs.Dayjs;
@@ -50,20 +48,18 @@ export default class AssignService {
         return usersRaw.filter(user => user.role === "student").map(user => {
             const choosingData = choosingRaw.find(data => data.user === user.id);
             const chosen = choosingData !== undefined;
+            const choices: Society[] = [];
 
-            let first_choice = null as Society | null;
-            let second_choice = null as Society | null;
-            let third_choice = null as Society | null;
             let rejects = new Array<Society>();
             let answer: string | undefined = undefined;
             if (chosen) {
-                first_choice = this.societiesIdMap.get(choosingData.first_choice)!;
-                second_choice = this.societiesIdMap.get(choosingData.second_choice)!;
-                third_choice = this.societiesIdMap.get(choosingData.third_choice)!;
+                choosingData.choices.forEach(societyId => {
+                    choices.push(this.societiesIdMap.get(societyId)!);
+                })
                 choosingData.rejects?.forEach(rejectId => {
                     rejects.push(this.societiesIdMap.get(rejectId)!);
                 })
-                answer = choosingData.answer;
+                answer = choosingData.answers;
             }
 
             return {
@@ -72,10 +68,8 @@ export default class AssignService {
                 number: user.username.slice(3),
                 class: user.class,
                 society: null,
-                batch: null,
-                first_choice,
-                second_choice,
-                third_choice,
+                batch: "not-admitted",
+                choices,
                 answer,
                 rejects,
                 // if not chosen, let the submit time be the latest.
@@ -91,7 +85,7 @@ export default class AssignService {
             cap: s.cap,
             countMembers: 0,
             adjustThreshold: s.adjustThreshold ?? 0,
-            lastBatch: null,
+            lastBatch: "not-full",
             lastTime: null,
         }]));
     }
@@ -103,48 +97,43 @@ export default class AssignService {
         return user.rejects.includes(society);
     }
 
-    public assign_choice(batch: 'first_choice' | 'second_choice' | 'third_choice') {
-        const users = this.users.filter(user => user.society === null && !this.isRejectedBy(user, user[batch])).map(user => {
-            const batchSociety = user[batch];
-            return {
-                user,
-                isCore: batchSociety?.coreMembers?.includes(user.id),
-            };
-        }).sort((a, b) => {
-            if (a.isCore && !b.isCore) {
-                return -1;
+    public admit_core_members() {
+        this.societiesIdMap.forEach((s, id) => {
+            for (let userID of s.coreMembers) {
+                const user = this.users.find(u => u.id === userID)!;
+                user.batch = "core";
+                user.society = this.societiesIdMap.get(id)!;
             }
-            if (!a.isCore && b.isCore) {
-                return 1;
-            }
-            return a.user.submit.diff(b.user.submit);
-        });
-
-        for (const user of users) {
-            const society = user.user[batch];
-            if (society === null || society.countMembers >= society.cap) {
-                continue;
-            }
-            society.countMembers++;
-            user.user.society = society;
-            user.user.batch = batch;
-            logger.info(`User ${user.user.name} assigned to ${society.name} in batch ${batch}.`);
-            if (society.countMembers === society.cap) {
-                society.lastBatch = batch;
-                // if the last user is core, assign start time immediately after the start of the batch, since anyone after them will be rejected.
-                society.lastTime = user.isCore ? this.startTime : user.user.submit;
-            }
-        }
+        })
     }
 
-    public assign_adjust() {
+    public admit_choice(batch: number) {
+        this.users.filter(user => user.society === null && !this.isRejectedBy(user, user.choices[batch])).sort((a, b) => {
+            return a.submit.diff(b.submit);
+        }).forEach(user => {
+            const society = user.choices[batch];
+            if (society === null || society.countMembers >= society.cap) {
+                return;
+            }
+            society.countMembers++;
+            user.society = society;
+            user.batch = batch;
+            logger.info(`User ${user.name} admitted to ${society.name} in batch ${batch}.`);
+            if (society.countMembers === society.cap) {
+                society.lastBatch = batch;
+                society.lastTime = user.submit;
+            }
+        });
+    }
+
+    public admit_adjust() {
         this.users = this.users.sort((a, b) => {
             return b.submit.diff(a.submit);
-        }); // make the latest submit assigned to the coldest society.
+        }); // make the latest submit admitted to the coldest society.
 
         let societiesPQ = new PriorityQueue<Society>(
             new Array(...this.societiesIdMap.values()).filter(s => s.countMembers < s.cap),
-            { comparator: AssignService.society_compare }
+            { comparator: AdmissionService.society_compare }
         );
 
         while (true) {
@@ -165,10 +154,11 @@ export default class AssignService {
         }
     }
 
-    public assign() {
-        this.assign_choice("first_choice");
-        this.assign_choice("second_choice");
-        this.assign_choice("third_choice");
-        this.assign_adjust();
+    public admit() {
+        this.admit_core_members();
+        for (let i = 0; i < 9; i++) {
+            this.admit_choice(i);
+        }
+        this.admit_adjust();
     }
 }
