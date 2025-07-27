@@ -31,7 +31,6 @@ app.get("/", (req, res) => {
     res.redirect("/index.html");
 });
 app.use(compression());
-app.use(history());
 
 app.use('/api/societies', societiesRouter);
 app.use('/api/login', loginRouter);
@@ -40,5 +39,6 @@ app.use('/api/history', historyRouter);
 app.use('/api/export', exportRouter);
 app.use('/api/review', reviewRouter);
 app.use('/', express.static('./client/dist'))
+app.use(history());
 
 export default app;

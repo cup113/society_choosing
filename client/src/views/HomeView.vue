@@ -88,7 +88,7 @@ function login() {
         </Card>
       </form>
     </UseTemplate>
-    <div class="max-w-96 flex flex-col gap-8 shadow-lg rounded-lg border-4">
+    <div class="w-xs flex flex-col gap-8 shadow-lg rounded-lg border-4">
       <LoginCard v-if="userStore.token.length === 0"></LoginCard>
       <div v-else>
         <Collapsible :default-open="false">
@@ -102,20 +102,18 @@ function login() {
     <div v-if="userStore.userInformation.role === 'student'">
       <p v-if="societyStore.historyChoices.count === 0">还没有选课记录哦，快去选课吧！</p>
       <div v-else class="flex flex-col gap-3 items-center">
-        <div class="text-xl">选课次数：{{ societyStore.historyChoices.count }}</div>
         <ul class="flex flex-col gap-2">
-          <li v-for="choice, index in societyStore.historyChoices.choices" :key="choice.id" class="flex flex-col gap-1">
+          <li v-for="choice in societyStore.historyChoices.choices" :key="choice.id" class="flex flex-col gap-1">
             <ChoiceShow :choice="choice">
               <template #title>
-                第 {{ societyStore.historyChoices.count - index }} 次选课
-                <span v-if="index === 0" class="text-amber-700 text-lg">（以此次为准）</span>
+                选课记录
               </template>
               <template #description>
-                <div class="flex flex-col pl-8">
-                  <span>时间: {{ choice.created.format("MM-DD HH:mm:ss.SSS") }}</span>
+                <div class="flex flex-col pl-8 pt-1">
+                  <span>提交时间: {{ choice.created.format("MM-DD HH:mm:ss.SSS") }}</span>
                   <span v-if="choice.ip">
                     <span v-if="choice.ip === societyStore.localIP">请求来自本 IP</span>
-                    <span v-else>请求来自 IP {{ choice.ip }}</span>
+                    <span v-else v-show="false">请求来自 IP {{ choice.ip }}</span>
                   </span>
                 </div>
               </template>

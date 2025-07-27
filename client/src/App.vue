@@ -77,7 +77,7 @@ const eta = computed(() => {
 </script>
 
 <template>
-  <div class="flex flex-col min-h-screen gap-4">
+  <div class="flex flex-col min-h-screen bg-amber-50 dark:bg-stone-900 dark:text-white">
     <header class="flex flex-col md:flex-row gap-2 justify-between items-center bg-amber-700 text-amber-700 pl-2">
       <h1 class="border text-2xl border-gray-300 rounded-md bg-white font-bold px-4 py-2">华二宝山社团选课系统</h1>
       <NavigationMenu>
@@ -114,8 +114,12 @@ const eta = computed(() => {
     </header>
 
     <p class="text-center p-2 bg-amber-300" v-if="reason || remainingEta">
-      <span class="text-red-800 text-lg md:text-2xl font-semibold" v-if="reason === 'not-started'">选课时间还未到。<b>{{ eta }}</b> 后到达开始时间 {{ estimated
-        }}，到时间后<b>无需</b>刷新页面。您可以<b>先在浏览器上对社团进行预览、选择</b>，开始后会自动出现“提交”按钮。</span>
+      <span class="text-lg md:text-2xl text-amber-900 [&>b]:text-red-800" v-if="reason === 'not-started'">
+        <span>选课时间还未到。</span>
+        <b>{{ eta }}</b> <span>后到达开始时间 {{ estimated
+          }}，到时间后</span><b>无需</b><span>刷新页面。</span><br>
+          <span>您可以</span><b>先在浏览器上对社团进行预览、选择</b><span>，开始后会自动出现“提交”按钮。</span>
+      </span>
       <span class="text-red-600 md:text-lg" v-else-if="reason === 'ended'">选课时间已结束。</span>
       <span v-else-if="remainingEta">选课系统即将维护，剩余时间 <b>{{ remainingEta }}</b> 秒。在维护开始后不保证能够收到选课请求。</span>
     </p>
