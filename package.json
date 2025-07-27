@@ -16,7 +16,6 @@
 		"vite": "7.0.6"
 	},
 	"devDependencies": {
-		"@types/seedrandom": "^3.0.8",
-		"typescript": "~5.8"
+		"@types/seedrandom": "^3.0.8"
 	}
 }
