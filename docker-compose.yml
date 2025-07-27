@@ -12,7 +12,6 @@ services:
     depends_on:
       - pocketbase
     environment:
-      - PNPM_HOME=/pnpm
       - APP_ENV=production
       - POCKETBASE_URL=http://pocketbase:4128
 
