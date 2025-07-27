@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router';
-import { computed } from 'vue';
+import { computed, watch, ref } from 'vue';
 
 import {
   NavigationMenu,
@@ -12,12 +12,14 @@ import { AlertDialog, AlertDialogHeader, AlertDialogTitle, AlertDialogContent, A
 
 import { useUserStore } from './stores/user';
 import { useSocietyStore } from './stores/society';
-import { useNow } from '@vueuse/core';
 import { useErrorStore } from './stores/error';
+import { useTimeStore } from './stores/time';
+import { useNow } from '@vueuse/core';
 
 const userStore = useUserStore();
 const societyStore = useSocietyStore();
 const errorStore = useErrorStore();
+const timeStore = useTimeStore();
 
 const name = computed(() => userStore.userInformation.name);
 const role = computed(() => userStore.userInformation.role);
@@ -47,32 +49,19 @@ const remainingEta = computed(() => {
   return s.toFixed(0);
 })
 
-const eta = computed(() => {
+const eta = ref("");
+watch(() => timeStore.now, () => {
   if (societyStore.timeStatus?.open !== false || societyStore.timeStatus.reason !== 'not-started') {
-    return 0;
+    return;
   }
   const ms = societyStore.timeStatus.estimated.diff(now.value.getTime());
   if (ms <= 0) {
     societyStore.timeStatus = { open: true, estimatedEnd: societyStore.timeStatus.estimated };
+    return;
   }
-  if (ms < 10000) {
-    return `${(ms / 1000).toFixed(2)}秒`
-  }
-  if (ms < 60000) {
-    return `${(ms / 1000).toFixed(0)}秒`
-  }
-  let sec = Math.floor(ms / 1000);
-  let min = Math.floor(sec / 60);
-  let hour = Math.floor(min / 60);
-  let secStr = (sec % 60).toString().padStart(2, '0');
-  let minStr = (min % 60).toString().padStart(2, '0');
-  if (ms < 60000 * 60) {
-    return `${minStr}:${secStr}`
-  }
-  return `${hour}:${minStr}:${secStr}`;
+  eta.value = timeStore.formatDuration(ms);
 });
 
-// 导航菜单数据结构
 interface NavItem {
   link: string;
   text: string | (() => string);
@@ -112,7 +101,7 @@ const navItems: NavItem[] = [
 
     <p class="text-center p-2 bg-amber-300" v-if="reason || remainingEta">
       <span class="text-lg md:text-2xl text-amber-900 [&>b]:text-red-800" v-if="reason === 'not-started'">
-        <span>选课时间还未到。</span><b>{{ eta }}</b><span>后到达开始时间 {{ estimated }}，到时间后</span>
+        <span>选课时间还未到。</span><b>{{ eta }}&nbsp;</b><span>后到达开始时间 {{ estimated }}，到时间后</span>
         <b>无需</b><span>刷新页面。</span>
         <br>
         <span>您可以</span><b>先在浏览器上对社团进行预览、选择</b><span>，开始后会自动出现“提交”按钮。</span>
