@@ -120,6 +120,8 @@ const choiceName = computed(() => {
 </template>
 
 <style>
+@reference "tailwindcss";
+
 .submit-btn::before {
   @apply absolute -right-1 bg-contain;
   width: 44px;

@@ -131,6 +131,8 @@ function login() {
 </template>
 
 <style>
+@reference "tailwindcss";
+
 .login-btn::before {
   @apply block absolute right-0 bg-contain;
   width: 130px;
