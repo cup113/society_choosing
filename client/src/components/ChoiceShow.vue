@@ -19,7 +19,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <Card>
+  <Card class="text-center">
     <CardHeader>
       <CardTitle>
         <slot name="title"></slot>

@@ -92,7 +92,7 @@ function login() {
       <LoginCard v-if="userStore.token.length === 0"></LoginCard>
       <div v-else>
         <Collapsible :default-open="false">
-          <CollapsibleTrigger class="font-bold text-center px-4 py-2">您已登录，点此展开重新登录。</CollapsibleTrigger>
+          <CollapsibleTrigger class="font-bold px-4 py-2 w-full text-center">您已登录，点此展开重新登录。</CollapsibleTrigger>
           <CollapsibleContent>
             <LoginCard></LoginCard>
           </CollapsibleContent>
@@ -106,10 +106,10 @@ function login() {
           <li v-for="choice in societyStore.historyChoices.choices" :key="choice.id" class="flex flex-col gap-1">
             <ChoiceShow :choice="choice">
               <template #title>
-                选课记录
+                <div>选课记录</div>
               </template>
               <template #description>
-                <div class="flex flex-col pl-8 pt-1">
+                <div class="flex flex-col px-1 item-center">
                   <span>提交时间: {{ choice.created.format("MM-DD HH:mm:ss.SSS") }}</span>
                   <span v-if="choice.ip">
                     <span v-if="choice.ip === societyStore.localIP">请求来自本 IP</span>

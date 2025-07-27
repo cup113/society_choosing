@@ -55,11 +55,8 @@ const eta = computed(() => {
   if (ms <= 0) {
     societyStore.timeStatus = { open: true, estimatedEnd: societyStore.timeStatus.estimated };
   }
-  if (ms < 1000) {
-    return `${ms}毫秒`
-  }
   if (ms < 10000) {
-    return `${(ms / 1000).toFixed(1)}秒`
+    return `${(ms / 1000).toFixed(2)}秒`
   }
   if (ms < 60000) {
     return `${(ms / 1000).toFixed(0)}秒`
@@ -67,13 +64,30 @@ const eta = computed(() => {
   let sec = Math.floor(ms / 1000);
   let min = Math.floor(sec / 60);
   let hour = Math.floor(min / 60);
-  sec = sec % 60;
-  min = min % 60;
+  let secStr = (sec % 60).toString().padStart(2, '0');
+  let minStr = (min % 60).toString().padStart(2, '0');
   if (ms < 60000 * 60) {
-    return `${min}分钟 ${sec}秒`
+    return `${minStr}:${secStr}`
   }
-  return `${hour}小时 ${min}分钟 ${sec}秒`
-})
+  return `${hour}:${minStr}:${secStr}`;
+});
+
+// 导航菜单数据结构
+interface NavItem {
+  link: string;
+  text: string | (() => string);
+  bold?: boolean;
+  roles: string[];
+}
+
+const navItems: NavItem[] = [
+  { link: "/", text: () => loginNavText.value, roles: ["student", "teacher"] },
+  { link: "/choose", text: "选课", bold: true, roles: ["student"] },
+  { link: "/export", text: "导出数据", roles: ["teacher"] },
+  { link: "/review", text: "志愿审核", roles: ["teacher"] },
+  { link: "/about", text: "关于此网站", roles: ["teacher", "student"] },
+  { link: "#", text: "清除缓存", roles: ["teacher", "student"] },
+];
 </script>
 
 <template>
@@ -82,32 +96,15 @@ const eta = computed(() => {
       <h1 class="border text-2xl border-gray-300 rounded-md bg-white font-bold px-4 py-2">华二宝山社团选课系统</h1>
       <NavigationMenu>
         <NavigationMenuList class="flex-wrap py-4 gap-2 md:gap-0 text-white">
-          <NavigationMenuItem
-            class="py-1 px-3 min-w-20 text-center md:border-l-2 border-white border-dashed bg-amber-600 rounded-md md:bg-transparent md:rounded-none">
-            <RouterLink to="/">{{ loginNavText }}</RouterLink>
-          </NavigationMenuItem>
-          <NavigationMenuItem
+          <NavigationMenuItem v-for="item in navItems" :key="item.link"
             class="py-1 px-3 min-w-20 text-center md:border-l-2 border-white border-dashed bg-amber-600 rounded-md md:bg-transparent md:rounded-none"
-            v-if="role === 'student'">
-            <RouterLink to="/choose" class="font-bold">选课</RouterLink>
-          </NavigationMenuItem>
-          <NavigationMenuItem
-            class="py-1 px-3 min-w-20 text-center md:border-l-2 border-white border-dashed bg-amber-600 rounded-md md:bg-transparent md:rounded-none"
-            v-if="role === 'teacher'">
-            <RouterLink to="/export">导出数据</RouterLink>
-          </NavigationMenuItem>
-          <NavigationMenuItem
-            class="py-1 px-3 min-w-20 text-center md:border-l-2 border-white border-dashed bg-amber-600 rounded-md md:bg-transparent md:rounded-none"
-            v-if="role === 'teacher'">
-            <RouterLink to="/review">志愿审核</RouterLink>
-          </NavigationMenuItem>
-          <NavigationMenuItem
-            class="py-1 px-3 min-w-20 text-center md:border-l-2 border-white border-dashed bg-amber-600 rounded-md md:bg-transparent md:rounded-none">
-            <RouterLink to="/about">关于此网站</RouterLink>
-          </NavigationMenuItem>
-          <NavigationMenuItem
-            class="py-1 px-3 min-w-20 text-center md:border-l-2 border-white border-dashed bg-amber-600 rounded-md md:bg-transparent md:rounded-none">
-            <button @click="clear_local_storage_cache">清除缓存</button>
+            v-show="item.roles.includes(role)">
+            <RouterLink v-if="item.link !== '#'" :to="item.link" :class="{ 'font-bold': item.bold }">
+              {{ typeof item.text === 'function' ? item.text() : item.text }}
+            </RouterLink>
+            <button v-else @click="clear_local_storage_cache">
+              {{ typeof item.text === 'function' ? item.text() : item.text }}
+            </button>
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
@@ -115,13 +112,12 @@ const eta = computed(() => {
 
     <p class="text-center p-2 bg-amber-300" v-if="reason || remainingEta">
       <span class="text-lg md:text-2xl text-amber-900 [&>b]:text-red-800" v-if="reason === 'not-started'">
-        <span>选课时间还未到。</span>
-        <b>{{ eta }}</b> <span>后到达开始时间 {{ estimated
-          }}，到时间后</span><b>无需</b><span>刷新页面。</span><br>
-          <span>您可以</span><b>先在浏览器上对社团进行预览、选择</b><span>，开始后会自动出现“提交”按钮。</span>
+        <span>选课时间还未到。</span><b>{{ eta }}</b><span>后到达开始时间 {{ estimated }}，到时间后</span>
+        <b>无需</b><span>刷新页面。</span>
+        <br>
+        <span>您可以</span><b>先在浏览器上对社团进行预览、选择</b><span>，开始后会自动出现“提交”按钮。</span>
       </span>
       <span class="text-red-600 md:text-lg" v-else-if="reason === 'ended'">选课时间已结束。</span>
-      <span v-else-if="remainingEta">选课系统即将维护，剩余时间 <b>{{ remainingEta }}</b> 秒。在维护开始后不保证能够收到选课请求。</span>
     </p>
 
     <div class="flex-grow">
