@@ -17,10 +17,9 @@ RUN cd client && \
     pnpm run build
 
 # Server
-COPY server/package.json server/pnpm-lock.yaml* ./server
+COPY server ./server
 RUN cd server && \
     pnpm install --frozen-lockfile
-COPY server ./server
 RUN cd server && \
     pnpm run build
 EXPOSE 4127
