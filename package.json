@@ -1,14 +1,10 @@
 {
-	"packageManager": "pnpm@9.0.6",
+	"packageManager": "pnpm@10.13.1",
 	"scripts": {
-		"ts-build": "tsc -p server/tsconfig.json",
 		"init-data": "start pnpm run serve-pocket && pnpm run ts-build && node server/dist/script/database_init.mjs",
 		"allocate": "start pnpm run serve-pocket && pnpm run ts-build && node server/dist/script/allocate.mjs",
 		"pocket": "./pocketbase serve",
-		"pocket-win": "pocketbase.exe serve",
-		"express": "pnpm run ts-build && node server/dist/main.mjs",
-		"dev": "SET NODE_ENV=development && start pnpm run serve-pocket & start pnpm run serve-express",
-		"start": "vite build client && SET NODE_ENV=production && start pnpm run serve-pocket && start pnpm run serve-express"
+		"pocket-win": "pocketbase.exe serve"
 	},
 	"dependencies": {
 		"dayjs": "^1.11.13",
@@ -16,9 +12,11 @@
 		"pocketbase": "^0.21.4",
 		"seedrandom": "^3.0.5",
 		"tailwindcss": "^3.4.4",
-		"tailwindcss-animate": "^1.0.7"
+		"tailwindcss-animate": "^1.0.7",
+		"vite": "7.0.6"
 	},
 	"devDependencies": {
-		"@types/seedrandom": "^3.0.8"
+		"@types/seedrandom": "^3.0.8",
+		"vite-plugin-vue-devtools": "^7.7.7"
 	}
 }

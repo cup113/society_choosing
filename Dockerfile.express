@@ -1,0 +1,28 @@
+# Root directory
+# Note: ./types/pocketbase-types.d.ts should be generated manually before pushing to github
+FROM node:22-alpine
+
+WORKDIR /app
+RUN npm install -g pnpm && \
+    pnpm install -g typescript
+COPY package.json pnpm-lock.yaml* postcss.config.js tailwind.config.js ./
+RUN pnpm install --frozen-lockfile
+COPY types ./types
+
+# Client
+COPY client/package.json client/pnpm-lock.yaml* ./client/
+RUN cd client && \
+    pnpm install --frozen-lockfile
+COPY client ./client
+RUN cd client && \
+    pnpm run build
+
+# Server
+COPY server/package.json server/pnpm-lock.yaml* ./server
+RUN cd server && \
+    pnpm install --frozen-lockfile
+COPY server ./server
+RUN cd server && \
+    pnpm run build
+EXPOSE 4127
+CMD ["node", "server/dist/server/main.mjs"]

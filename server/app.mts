@@ -3,9 +3,9 @@ import logger from 'morgan';
 import bodyParser from 'body-parser';
 import timeout from 'connect-timeout';
 import compression from 'compression';
+import logger_ from './services/logger.mjs';
 import 'express-async-errors';
 
-import indexRouter from './routes/choose.mjs';
 import societiesRouter from './routes/societies.mjs';
 import loginRouter from './routes/login.mjs';
 import chooseRouter from './routes/choose.mjs';
@@ -27,14 +27,17 @@ app.use((req, res, next) => {
         next();
     }
 });
+app.get("/", (req, res) => {
+    res.redirect("/index.html");
+});
 app.use(compression());
 
-app.use('/', indexRouter);
 app.use('/api/societies', societiesRouter);
 app.use('/api/login', loginRouter);
 app.use('/api/choose', chooseRouter);
 app.use('/api/history', historyRouter);
 app.use('/api/export', exportRouter);
 app.use('/api/review', reviewRouter);
+app.use('/', express.static('./client/dist'))
 
 export default app;

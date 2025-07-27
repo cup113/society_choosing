@@ -10,6 +10,16 @@ from shutil import which
 ROOT = Path(argv[0]).absolute().parent
 
 
+def get_which(name: str) -> Path:
+    result = which(name)
+    assert result is not None, f"{name} not found"
+    return Path(result)
+
+
+pnpm = get_which("pnpm")
+pnpx = get_which("pnpx")
+
+
 def general_popen(
     *cmd: Union[str, Path], cwd: Path = ROOT, env_add: Optional[dict[str, str]] = None
 ):
@@ -27,31 +37,22 @@ def init_database():
 
 
 def build_ts():
-    tsc = which("tsc")
-    assert tsc is not None, "TypeScript compiler not found"
-    return general_popen(tsc, cwd=ROOT / "server")
-
-
-def build_client():
-    pnpm = which("pnpm")
-    assert pnpm is not None, "PNPM not found"
-    return general_popen(pnpm, "run", "build", cwd=ROOT / "client")
-
+    return general_popen(pnpm, "run", "build", cwd=ROOT / "server")
 
 def run_pocket_base():
-    pnpx = which("pnpx")
-    assert pnpx is not None, "PNPX not found"
     all_wait(
         general_popen(
             pnpx,
             "pocketbase-typegen",
             "--db",
-            ROOT / "pb_data" / "data.db",
+            ROOT / "db" / "pb_data" / "data.db",
             "--out",
             ROOT / "types" / "pocketbase-types.d.ts",
         )
     )
-    return general_popen(ROOT / "pocketbase.exe", "serve")
+    return general_popen(
+        ROOT / "db" / "pocketbase.exe", "serve", "--http", "127.0.0.1:4128"
+    )
 
 
 def all_wait(*wait_list: Popen[bytes]):
@@ -61,10 +62,11 @@ def all_wait(*wait_list: Popen[bytes]):
             raise ChildProcessError(f"Process {p.args} exited with code {code}")
 
 
-def run_express_server(node_env: str = "development"):
+def run_vite():
+    return general_popen(pnpm, "run", "dev", cwd=ROOT / "client")
+
+def run_express_server():
     pocket_base = run_pocket_base()
-    if node_env == "production":
-        build_client().wait()
     build_ts().wait()
     sleep(1)  # To make sure pocket base is ready to serve
     return (
@@ -72,14 +74,10 @@ def run_express_server(node_env: str = "development"):
         general_popen(
             "node",
             ROOT / "server" / "dist" / "server" / "main.mjs",
-            env_add={"NODE_ENV": node_env},
+            env_add={"NODE_ENV": "development", "POCKETBASE_URL": "http://localhost:4128/"},
         ),
+        run_vite()
     )
-
-
-def run_nginx():
-    all_wait(general_popen("nginx", "-s", "stop"))
-    return general_popen("nginx", "-p", ".", "-c", "./conf/nginx.conf", cwd=ROOT / "nginx")
 
 
 def main():
@@ -109,9 +107,7 @@ def main():
         pocket_base = run_pocket_base()
         pocket_base.terminate()
     else:
-        processes = list(run_express_server("production" if args.production else "development"))
-        if args.production:
-            processes.append(run_nginx())
+        processes = run_express_server()
         try:
             all_wait(*processes)
         except KeyboardInterrupt:

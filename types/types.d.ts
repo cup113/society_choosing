@@ -24,17 +24,17 @@ export type TimeStatus = {
     reason: 'ended';
 }));
 
-export type CreateUserInner = UsersRecord & { username: string; password: string };
+export type CreateUserInner = Omit<UsersRecord, "id" | "tokenKey"> & { username: string; password: string };
 
-export type CreateSocietyInner = SocietiesRecord;
+export type CreateSocietyInner = Omit<SocietiesRecord, "id">;
 
-export type User = UsersRecord & Pick<AuthSystemFields, "id" | "created" | "username">;
+export type User = UsersRecord;
 
-export type Society = SocietiesRecord & Pick<BaseSystemFields, 'id'>;
+export type Society = SocietiesRecord;
 
-export type Choice = Choosing24bRecord & Pick<BaseSystemFields, 'id' | 'created'>;
+export type Choice = Choosing24bRecord;
 
-export type CreateChoosingData = Omit<Choosing24bRecord, "ip" | "user">;
+export type CreateChoosingData = Omit<Choosing24bRecord, "ip" | "user" | "id" | "created" | "updated">;
 
 export type ListSocietyResponse = {
     societies: Society[];

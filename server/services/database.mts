@@ -1,6 +1,7 @@
 import PocketBase from 'pocketbase';
-import type { Choice, CreateSocietyInner, CreateUserInner, Society, TypedPocketBase, User, Choosing24bRecord, DatesRecord } from '../../types/types.d.ts';
+import type { Choice, CreateSocietyInner, CreateUserInner, Society, TypedPocketBase, User, Choosing24bRecord, DatesRecord, CreateChoosingData } from '../../types/types.d.ts';
 import logger from './logger.mjs';
+import { env } from 'node:process';
 
 export abstract class DatabaseService {
   // Users
@@ -12,7 +13,7 @@ export abstract class DatabaseService {
   public abstract list_all_societies(): Promise<Society[]>;
 
   // Choosing
-  public abstract create_choosing(data: Choosing24bRecord): Promise<void>;
+  public abstract create_choosing(data: CreateChoosingData): Promise<void>;
   public abstract list_choices(): Promise<Choice[]>;
   public abstract toggle_choice_reject(userID: string, societyID: string, reject: boolean): Promise<void>;
   public abstract delete_duplicated_choices(): Promise<void>;
@@ -26,7 +27,7 @@ export class PocketBaseService extends DatabaseService {
 
   constructor() {
     super();
-    this.pb = new PocketBase("http://localhost:8090");
+    this.pb = new PocketBase(env.POCKETBASE_URL);
   }
 
   public async create_user(data: CreateUserInner): Promise<void> {

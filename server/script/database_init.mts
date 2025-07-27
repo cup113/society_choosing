@@ -3,6 +3,7 @@ import { PocketBaseService } from '../services/database.mjs';
 import { PocketBaseAuthorizationService } from '../services/authorization.mjs';
 import { readFileSync } from 'node:fs';
 import 'dotenv/config';
+import { UsersRoleOptions } from '../../types/pocketbase-types.js';
 
 const databaseService = new PocketBaseService();
 const authorizationService = new PocketBaseAuthorizationService(databaseService);
@@ -45,7 +46,7 @@ await Promise.all(students.map(async (student: any) => {
         "password": student.password,
         "name": student.name,
         "class": student.className,
-        "role": "student" as const,
+        "role": UsersRoleOptions.student,
     });
 }));
 

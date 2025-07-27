@@ -2,7 +2,9 @@
   "name": "server",
   "version": "0.0.0",
   "private": true,
-  "scripts": {},
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
   "dependencies": {
     "@types/compression": "^1.7.5",
     "body-parser": "^1.20.2",
@@ -17,7 +19,6 @@
     "morgan": "~1.9.1",
     "priority-queue-typed": "^1.52.1",
     "vite": "^5.3.3",
-    "vite-express": "^0.17.0",
     "winston": "^3.13.1",
     "winston-daily-rotate-file": "^5.0.0",
     "xlsx": "^0.18.5"
