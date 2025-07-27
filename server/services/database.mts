@@ -27,6 +27,7 @@ export class PocketBaseService extends DatabaseService {
 
   constructor() {
     super();
+    logger.info(`PocketBaseService initialized with URL ${env.POCKETBASE_URL}`);
     this.pb = new PocketBase(env.POCKETBASE_URL);
   }
 
