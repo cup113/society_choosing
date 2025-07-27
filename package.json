@@ -9,7 +9,7 @@
 	"dependencies": {
 		"dayjs": "^1.11.13",
 		"fast-shuffle": "^6.1.0",
-		"pocketbase": "^0.21.4",
+		"pocketbase": "^0.26.2",
 		"seedrandom": "^3.0.5",
 		"tailwindcss": "^3.4.4",
 		"tailwindcss-animate": "^1.0.7",

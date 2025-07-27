@@ -15,8 +15,8 @@ importers:
         specifier: ^6.1.0
         version: 6.1.0
       pocketbase:
-        specifier: ^0.21.4
-        version: 0.21.4
+        specifier: ^0.26.2
+        version: 0.26.2
       seedrandom:
         specifier: ^3.0.5
         version: 3.0.5
@@ -623,8 +623,8 @@ packages:
     resolution: {integrity: sha512-saLsH7WeYYPiD25LDuLRRY/i+6HaPYr6G1OUlN39otzkSTxKnubR9RTxS3/Kk50s1g2JTgFwWQDQyplC5/SHZg==}
     engines: {node: '>= 6'}
 
-  pocketbase@0.21.4:
-    resolution: {integrity: sha512-WJHyaqdAt95JgZ1OCRD099+DST4IIG0M/jMrCckWYDSN/6ocp61qsz7m6h0xI0J2N79ScBljceEC0fFAaQrrAw==}
+  pocketbase@0.26.2:
+    resolution: {integrity: sha512-WA8EOBc3QnSJh8rJ3iYoi9DmmPOMFIgVfAmIGux7wwruUEIzXgvrO4u0W2htfQjGIcyezJkdZOy5Xmh7SxAftw==}
 
   postcss-import@15.1.0:
     resolution: {integrity: sha512-hpr+J05B2FVYUAXHeK1YyI267J/dDDhMU6B6civm8hSY1jYJnBXxzKDKDswzJmtLHryrjhnDjqqp/49t8FALew==}
@@ -1276,7 +1276,7 @@ snapshots:
 
   pirates@4.0.6: {}
 
-  pocketbase@0.21.4: {}
+  pocketbase@0.26.2: {}
 
   postcss-import@15.1.0(postcss@8.4.39):
     dependencies:
