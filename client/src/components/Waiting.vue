@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, computed, watch } from 'vue';
-import { useNow } from '@vueuse/core';
+import { useTimeStore } from '@/stores/time';
 
 import { Dialog, DialogHeader, DialogDescription, DialogTitle, DialogContent } from '@/components/ui/dialog';
 
@@ -11,13 +11,11 @@ defineSlots<{
 const props = defineProps<{
   show: boolean;
 }>();
+const timeStore = useTimeStore();
 
 const start = ref(Date.now());
-const now = useNow({
-  interval: 30,
-});
 const time = computed(() => {
-  return now.value.getTime() - start.value;
+  return timeStore.now.getTime() - start.value;
 });
 const opacity = computed(() => {
   return (0.6 + 0.4 * Math.sin(time.value / 200)).toString();

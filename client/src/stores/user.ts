@@ -14,27 +14,8 @@ export const useUserStore = defineStore('user', () => {
     role: '',
     username: '',
   });
-  const choice = useLocalStorage('SC_choice', {
-    'first_choice': undefined as string | undefined,
-    'second_choice': undefined as string | undefined,
-    'third_choice': undefined as string | undefined,
-  });
+  const choice = useLocalStorage('SC_choice_v2', []);
   const answer = useLocalStorage('SC_answer', '');
 
-  const batches: Batch[] = [
-    {
-      name: "第一志愿",
-      key: "first_choice",
-    },
-    {
-      name: "第二志愿",
-      key: "second_choice",
-    },
-    {
-      name: "第三志愿",
-      key: "third_choice",
-    }
-  ];
-
-  return { userID, token, userInformation, choice, batches, answer }
+  return { userID, token, userInformation, choice, answer }
 })

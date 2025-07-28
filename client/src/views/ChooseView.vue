@@ -3,12 +3,11 @@ import { computed, ref } from 'vue';
 
 import { useUserStore } from '@/stores/user';
 import { useSocietyStore } from '@/stores/society';
-import router from '@/router';
 import { Fetcher } from '@/lib/fetch';
+import router from '@/router';
 
 import { Button } from '@/components/ui/button';
 import SocietyCard from '@/components/SocietyCard.vue';
-import ChoiceComboBox from '@/components/ChoiceComboBox.vue';
 import { Textarea } from '@/components/ui/textarea';
 
 import Waiting from '@/components/Waiting.vue';
@@ -28,23 +27,7 @@ function confirm_choice() {
 
 function submit() {
   const errors = new Array<string>();
-  if (userStore.choice.first_choice === undefined) {
-    errors.push('未选择第一志愿，请选择后提交。');
-  }
-  if (userStore.choice.second_choice === undefined) {
-    errors.push('未选择第二志愿，请选择后提交。');
-  }
-  if (userStore.choice.third_choice === undefined) {
-    errors.push('未选择第三志愿，请选择后提交。');
-  }
-  if (societyStore.question.length > 0 && userStore.answer.length === 0) {
-    errors.push(`您选择的社团需要您回答问题，请填写答案。问题为：${societyStore.question}`);
-  }
-  if (userStore.choice.first_choice === userStore.choice.second_choice || userStore.choice.first_choice === userStore.choice.third_choice || userStore.choice.second_choice === userStore.choice.third_choice) {
-    if (errors.length === 0) {
-      errors.push("第一、第二、第三志愿不能相同，请重新选择。")
-    }
-  }
+  // TODO check
   if (errors.length > 0) {
     errorStore.add_error(...errors);
     return;
@@ -76,14 +59,8 @@ function submit_confirmed() {
 
 const choiceName = computed(() => {
   const get_name = (id: string | undefined) => id ? societyStore.get_society(id) : undefined;
-  const first_choice = userStore.choice.first_choice;
-  const second_choice = userStore.choice.second_choice;
-  const third_choice = userStore.choice.third_choice;
-  return {
-    first_choice: get_name(first_choice)?.name,
-    second_choice: get_name(second_choice)?.name,
-    third_choice: get_name(third_choice)?.name,
-  }
+  // TODO
+  throw "unimplemented";
 })
 </script>
 
@@ -96,9 +73,8 @@ const choiceName = computed(() => {
       <div
         class="flex items-center justify-center gap-4 md:gap-8 lg:gap-12 md:px-8">
         <div class="flex flex-col md:flex-row md:flex-wrap md:gap-x-8 md:justify-center lg:flex-nowrap gap-1">
-          <ChoiceComboBox v-for="batch in userStore.batches" :key="batch.key" :batch="batch"></ChoiceComboBox>
         </div>
-        <Button v-if="societyStore.timeStatus?.open" @click="submit()"
+        <Button v-if="societyStore.timeStatus?.open && !societyStore.coreMemberOf" @click="submit()"
           class="submit-btn relative w-20 my-8 bg-amber-700 hover:bg-amber-800">提交</Button>
       </div>
       <div>

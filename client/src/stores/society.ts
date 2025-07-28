@@ -10,13 +10,13 @@ import { Fetcher } from "@/lib/fetch";
 import type { HistoryChoiceResponse, Choice as _Choice, ListSocietyResponse, Society as _Society } from "../../../types/types.d.ts";
 
 
-export type Society = _Society & { index: string, isCoreMember: boolean };
+export type Society = _Society & { index: string };
 
 type Choice = Omit<_Choice, "created" | "updated"> & { updated: dayjs.Dayjs }
 
 export const useSocietyStore = defineStore('society', () => {
   const societies = ref(new Array<Society>());
-
+  const coreMemberOf = ref<string | null>(null)
   const historyChoice = ref<Choice | null>(null);
 
   const timeStatus = ref<{
@@ -36,15 +36,10 @@ export const useSocietyStore = defineStore('society', () => {
       method: 'GET',
     }).fetch_json().then(data => {
       const userID = useUserStore().userID;
-      const societiesData = data.societies.map((society: Omit<Society, 'index' | 'isCoreMember'>) => {
-        return {
-          ...society,
-          isCoreMember: society.coreMembers?.includes(userID) ?? false,
-        };
-      });
-      societies.value = createShuffle(alea(userID).int32(), societiesData).sort((a, b) => {
-        return a.isCoreMember ? 0 : 1 - (b.isCoreMember ? 0 : 1);
-      }).map((society, index) => {
+      data.societies.filter(society => society.coreMembers?.includes(userID)).forEach(society => {
+        coreMemberOf.value = society.name;
+      })
+      societies.value = createShuffle(alea(userID).int32(), data.societies).map((society, index) => {
         return {
           ...society,
           index: (index < 9 ? '0' : '') + (index + 1).toString(),
@@ -118,15 +113,8 @@ export const useSocietyStore = defineStore('society', () => {
 
   const question = computed(() => {
     const userStore = useUserStore();
-    return userStore.batches.map(batch => {
-      const society = get_society(userStore.choice[batch.key] ?? '');
-      const q = society?.question;
-      if (!q) {
-        return false;
-      } else {
-        return `(来自${society.name}) ${q}`
-      }
-    }).filter(Boolean).join('；');
+    // TODO
+    return "";
   });
 
   return {
@@ -135,6 +123,7 @@ export const useSocietyStore = defineStore('society', () => {
     timeStatus,
     localIP,
     question,
+    coreMemberOf,
     get_society,
     get_society_id,
     refresh,

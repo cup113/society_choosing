@@ -9,11 +9,7 @@ const slots = defineSlots<{
 }>();
 
 const props = defineProps<{
-  choice: {
-    first_choice?: string,
-    second_choice?: string,
-    third_choice?: string,
-  }
+  choice: string[];
 }>();
 
 </script>
@@ -30,9 +26,9 @@ const props = defineProps<{
     </CardHeader>
     <CardContent>
       <div class="flex flex-col gap-1">
-        <p>第一志愿: <b>{{ props.choice.first_choice }}</b></p>
-        <p>第二志愿: <b>{{ props.choice.second_choice }}</b></p>
-        <p>第三志愿: <b>{{ props.choice.third_choice }}</b></p>
+        <p v-for="choice, i in choice" :key="choice">
+          第 <b>{{ i + 1 }}</b> 志愿：{{ choice }}
+        </p>
         <slot name="extra"></slot>
       </div>
     </CardContent>

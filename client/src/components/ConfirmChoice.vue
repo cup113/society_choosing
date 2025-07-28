@@ -12,11 +12,7 @@ const userStore = useUserStore();
 
 const props = defineProps<{
   open: boolean,
-  choice: {
-    first_choice?: string,
-    second_choice?: string,
-    third_choice?: string,
-  }
+  choice: never, // TODO
 }>();
 
 defineEmits<{

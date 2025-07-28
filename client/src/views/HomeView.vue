@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { createReusableTemplate } from '@vueuse/core';
 
 import { useUserStore } from '@/stores/user';
@@ -54,6 +54,10 @@ function login() {
     errorStore.add_error(`登录失败，请按照输入框下的提示检查用户名和密码是否正确：${error.toString()}`);
   });
 }
+
+const choice = computed(() => {
+  return societyStore.historyChoice;
+});
 </script>
 
 <template>
@@ -100,26 +104,22 @@ function login() {
       </div>
     </div>
     <div v-if="userStore.userInformation.role === 'student'">
-      <p v-if="societyStore.historyChoices.count === 0">还没有选课记录哦，快去选课吧！</p>
+      <p v-if="choice === null">还没有选课记录哦，快去选课吧！</p>
       <div v-else class="flex flex-col gap-3 items-center">
-        <ul class="flex flex-col gap-2">
-          <li v-for="choice in societyStore.historyChoices.choices" :key="choice.id" class="flex flex-col gap-1">
-            <ChoiceShow :choice="choice">
-              <template #title>
-                <div>选课记录</div>
-              </template>
-              <template #description>
-                <div class="flex flex-col px-1 item-center">
-                  <span>提交时间: {{ choice.created.format("MM-DD HH:mm:ss.SSS") }}</span>
-                  <span v-if="choice.ip">
-                    <span v-if="choice.ip === societyStore.localIP">请求来自本 IP</span>
-                    <span v-else v-show="false">请求来自 IP {{ choice.ip }}</span>
-                  </span>
-                </div>
-              </template>
-            </ChoiceShow>
-          </li>
-        </ul>
+        <ChoiceShow :choice="choice.choices">
+          <template #title>
+            <div>选课记录</div>
+          </template>
+          <template #description>
+            <div class="flex flex-col px-1 item-center">
+              <span>提交时间: {{ choice.updated.format("MM-DD HH:mm:ss.SSS") }}</span>
+              <span v-if="choice.ip">
+                <span v-if="choice.ip === societyStore.localIP">请求来自本 IP</span>
+                <span v-else v-show="false">请求来自 IP {{ choice.ip }}</span>
+              </span>
+            </div>
+          </template>
+        </ChoiceShow>
       </div>
     </div>
     <Waiting :show="loginLoading">

@@ -22,7 +22,8 @@ function go_home() {
     </ul>
     <h1 class="text-2xl font-bold">第三方库 / Third-party libraries</h1>
     <ul>
-      <li>前后端框架: Vue 3, ViteExpress</li>
+      <li>部署工具：Coolify Docker</li>
+      <li>前后端框架: Vue 3 (Vite), Express.js</li>
       <li>UI 框架: shadcn-vue</li>
       <li>数据库系统: PocketBase</li>
       <li>工具库: TailwindCSS, vueuse, vue-router, clsx, priority-queue, winston, xlsx</li>
