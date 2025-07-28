@@ -40,6 +40,6 @@ export default class TimeService {
     }
 
     public async get_start_time(): Promise<string> {
-        return (await this.db.get_date("society_2024_09")).start;
+        return (await this.db.get_date("society20250907")).start;
     }
 }

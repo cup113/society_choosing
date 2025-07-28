@@ -1,5 +1,4 @@
 import RequestHandler from "../services/request-handler.mjs";
-import { to_status } from "../../types/codes.js";
 import type { LoginResponse } from "../../types/types.d.ts";
 
 class LoginHandler extends RequestHandler {

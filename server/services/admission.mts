@@ -1,56 +1,33 @@
 import { PriorityQueue } from 'priority-queue-typed';
-import type { User as RawUser, Society as RawSociety, Choice, Batch } from '../../types/types.js';
+import type { User as RawUser, Society as RawSociety, Choice, AdmittedSociety, AdmittedUser, AdmissionResult } from '../../types/types.js';
 import logger from './logger.mjs';
 import dayjs from 'dayjs';
 
-interface Society {
-    name: string;
-    cap: number;
-    coreMembers: string[];
-    countMembers: number;
-    adjustThreshold: number;
-    lastBatch: Batch;
-    lastTime: dayjs.Dayjs | null;
-}
-
-interface User {
-    id: string;
-    number: string;
-    name: string;
-    class: string;
-    society: Society | null;
-    choices: Society[];
-    rejects: Society[];
-    batch: Batch;
-    answer?: string;
-    submit: dayjs.Dayjs;
-}
-
 export default class AdmissionService {
-    public users: User[];
-    public societiesIdMap: Map<string, Society>;
+    public users: AdmittedUser[];
+    public societiesIdMap: Map<string, AdmittedSociety>;
     public startTime: dayjs.Dayjs;
 
     constructor(usersRaw: RawUser[], societiesRaw: RawSociety[], choosingRaw: Choice[], startTime: dayjs.Dayjs) {
+        this.startTime = startTime;
         this.societiesIdMap = this.get_society_map(societiesRaw);
         this.users = this.get_users(usersRaw, choosingRaw);
-        this.startTime = startTime;
     }
 
-    static society_compare(a: Society, b: Society) {
+    static society_compare(a: AdmittedSociety, b: AdmittedSociety) {
         if (a.adjustThreshold !== b.adjustThreshold) {
             return a.adjustThreshold - b.adjustThreshold; // lower threshold first.
         }
         return a.countMembers / a.cap - b.countMembers / b.cap; // colder first
     }
 
-    private get_users(usersRaw: RawUser[], choosingRaw: Choice[]): User[] {
-        return usersRaw.filter(user => user.role === "student").map(user => {
+    private get_users(usersRaw: RawUser[], choosingRaw: Choice[]): AdmittedUser[] {
+        return usersRaw.filter(user => user.role !== "teacher").map(user => {
             const choosingData = choosingRaw.find(data => data.user === user.id);
             const chosen = choosingData !== undefined;
-            const choices: Society[] = [];
+            const choices: AdmittedSociety[] = [];
 
-            let rejects = new Array<Society>();
+            let rejects = new Array<AdmittedSociety>();
             let answer: string | undefined = undefined;
             if (chosen) {
                 choosingData.choices.forEach(societyId => {
@@ -61,7 +38,7 @@ export default class AdmissionService {
                 })
                 answer = choosingData.answers;
             }
-
+            const startTime = this.startTime;
             return {
                 id: user.id,
                 name: user.name,
@@ -73,13 +50,14 @@ export default class AdmissionService {
                 answer,
                 rejects,
                 // if not chosen, let the submit time be the latest.
-                submit: dayjs(choosingData?.created),
+                submit: dayjs(choosingData?.updated).diff(startTime),
             };
         });
     }
 
-    private get_society_map(societiesRaw: RawSociety[]): Map<string, Society> {
+    private get_society_map(societiesRaw: RawSociety[]): Map<string, AdmittedSociety> {
         return new Map(societiesRaw.map(s => [s.id, {
+            id: s.id,
             coreMembers: s.coreMembers ?? [],
             name: s.name,
             cap: s.cap,
@@ -90,7 +68,7 @@ export default class AdmissionService {
         }]));
     }
 
-    private isRejectedBy(user: User, society: Society | null) {
+    private isRejectedBy(user: AdmittedUser, society: AdmittedSociety | null) {
         if (society === null) {
             return false;
         }
@@ -108,8 +86,8 @@ export default class AdmissionService {
     }
 
     public admit_choice(batch: number) {
-        this.users.filter(user => user.society === null && !this.isRejectedBy(user, user.choices[batch])).sort((a, b) => {
-            return a.submit.diff(b.submit);
+        this.users.filter(user => user.society === null && user.choices.length > 0 && !this.isRejectedBy(user, user.choices[batch])).sort((a, b) => {
+            return a.submit - b.submit;
         }).forEach(user => {
             const society = user.choices[batch];
             if (society === null || society.countMembers >= society.cap) {
@@ -128,10 +106,10 @@ export default class AdmissionService {
 
     public admit_adjust() {
         this.users = this.users.sort((a, b) => {
-            return b.submit.diff(a.submit);
+            return b.submit - a.submit;
         }); // make the latest submit admitted to the coldest society.
 
-        let societiesPQ = new PriorityQueue<Society>(
+        let societiesPQ = new PriorityQueue<AdmittedSociety>(
             new Array(...this.societiesIdMap.values()).filter(s => s.countMembers < s.cap),
             { comparator: AdmissionService.society_compare }
         );
@@ -154,11 +132,17 @@ export default class AdmissionService {
         }
     }
 
-    public admit() {
+    public admit(): AdmissionResult {
+        logger.info("Admitting...");
         this.admit_core_members();
         for (let i = 0; i < 3; i++) {
             this.admit_choice(i);
         }
         this.admit_adjust();
+        logger.info("Admitting done.");
+        return {
+            users: this.users,
+            societies: Array.from(this.societiesIdMap.values()),
+        };
     }
 }

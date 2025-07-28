@@ -72,8 +72,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { link: "/", text: () => loginNavText.value, roles: ["student", "teacher"] },
   { link: "/choose", text: "选课", bold: true, roles: ["student"] },
-  { link: "/export", text: "导出数据", roles: ["teacher"] },
-  { link: "/review", text: "志愿审核", roles: ["teacher"] },
+  { link: "/dashboard", text: "数据总览", roles: ["teacher"] },
   { link: "/about", text: "关于此网站", roles: ["teacher", "student"] },
   { link: "#", text: "清除缓存", roles: ["teacher", "student"] },
 ];

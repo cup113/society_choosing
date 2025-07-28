@@ -8,6 +8,7 @@ import type {
     UsersRecord,
     DatesRecord,
 } from "./pocketbase-types.d.ts";
+import dayjs from "dayjs";
 
 export { Collections, TypedPocketBase, Choosing25bRecord, DatesRecord };
 
@@ -54,8 +55,33 @@ export type LoginResponse = {
     }
 }
 
-export type ListSocietyUser = User & Pick<Choice, 'answer'> & { rejected: boolean };
-
-export type ListSocietyUserResponse = Record<'first_choice' | 'second_choice' | 'third_choice', ListSocietyUser[]>
-
 export type Batch = number | "adjust" | "core" | "not-admitted" | "not-full";
+
+export interface AdmittedSociety {
+    id: string;
+    name: string;
+    cap: number;
+    coreMembers: string[];
+    countMembers: number;
+    adjustThreshold: number;
+    lastBatch: Batch;
+    lastTime: number | null;
+}
+
+export interface AdmittedUser {
+    id: string;
+    number: string;
+    name: string;
+    class: string;
+    society: AdmittedSociety | null;
+    choices: AdmittedSociety[];
+    rejects: AdmittedSociety[];
+    batch: Batch;
+    answer?: string;
+    submit: number;
+}
+
+export interface AdmissionResult {
+    users: AdmittedUser[];
+    societies: AdmittedSociety[];
+}
