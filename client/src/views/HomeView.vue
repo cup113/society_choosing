@@ -58,6 +58,10 @@ function login() {
 const choice = computed(() => {
   return societyStore.historyChoice;
 });
+
+const choices = computed(() => {
+  return choice.value?.choices.map(id => societyStore.get_society(id)?.name ?? "未知") ?? ["", "", ""];
+})
 </script>
 
 <template>
@@ -106,7 +110,7 @@ const choice = computed(() => {
     <div v-if="userStore.userInformation.role === 'student'">
       <p v-if="choice === null">还没有选课记录哦，快去选课吧！</p>
       <div v-else class="flex flex-col gap-3 items-center">
-        <ChoiceShow :choice="choice.choices">
+        <ChoiceShow :choice="choices">
           <template #title>
             <div>选课记录</div>
           </template>

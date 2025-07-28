@@ -133,6 +133,8 @@ export type SocietiesRecord = {
 	created?: IsoDateString
 	description: string
 	id: string
+	lastYearBatch?: number
+	lastYearSeconds?: number
 	limit?: string
 	name: string
 	question?: string

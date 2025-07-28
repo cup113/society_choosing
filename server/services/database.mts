@@ -62,7 +62,7 @@ export class PocketBaseService extends DatabaseService {
 
   public async get_choice(userID: string): Promise<Choice | null> {
     try {
-      return await this.pb.collection("choosing_25B").getFirstListItem(`user.id = ${userID}`, { requestKey: null });
+      return await this.pb.collection("choosing_25B").getFirstListItem(`user.id="${userID}"`, { requestKey: null });
     } catch (e) {
       return null;
     }
@@ -71,7 +71,7 @@ export class PocketBaseService extends DatabaseService {
   public async toggle_choice_reject(userID: string, societyID: string, reject: boolean): Promise<void> {
     const choice = (await this.pb.collection("choosing_25B").getList(1, 1, {
       requestKey: null,
-      filter: `user.id = "${userID}"`,
+      filter: `user.id="${userID}"`,
     })).items[0];
 
     if (!choice) {

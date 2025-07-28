@@ -8,7 +8,7 @@ const slots = defineSlots<{
   footer?(props: {}): any,
 }>();
 
-const props = defineProps<{
+defineProps<{
   choice: string[];
 }>();
 
@@ -27,7 +27,8 @@ const props = defineProps<{
     <CardContent>
       <div class="flex flex-col gap-1">
         <p v-for="choice, i in choice" :key="choice">
-          第 <b>{{ i + 1 }}</b> 志愿：{{ choice }}
+          <span>第 <b>{{ i + 1 }}</b> 志愿：</span>
+          <b class="inline-block min-w-32">{{ choice }}</b>
         </p>
         <slot name="extra"></slot>
       </div>

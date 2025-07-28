@@ -3,7 +3,7 @@ import { useLocalStorage } from '@vueuse/core';
 
 export interface Batch {
   name: string;
-  key: 'first_choice' | 'second_choice' | 'third_choice';
+  index: 0 | 1 | 2;
 }
 
 export const useUserStore = defineStore('user', () => {
@@ -14,8 +14,14 @@ export const useUserStore = defineStore('user', () => {
     role: '',
     username: '',
   });
-  const choice = useLocalStorage('SC_choice_v2', []);
+  const favorites = useLocalStorage('SC_favorites', new Array<string>());
+  const choices = useLocalStorage('SC_choice_v4', [undefined, undefined, undefined] as [string | undefined, string | undefined, string | undefined]);
   const answer = useLocalStorage('SC_answer', '');
+  const batches: Batch[] = [
+    { 'name': '第一志愿', 'index': 0 },
+    { 'name': '第二志愿', 'index': 1 },
+    { 'name': '第三志愿', 'index': 2 },
+  ];
 
-  return { userID, token, userInformation, choice, answer }
+  return { userID, token, userInformation, choices, favorites, answer, batches }
 })

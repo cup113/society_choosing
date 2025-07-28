@@ -2,12 +2,37 @@
 import { computed } from 'vue';
 import type { Society } from '@/stores/society';
 import { Button } from '@/components/ui/button';
+import { useUserStore } from '@/stores/user';
 
 const props = defineProps<{
   society: Society
 }>();
+const userStore = useUserStore();
 
 const society = computed(() => props.society);
+const heatHint = computed(() => {
+  if (!society.value.lastYearBatch || !society.value.lastYearSeconds) {
+    return '';
+  }
+  const batch = ['第一志愿', '第二志愿', '第三志愿'][society.value.lastYearBatch - 1];
+  const sec = society.value.lastYearSeconds;
+  const time = sec < 10 ? (sec.toFixed(2) + "s") : (sec < 300 ? (sec.toFixed(0) + "s") : (sec < 6000 ? (sec / 60).toFixed(0) + "min" : ((sec / 3600).toFixed(0) + "h")));
+  if (society.value.lastYearBatch === 1) {
+    return `去年录取至：<b class="text-yellow-700">${batch} ${time}</b>`;
+  } else {
+    return `去年录取至：<span class="text-amber-800">${batch}</span> ${time}`;
+  }
+});
+const isFavorite = computed(() => userStore.favorites.includes(society.value.id));
+const toggle_favorite = () => {
+  if (isFavorite.value) {
+    userStore.favorites.splice(userStore.favorites.indexOf(society.value.id), 1)
+    console.log(userStore.favorites);
+  } else {
+    userStore.favorites.push(society.value.id);
+    console.log(userStore.favorites);
+  }
+}
 </script>
 
 <template>
@@ -32,11 +57,9 @@ const society = computed(() => props.society);
     <div v-else class="text-slate-500">无选课限制</div>
     <div class="py-1 text-sm">{{ society.description }}</div>
     <hr class="my-2">
-    <div class="grid grid-cols-2 gap-x-4 gap-y-2">
-      <Button class="px-1 h-8 bg-yellow-500 hover:bg-yellow-600">⭐ 很感兴趣</Button>
-      <Button class="px-1 h-8 bg-amber-500 hover:bg-amber-600">😀 感兴趣</Button>
-      <Button class="px-1 h-8 bg-blue-500 hover:bg-blue-600">🤔 一般</Button>
-      <Button class="px-1 h-8 bg-red-500 hover:bg-red-600">❌ 不考虑</Button>
+    <div class="flex justify-between items-center">
+      <div class="text-sm text-slate-500" v-html="heatHint"></div>
+      <Button @click="toggle_favorite" variant="outline" class="h-8 w-10" :class="{ 'bg-red-200': isFavorite, 'hover:bg-red-300': isFavorite }">收藏</Button>
     </div>
   </div>
 </template>

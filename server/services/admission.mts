@@ -156,7 +156,7 @@ export default class AdmissionService {
 
     public admit() {
         this.admit_core_members();
-        for (let i = 0; i < 9; i++) {
+        for (let i = 0; i < 3; i++) {
             this.admit_choice(i);
         }
         this.admit_adjust();

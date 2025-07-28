@@ -111,10 +111,17 @@ export const useSocietyStore = defineStore('society', () => {
     return societies.value.find(society => society.name === name)?.id;
   }
 
-  const question = computed(() => {
+  const questions = computed(() => {
     const userStore = useUserStore();
-    // TODO
-    return "";
+    let result = "";
+    userStore.choices.filter(choice => choice !== undefined).forEach(choice => {
+      const society = get_society(choice);
+      const question = society?.question;
+      if (question) {
+        result += `【${society.name}】${society.question}`;
+      }
+    });
+    return result;
   });
 
   return {
@@ -122,7 +129,7 @@ export const useSocietyStore = defineStore('society', () => {
     historyChoice,
     timeStatus,
     localIP,
-    question,
+    questions,
     coreMemberOf,
     get_society,
     get_society_id,
