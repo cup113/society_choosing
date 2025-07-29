@@ -2,6 +2,8 @@ import type { DatabaseService } from './database.mjs'
 import dayjs from 'dayjs';
 import type { TimeStatus } from '../../types/types.d.ts';
 
+const ACTIVITY_ID = "society20250907";
+
 export default class TimeService {
     public db: DatabaseService;
 
@@ -10,7 +12,7 @@ export default class TimeService {
     }
 
     public async get_time_status(): Promise<TimeStatus> {
-        const { start, end } = await this.db.get_date("society20250907");
+        const { start, end } = await this.db.get_date(ACTIVITY_ID);
         const now = dayjs();
         const eta = dayjs(start).diff(now);
         const endEta = dayjs(end).diff(now);
@@ -40,6 +42,6 @@ export default class TimeService {
     }
 
     public async get_start_time(): Promise<string> {
-        return (await this.db.get_date("society20250907")).start;
+        return (await this.db.get_date(ACTIVITY_ID)).start;
     }
 }
