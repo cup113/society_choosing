@@ -33,7 +33,7 @@ const open = ref(false);
 const isDesktop = useMediaQuery('(min-width: 1024px)');
 const [UseCommandTemplate, CommandTemplate] = createReusableTemplate();
 
-const name = computed({
+const societyName = computed({
   get() {
     const society = societyStore.get_society(userStore.choices[props.batch.index] ?? '');
     return society ? `${society.index} ${society.name}` : undefined;
@@ -48,7 +48,7 @@ const name = computed({
 });
 
 const nameDisplayed = computed(() => {
-  return name.value?.slice(3) ?? '请选择社团';
+  return societyName.value?.slice(3) ?? '请选择社团';
 });
 </script>
 
