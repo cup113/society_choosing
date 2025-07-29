@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref, reactive, computed } from "vue";
+import { ref, reactive, computed, nextTick } from "vue";
 import { createShuffle } from 'fast-shuffle';
 import { alea } from 'seedrandom';
 import dayjs from "dayjs";
@@ -101,7 +101,12 @@ export const useSocietyStore = defineStore('society', () => {
     });
   }
 
-  refresh();
+  nextTick(() => {
+    const userStore = useUserStore();
+    if (userStore.userInformation.role === 'student') {
+      refresh();
+    }
+  })
 
   const get_society = (id: string) => {
     return societies.value.find(society => society.id === id);

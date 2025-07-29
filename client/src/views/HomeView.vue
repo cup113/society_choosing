@@ -4,8 +4,6 @@ import { createReusableTemplate } from '@vueuse/core';
 
 import { useUserStore } from '@/stores/user';
 import { useSocietyStore } from '@/stores/society';
-import router from '@/router';
-import { Fetcher } from '@/lib/fetch';
 
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -16,7 +14,6 @@ import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/component
 import Waiting from '@/components/Waiting.vue';
 import ChoiceShow from '@/components/ChoiceShow.vue';
 
-import type { LoginResponse } from '../../../types/types.d.ts';
 import { useErrorStore } from '@/stores/error.js';
 
 const username = ref('');
@@ -32,27 +29,7 @@ function login() {
     errorStore.add_error('请填写用户名、密码');
     return;
   }
-  loginLoading.value = true;
-  const data = {
-    username: username.value,
-    password: password.value,
-  };
-  new Fetcher<LoginResponse>({
-    url: '/api/login',
-    method: 'POST',
-    data: JSON.stringify(data),
-  }).fetch_json().then(data => {
-    userStore.userID = data.userID;
-    userStore.token = data.token;
-    userStore.userInformation = data.userInformation;
-    societyStore.refresh_society_history();
-    router.push(userStore.userInformation.role === 'student' ? '/choose' : '/export');
-    societyStore.refresh();
-  }).catch(error => {
-    loginLoading.value = false;
-    console.error(error);
-    errorStore.add_error(`登录失败，请按照输入框下的提示检查用户名和密码是否正确：${error.toString()}`);
-  });
+  userStore.login(username.value, password.value);
 }
 
 const choice = computed(() => {

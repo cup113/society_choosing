@@ -7,10 +7,11 @@ import type {
     AuthSystemFields,
     UsersRecord,
     DatesRecord,
+    UsersRoleOptions
 } from "./pocketbase-types.d.ts";
 import dayjs from "dayjs";
 
-export { Collections, TypedPocketBase, Choosing25bRecord, DatesRecord };
+export { Collections, TypedPocketBase, Choosing25bRecord, DatesRecord, UsersRoleOptions };
 
 export type TimeStatus = {
     open: true;
@@ -51,7 +52,7 @@ export type LoginResponse = {
     userInformation: {
         name: string;
         username: string;
-        role: string;
+        role: UsersRoleOptions;
     }
 }
 
