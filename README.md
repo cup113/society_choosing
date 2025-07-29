@@ -5,6 +5,7 @@
 ## 项目概述
 
 该系统基于现代Web技术栈构建，包括：
+
 - 前端：Vue 3 + TypeScript + TailwindCSS
 - 后端：Node.js + Express
 - 数据库：PocketBase（集成了认证、数据库和实时功能）
@@ -15,16 +16,14 @@
 ### 学生功能
 
 - 在线浏览所有社团信息
-- 提交三个志愿选择（#TODO 修改）
+- 提交三个志愿选择，可修改（多处）源代码进行调整
 - 回答社团特定问题
 - 实时查看选课状态
 
 ### 教师功能
 
-- 管理社团信息（增删改查）
 - 导出选课数据
 - 审核学生志愿
-- 设置选课时间窗口
 
 ### 系统特色
 
@@ -32,7 +31,7 @@
 - 实时状态更新，无需手动刷新
 - 权限控制（学生/教师）
 - 数据持久化存储
-- Docker容器化部署
+- Docker 容器化部署
 
 ## 环境要求
 
@@ -44,7 +43,7 @@
 
 ### 生产环境
 
-- 支持Docker的服务器
+- 支持 Docker 的服务器
 
 ## 快速开始
 
@@ -56,7 +55,13 @@ git clone <项目地址>
 cd society_choosing
 ```
 
-2. 安装依赖
+2. 复制并配置环境变量
+```bash
+cp .env.example .env
+```
+然后编辑 `.env` 文件，填写必要的配置项
+
+3. 安装依赖
 ```bash
 # 根目录
 pnpm install
@@ -72,7 +77,7 @@ pnpm install
 cd ..
 ```
 
-3. 启动开发服务器
+4. 启动开发服务器
 ```bash
 python run_dev.py
 ```
@@ -86,8 +91,38 @@ docker-compose up -d
 ```
 
 这将启动两个服务：
-- `express`: 前端和API服务 (端口 4127)
-- `pocketbase`: 数据库和认证服务 (端口 4128)
+
+- [express](./Dockerfile.express): 前端和API服务 (端口 4127)
+- [pocketbase](./Dockerfile.pocketbase): 数据库和认证服务 (端口 4128)
+
+#### 部署前配置
+
+1. 复制并配置环境变量
+```bash
+cp .env.example .env
+```
+
+需要配置的环境变量包括：
+- `admin_email` 和 `admin_password`: 管理员账户信息
+- `PB_TYPEGEN_URL`: PocketBase地址 (生产环境通常为 `http://pocketbase:4128`)
+- `PB_TYPEGEN_EMAIL` 和 `PB_TYPEGEN_PASSWORD`: 与管理员账户相同
+- `teacher_username` 和 `teacher_password`: 教师账户信息
+
+2. 构建项目
+
+```bash
+docker-compose build
+```
+
+3. 启动服务
+
+```bash
+docker-compose up -d
+```
+
+4. 初始化数据库（首次部署时）
+
+执行 `server/script/database_init.mts` 初始化数据库，注意需要添加相关文件。
 
 ## 项目结构
 
@@ -125,50 +160,15 @@ docker-compose up -d
 - 特定问题（可选）
 
 ### 选课流程
+
 1. 系统开放选课时间窗口
 2. 学生登录并提交三个志愿
 3. 系统根据规则分配社团
 4. 教师审核并导出结果
 
-## 管理命令
-
-```bash
-# 初始化数据库
-pnpm run init-data
-
-# 执行分配算法
-pnpm run allocate
-
-# 启动PocketBase
-pnpm run pocket      # Linux/Mac
-pnpm run pocket-win  # Windows
-```
-
-## 配置说明
-
-### 环境变量
-
-创建 `.env` 文件参考 `.env.example` 文件配置。
-
 ## 故障排除
 
 ### 常见问题
 
-1. **无法连接到数据库**
-   - 检查PocketBase是否正常运行
-   - 确认端口配置正确
-
-2. **前端页面空白**
-   - 检查API连接配置
-   - 查看浏览器控制台错误信息
-
-## 贡献指南
-
-1. Fork 项目
-2. 创建功能分支
-3. 提交更改
-4. 发起 Pull Request
-
-## 许可证
-
-本项目采用 [MIT License](LICENSE.md) 许可证。
+1. **前台报错**
+   主要原因可能是未将 ACTIVITY_ID 添加到数据库中，请登录数据库管理员账号手动添加。
