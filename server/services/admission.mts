@@ -22,6 +22,7 @@ export default class AdmissionService {
     }
 
     private get_users(usersRaw: RawUser[], choosingRaw: Choice[]): AdmittedUser[] {
+        const now = dayjs()
         return usersRaw.filter(user => user.role !== "teacher").map(user => {
             const choosingData = choosingRaw.find(data => data.user === user.id);
             const chosen = choosingData !== undefined;
@@ -50,7 +51,7 @@ export default class AdmissionService {
                 answer,
                 rejects,
                 // if not chosen, let the submit time be the latest.
-                submit: dayjs(choosingData?.updated).diff(startTime),
+                submit: (choosingData?.updated ? dayjs(choosingData.updated) : now).diff(startTime),
             };
         });
     }
