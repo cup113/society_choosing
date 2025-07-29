@@ -8,7 +8,7 @@ import router from '@/router';
 
 import SocietyCard from '@/components/SocietyCard.vue';
 import ChoiceComboBox from '@/components/ChoiceComboBox.vue'
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
+import { Accordion, AccordionTrigger, AccordionContent, AccordionItem } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -84,23 +84,25 @@ const favoriteSocieties = computed(() => {
 
 <template>
   <main class="flex flex-col gap-4">
-    <Collapsible class="w-xs md:w-lg lg:w-2xl py-2 px-2 mx-auto border-slate-500 border-2 rounded-lg"
+    <accordion class="w-xs md:w-lg lg:w-2xl py-2 px-2 mx-auto border-slate-500 border-2 rounded-lg"
       :default-open="true">
-      <CollapsibleTrigger as-child>
-        <h2 class="text-center font-bold text-xl mb-2">选课指引</h2>
-      </CollapsibleTrigger>
-      <CollapsibleContent>
-        <div class="indent-8">
-          <p>您可以先浏览每个社团及其介绍，在感兴趣的社团右下角点击“收藏”以便最终填报选择。</p>
-          <p>填报时，确保您满足社团的限制（若有），并且对填报的社团感兴趣。</p>
-          <p>录取时，<strong>志愿优先，同一志愿先到先得。</strong>为了防止三个志愿都未成功录取而被调剂的情况出现，请遵循以下建议：</p>
-          <ol>
-            <li>1. <strong>兴趣优先。</strong>不要为了热门而填报热门社团，会增大您此批次无法录取的概率。</li>
-            <li>2. <strong>在第二/三志愿填报您比较感兴趣的非热门社团保底。</strong>对于备注了去年录取截止批次及时间的社团，请您尽量不要将其选为第三志愿。</li>
-          </ol>
-        </div>
-      </CollapsibleContent>
-    </Collapsible>
+      <accordion-item value="guide">
+        <accordion-trigger as-child>
+          <h2 class="text-center font-bold text-xl mb-2">选课指引</h2>
+        </accordion-trigger>
+        <accordion-content>
+          <div class="indent-8">
+            <p>您可以先浏览每个社团及其介绍，在感兴趣的社团右下角点击“收藏”以便最终填报选择。</p>
+            <p>填报时，确保您满足社团的限制（若有），并且对填报的社团感兴趣。</p>
+            <p>录取时，<strong>志愿优先，同一志愿先到先得。</strong>为了防止三个志愿都未成功录取而被调剂的情况出现，请遵循以下建议：</p>
+            <ol>
+              <li>1. <strong>兴趣优先。</strong>不要为了热门而填报热门社团，会增大您此批次无法录取的概率。</li>
+              <li>2. <strong>在第二/三志愿填报您比较感兴趣的非热门社团保底。</strong>对于备注了去年录取截止批次及时间的社团，请您尽量不要将其选为第三志愿。</li>
+            </ol>
+          </div>
+        </accordion-content>
+      </accordion-item>
+    </accordion>
     <div class="flex flex-wrap justify-center grow py-8 px-2 mb-2 gap-y-4 gap-x-8 md:w-2xl lg:w-5xl mx-auto">
       <SocietyCard v-for="society in societyStore.societies" :key="society.id" :society="society" />
     </div>

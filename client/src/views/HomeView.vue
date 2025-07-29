@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 
 import Waiting from '@/components/Waiting.vue';
 import ChoiceShow from '@/components/ChoiceShow.vue';
@@ -73,15 +73,19 @@ const choices = computed(() => {
         </Card>
       </form>
     </UseTemplate>
-    <div class="w-xs flex flex-col gap-8 shadow-lg rounded-lg border-4">
-      <LoginCard v-if="userStore.token.length === 0"></LoginCard>
-      <div v-else>
-        <Collapsible :default-open="false">
-          <CollapsibleTrigger class="font-bold px-4 py-2 w-full text-center">您已登录，点此展开重新登录。</CollapsibleTrigger>
-          <CollapsibleContent>
-            <LoginCard></LoginCard>
-          </CollapsibleContent>
-        </Collapsible>
+    <div class="w-xs shadow-lg rounded-lg border-4" v-if="userStore.token.length === 0">
+      <LoginCard></LoginCard>
+    </div>
+    <div class="w-xs" v-else>
+      <div>
+        <accordion :collapsible="true">
+          <accordion-item value="login">
+            <accordion-trigger class="font-bold px-4 py-2 w-full text-center">您已登录，点此展开重新登录。</accordion-trigger>
+            <accordion-content>
+              <LoginCard></LoginCard>
+            </accordion-content>
+          </accordion-item>
+        </accordion>
       </div>
     </div>
     <div v-if="userStore.userInformation.role === 'student'">
