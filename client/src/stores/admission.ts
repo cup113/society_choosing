@@ -1,9 +1,11 @@
 import { defineStore } from 'pinia';
+import { writeFile, utils } from 'xlsx';
 import { Fetcher } from '@/lib/fetch.js';
 import { batch_to_number, batch_to_string } from '@/lib/utils.js';
 import { computed, reactive } from 'vue';
-import type { AdmittedSociety, AdmittedUser, AdmissionResult } from '../../../types/types.d.ts';
 import { useErrorStore } from './error.js';
+
+import type { AdmittedSociety, AdmittedUser, AdmissionResult } from '../../../types/types.d.ts';
 
 export type DefaultItem = Record<string, any> & { id: string }
 
@@ -267,7 +269,44 @@ export const useAdmissionStore = defineStore('admission', () => {
         }).fetch_json().then(data => {
             users.splice(0, users.length, ...data.users);
             societies.splice(0, societies.length, ...data.societies);
-        })
+        });
+    }
+
+
+    function tableToSheet(table: TableData) {
+        const json = table.rows.map(row => Object.fromEntries(
+            Object.entries(row)
+                .map(([key, value]) => [table.heads[key], value])
+                .filter(([key, _]) => key !== undefined)
+        ));
+        const sheet = utils.json_to_sheet(json);
+        return sheet;
+    }
+
+
+    function generateExcelOverview() {
+        const workbook = utils.book_new();
+        utils.book_append_sheet(workbook, tableToSheet(tableUsers.value), "学生总览");
+        utils.book_append_sheet(workbook, tableToSheet(tableSocieties.value), "社团总览");
+        return writeFile(workbook, "数据总览.xlsx")
+    }
+
+    function generateExcelSocieties() {
+        const workbook = utils.book_new();
+        societies.forEach(society => {
+            const table = getTableResultSocieties(society.name);
+            utils.book_append_sheet(workbook, tableToSheet(table), society.name);
+        });
+        return writeFile(workbook, "按社团分.xlsx")
+    }
+
+    function generateExcelClasses() {
+        const workbook = utils.book_new();
+        classes.value.forEach(class_ => {
+            const table = getTableResultClasses(class_);
+            utils.book_append_sheet(workbook, tableToSheet(table), class_);
+        });
+        return writeFile(workbook, "按班级分.xlsx");
     }
 
 
@@ -280,6 +319,9 @@ export const useAdmissionStore = defineStore('admission', () => {
         getTableReview,
         getTableResultSocieties,
         getTableResultClasses,
+        generateExcelOverview,
+        generateExcelSocieties,
+        generateExcelClasses,
         fetchAdmissionResult,
         toggle_reject,
     };

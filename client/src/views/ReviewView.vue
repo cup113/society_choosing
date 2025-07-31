@@ -25,8 +25,6 @@ const tableResultClasses = computed(() => admissionStore.getTableResultClasses(c
 onMounted(() => {
   admissionStore.fetchAdmissionResult();
 });
-
-
 </script>
 
 <template>
@@ -69,6 +67,9 @@ onMounted(() => {
         <tabs-trigger value="result-classes">按班级分</tabs-trigger>
       </tabs-list>
       <tabs-content value="student-raw-data">
+        <div class="text-center my-4">
+          <Button @click="admissionStore.generateExcelOverview()">导出 数据总览.xlsx</Button>
+        </div>
         <DashboardTable :data="admissionStore.tableUsers"></DashboardTable>
       </tabs-content>
       <tabs-content value="society-stat">
@@ -87,10 +88,16 @@ onMounted(() => {
         </DashboardTable>
       </tabs-content>
       <tabs-content value="result-societies">
+        <div class="text-center my-4">
+          <Button @click="admissionStore.generateExcelSocieties()">导出 按社团分.xlsx</Button>
+        </div>
         <SearchSociety></SearchSociety>
         <DashboardTable :data="tableResultSocieties"></DashboardTable>
       </tabs-content>
       <tabs-content value="result-classes">
+        <div class="text-center my-4">
+          <Button @click="admissionStore.generateExcelClasses()">导出 按班级分.xlsx</Button>
+        </div>
         <div class="flex items-center gap-2 justify-center">
           <span>选择班级</span>
           <popover v-model:open="open">
