@@ -32,12 +32,9 @@ def general_popen(
     )
 
 
-def init_database():
-    return general_popen("node", ROOT / "server/dist/server/script/database_init.mjs")
-
-
 def build_ts():
     return general_popen(pnpm, "run", "build", cwd=ROOT / "server")
+
 
 def run_pocket_base():
     all_wait(
@@ -65,6 +62,7 @@ def all_wait(*wait_list: Popen[bytes]):
 def run_vite():
     return general_popen(pnpm, "run", "dev", cwd=ROOT / "client")
 
+
 def run_express_server():
     pocket_base = run_pocket_base()
     build_ts().wait()
@@ -74,9 +72,12 @@ def run_express_server():
         general_popen(
             "node",
             ROOT / "server" / "dist" / "server" / "main.mjs",
-            env_add={"NODE_ENV": "development", "POCKETBASE_URL": "http://localhost:4128/"},
+            env_add={
+                "NODE_ENV": "development",
+                "POCKETBASE_URL": "http://localhost:4128/",
+            },
         ),
-        run_vite()
+        run_vite(),
     )
 
 
@@ -100,7 +101,6 @@ def main():
         pocket_base = run_pocket_base()
         try:
             build_ts().wait()
-            init_database().wait()
         finally:
             pocket_base.terminate()
     elif args.gen_type:
