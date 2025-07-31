@@ -122,6 +122,7 @@ export type DatesRecord = {
 	created?: IsoDateString
 	end: IsoDateString
 	id: string
+	isActive?: boolean
 	start: IsoDateString
 	updated?: IsoDateString
 }
@@ -142,6 +143,11 @@ export type SocietiesRecord = {
 	updated?: IsoDateString
 }
 
+export enum UsersGenderOptions {
+	"male" = "male",
+	"female" = "female",
+}
+
 export enum UsersRoleOptions {
 	"student" = "student",
 	"teacher" = "teacher",
@@ -151,6 +157,7 @@ export type UsersRecord = {
 	created?: IsoDateString
 	email?: string
 	emailVisibility?: boolean
+	gender: UsersGenderOptions
 	id: string
 	name: string
 	password: string

@@ -7,11 +7,12 @@ import type {
     AuthSystemFields,
     UsersRecord,
     DatesRecord,
-    UsersRoleOptions
+    UsersRoleOptions,
+    UsersGenderOptions,
 } from "./pocketbase-types.d.ts";
 import dayjs from "dayjs";
 
-export { Collections, TypedPocketBase, Choosing25bRecord, DatesRecord, UsersRoleOptions };
+export { Collections, TypedPocketBase, Choosing25bRecord, DatesRecord, UsersRoleOptions, UsersGenderOptions };
 
 export type TimeStatus = {
     open: true;
@@ -42,7 +43,7 @@ export type CreateChoosingData = Omit<Choosing25bRecord, "user" | "id" | "create
 
 export type ListSocietyResponse = {
     societies: Society[];
-    timeStatus: TimeStatus;
+    timeStatus: TimeStatus | null;
     ip?: string;
 }
 
@@ -74,6 +75,7 @@ export interface AdmittedUser {
     number: string;
     name: string;
     class: string;
+    gender: UsersGenderOptions;
     society: AdmittedSociety | null;
     choices: AdmittedSociety[];
     rejects: AdmittedSociety[];

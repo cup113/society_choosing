@@ -18,6 +18,7 @@ interface ItemUser {
     id: string;
     class: string;
     name: string;
+    gender: string;
     society: string;
     submit: string;
     choicesStr: string;
@@ -37,6 +38,7 @@ interface ItemSociety {
 interface ItemReview {
     id: string;
     name: string;
+    gender: string;
     batch: string;
     submit: string;
     admittedSociety: string;
@@ -50,6 +52,7 @@ interface ItemResultSociety {
     no: number;
     class: string;
     name: string;
+    gender: string;
 }
 
 interface ItemResultClass {
@@ -57,6 +60,7 @@ interface ItemResultClass {
     number: string;
     name: string;
     society: string;
+    gender: string;
 }
 
 export const useAdmissionStore = defineStore('admission', () => {
@@ -75,6 +79,7 @@ export const useAdmissionStore = defineStore('admission', () => {
                 id: user.id,
                 class: user.class,
                 name: user.name,
+                gender: user.gender === 'male' ? '男' : '女',
                 society: user.society?.name ?? "未录取",
                 submit: submitDisplay,
                 choicesStr: [0, 1, 2].map(i => user.choices?.[i]?.name ?? "未选择").join(", "),
@@ -84,6 +89,7 @@ export const useAdmissionStore = defineStore('admission', () => {
             heads: {
                 'class': '班级',
                 'name': '姓名',
+                'gender': '性别',
                 'society': '录取社团',
                 'submit': '选课时间',
                 'choicesStr': '选课志愿',
@@ -139,6 +145,7 @@ export const useAdmissionStore = defineStore('admission', () => {
     function getTableReview(societyName: string): TableData<ItemReview> {
         const heads = {
             'name': '姓名',
+            'gender': '性别',
             'batch': '报名批次',
             'submit': '提交时间',
             'admittedSociety': '拟录取社团',
@@ -183,6 +190,7 @@ export const useAdmissionStore = defineStore('admission', () => {
             return {
                 id: student.id,
                 name: student.name,
+                gender: student.gender === 'male' ? '男' : '女',
                 batch: choiceBatch,
                 submit: student.submit.toFixed(3),
                 admittedSociety: student.society?.name ?? "未录取",
@@ -200,6 +208,7 @@ export const useAdmissionStore = defineStore('admission', () => {
             'no': '序号',
             'class': '班级',
             'name': '姓名',
+            'gender': '性别',
         };
         if (!society) {
             return { heads, rows: [] };
@@ -213,6 +222,7 @@ export const useAdmissionStore = defineStore('admission', () => {
                 id: user.id,
                 class: user.class,
                 name: user.name,
+                gender: user.gender === 'male' ? '男' : '女',
             };
         });
         return { heads, rows };
@@ -227,10 +237,11 @@ export const useAdmissionStore = defineStore('admission', () => {
                     id: user.id,
                     number: user.number,
                     name: user.name,
+                    gender: user.gender === "male" ? "男" : "女",
                     society: user.society?.name ?? "未录取",
                 };
             });
-        return { heads: { 'number': '学号', 'name': '姓名', 'society': '录取社团' }, rows: _users };
+        return { heads: { 'number': '学号', 'name': '姓名', 'society': '录取社团', 'gender': '性别' }, rows: _users };
     }
 
     function toggle_reject(userID: string, society: AdmittedSociety | undefined): void {

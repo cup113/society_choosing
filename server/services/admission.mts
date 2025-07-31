@@ -43,6 +43,7 @@ export default class AdmissionService {
             return {
                 id: user.id,
                 name: user.name,
+                gender: user.gender,
                 number: user.username.slice(3),
                 class: user.class,
                 society: null,
