@@ -101,6 +101,7 @@ const navItems: NavItem[] = [
         <br>
         <span>您可以</span><b>先在浏览器上对社团进行预览、选择</b><span>，开始后会自动出现“提交”按钮。</span>
       </span>
+      <span v-else-if="reason === 'no-activity'">管理员没有设置当前选课活动。若您被通知在接下来的几天内即将进入选课，请联系管理员。</span>
       <span class="text-red-600 md:text-lg" v-else-if="reason === 'ended'">选课时间已结束。</span>
     </p>
 

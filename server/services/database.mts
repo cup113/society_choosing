@@ -19,7 +19,7 @@ export abstract class DatabaseService {
   public abstract toggle_choice_reject(userID: string, societyID: string, reject: boolean): Promise<void>;
 
   // Dates
-  public abstract get_date(id: string): Promise<DatesRecord>;
+  public abstract get_active_date(): Promise<DatesRecord | null>;
 }
 
 export class PocketBaseService extends DatabaseService {
@@ -94,7 +94,11 @@ export class PocketBaseService extends DatabaseService {
     });
   }
 
-  public async get_date(id: string): Promise<DatesRecord> {
-    return await this.pb.collection("dates").getOne(id);
+  public async get_active_date(): Promise<DatesRecord | null> {
+    try {
+      return await this.pb.collection("dates").getFirstListItem("isActive=true");
+    } catch (e) {
+      return null;
+    }
   }
 }

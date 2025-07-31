@@ -26,7 +26,7 @@ export const useSocietyStore = defineStore('society', () => {
   } | ({ open: false } & ({
     reason: 'not-started',
     estimated: dayjs.Dayjs,
-  } | { reason: 'ended' })) | null>(null);
+  } | { reason: 'ended' } | { reason: 'no-activity' })) | null>(null);
 
   const localIP = ref("");
 
@@ -45,17 +45,21 @@ export const useSocietyStore = defineStore('society', () => {
           index: (index < 9 ? '0' : '') + (index + 1).toString(),
         }
       });
-      if (data.timeStatus.open) {
-        timeStatus.value = {
-          open: true,
-          estimatedEnd: dayjs().add(data.timeStatus.endEta)
-        };
-      } else {
-        if (data.timeStatus.reason === 'not-started') {
-          timeStatus.value = { open: false, reason: 'not-started', estimated: dayjs().add(data.timeStatus.eta) };
+      if (data.timeStatus !== null) {
+        if (data.timeStatus.open) {
+          timeStatus.value = {
+            open: true,
+            estimatedEnd: dayjs().add(data.timeStatus.endEta)
+          };
         } else {
-          timeStatus.value = { open: false, reason: data.timeStatus.reason };
+          if (data.timeStatus.reason === 'not-started') {
+            timeStatus.value = { open: false, reason: 'not-started', estimated: dayjs().add(data.timeStatus.eta) };
+          } else {
+            timeStatus.value = { open: false, reason: data.timeStatus.reason };
+          }
         }
+      } else {
+        timeStatus.value = { open: false, reason: 'no-activity' }
       }
       localIP.value = data.ip ?? "";
     }).catch(error => {
