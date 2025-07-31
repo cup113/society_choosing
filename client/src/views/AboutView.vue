@@ -17,12 +17,12 @@ function go_home() {
     </ul>
     <h1 class="text-2xl font-bold">服务 / Services</h1>
     <ul>
-      <li>云服务器: 华为云</li>
+      <li>云服务器: 华为云 Flexus L</li>
       <li>资金支持: 华东师范大学第二附属中学（宝山校区）</li>
     </ul>
     <h1 class="text-2xl font-bold">第三方库 / Third-party libraries</h1>
     <ul>
-      <li>部署工具：Coolify Docker</li>
+      <li>部署工具：Coolify (Docker)</li>
       <li>前后端框架: Vue 3 (Vite), Express.js</li>
       <li>UI 框架: shadcn-vue</li>
       <li>数据库系统: PocketBase</li>
