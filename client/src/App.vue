@@ -14,7 +14,6 @@ import { useUserStore } from './stores/user';
 import { useSocietyStore } from './stores/society';
 import { useErrorStore } from './stores/error';
 import { useTimeStore } from './stores/time';
-import { useNow } from '@vueuse/core';
 
 const userStore = useUserStore();
 const societyStore = useSocietyStore();
@@ -30,10 +29,6 @@ function clear_local_storage_cache() {
   location.reload();
 }
 
-const now = useNow({
-  interval: 50,
-});
-
 const estimated = computed(() => societyStore.timeStatus?.open === false && societyStore.timeStatus.reason === 'not-started' ? societyStore.timeStatus.estimated.format("MM-DD HH:mm:ss") : undefined);
 
 const reason = computed(() => societyStore.timeStatus && !societyStore.timeStatus.open ? societyStore.timeStatus.reason : undefined);
@@ -42,7 +37,7 @@ const remainingEta = computed(() => {
   if (societyStore.timeStatus?.open !== true || societyStore.timeStatus.estimatedMaintain === undefined) {
     return;
   }
-  const s = societyStore.timeStatus.estimatedMaintain.diff(now.value.getTime(), 's');
+  const s = societyStore.timeStatus.estimatedMaintain.diff(timeStore.now.getTime(), 's');
   if (s > 10 * 60) {
     return;
   }
@@ -54,7 +49,7 @@ watch(() => timeStore.now, () => {
   if (societyStore.timeStatus?.open !== false || societyStore.timeStatus.reason !== 'not-started') {
     return;
   }
-  const ms = societyStore.timeStatus.estimated.diff(now.value.getTime());
+  const ms = societyStore.timeStatus.estimated.diff(timeStore.now.getTime());
   if (ms <= 0) {
     societyStore.timeStatus = { open: true, estimatedEnd: societyStore.timeStatus.estimated };
     return;
@@ -72,6 +67,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { link: "/", text: () => loginNavText.value, roles: ["student", "teacher"] },
   { link: "/choose", text: "选课", bold: true, roles: ["student"] },
+  { link: '/admin', text: "网站管理", roles: ["teacher"] },
   { link: "/dashboard", text: "数据总览", roles: ["teacher"] },
   { link: "/about", text: "关于此网站", roles: ["teacher", "student"] },
   { link: "#", text: "清除缓存", roles: ["teacher", "student"] },
