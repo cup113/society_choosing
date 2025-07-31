@@ -97,7 +97,6 @@ export default class AdmissionService {
             society.countMembers++;
             user.society = society;
             user.batch = batch;
-            logger.info(`User ${user.name} admitted to ${society.name} in batch ${batch}.`);
             if (society.countMembers === society.cap) {
                 society.lastBatch = batch;
                 society.lastTime = user.submit;
