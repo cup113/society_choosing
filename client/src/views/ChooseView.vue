@@ -30,8 +30,8 @@ function confirm_choice() {
 function submit() {
   const errors = new Array<string>();
   userStore.batches.forEach(batch => {
-    if (userStore.choices[batch.index] === undefined) {
-      errors.push(`请选择 ${batch.name} 志愿。`);
+    if (!userStore.choices[batch.index]) {
+      errors.push(`请选择 ${batch.name}。`);
     }
   });
   const set = new Set(userStore.choices.filter(choice => choice !== undefined));
@@ -85,19 +85,21 @@ const favoriteSocieties = computed(() => {
 <template>
   <main class="flex flex-col gap-4">
     <accordion class="w-xs md:w-lg lg:w-2xl py-2 px-2 mx-auto border-slate-500 border-2 rounded-lg"
-      :default-open="true">
+      :default-open="true" :collapsible="true">
       <accordion-item value="guide">
-        <accordion-trigger as-child>
-          <h2 class="text-center font-bold text-xl mb-2">选课指引</h2>
+        <accordion-trigger>
+          <h2 class="text-center w-full font-bold text-xl">选课指引</h2>
         </accordion-trigger>
         <accordion-content>
           <div class="indent-8">
-            <p>您可以先浏览每个社团及其介绍，在感兴趣的社团右下角点击“收藏”以便最终填报选择。</p>
-            <p>填报时，确保您满足社团的限制（若有），并且对填报的社团感兴趣。</p>
-            <p>录取时，<strong>志愿优先，同一志愿先到先得。</strong>为了防止三个志愿都未成功录取而被调剂的情况出现，请遵循以下建议：</p>
+            <p></p>
+            <p></p>
             <ol>
-              <li>1. <strong>兴趣优先。</strong>不要为了热门而填报热门社团，会增大您此批次无法录取的概率。</li>
-              <li>2. <strong>在第二/三志愿填报您比较感兴趣的非热门社团保底。</strong>对于备注了去年录取截止批次及时间的社团，请您尽量不要将其选为第三志愿。</li>
+              <li>1. 您可以先浏览每个社团及其介绍，在感兴趣的社团右下角点击<strong>“收藏”</strong>以便最终填报选择。</li>
+              <li>2. 填报时，确保您满足社团的限制（若有）。</li>
+              <li>3. 录取时，<strong>志愿优先，同一志愿先到先得。</strong>以下两条建议可以有效防止您滑档。</li>
+              <li>4. <strong>兴趣优先。</strong>社团不分高下，不必追寻热门。适合自己的就是最好的。</li>
+              <li>5. <strong>在第二/三志愿填报您比较感兴趣的非热门社团保底。</strong>对于备注了去年录取截止批次及时间的社团，请您尽量不要将其选为第三志愿。</li>
             </ol>
           </div>
         </accordion-content>
