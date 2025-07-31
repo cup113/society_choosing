@@ -1,8 +1,6 @@
 {
 	"packageManager": "pnpm@10.13.1",
 	"scripts": {
-		"init-data": "start pnpm run serve-pocket && pnpm run ts-build && node server/dist/script/database_init.mjs",
-		"allocate": "start pnpm run serve-pocket && pnpm run ts-build && node server/dist/script/allocate.mjs",
 		"pocket": "./pocketbase serve",
 		"pocket-win": "pocketbase.exe serve"
 	},

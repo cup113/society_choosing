@@ -120,9 +120,9 @@ docker-compose build
 docker-compose up -d
 ```
 
-4. 初始化数据库（首次部署时）
+4. 初始化数据库
 
-执行 `server/script/database_init.mts` 初始化数据库，注意需要添加相关文件。
+前往 pocketbase 管理面板创建管理员账号，在其中注册一个教师账户，以便后续操作。
 
 ## 项目结构
 
