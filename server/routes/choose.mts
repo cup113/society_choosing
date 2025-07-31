@@ -1,6 +1,7 @@
 import RequestHandler from "../services/request-handler.mjs";
 import TimeService from "../services/time.mjs";
 import type { CreateChoosingData, HistoryChoiceResponse } from '../../types/types.d.ts';
+import { CodeType } from "../../types/codes.js";
 
 class ChooseRouter extends RequestHandler {
   static method = RequestHandler.POST;
@@ -8,8 +9,11 @@ class ChooseRouter extends RequestHandler {
 
   public async handle_core(): Promise<{ success: true }> {
     const timeStatus = await new TimeService(this.databaseService).get_time_status();
+    if (timeStatus === null) {
+      throw new this.Terminate(CodeType.Unauthorized, "There is no active activities. How can you get here? UI Bugs or Illegal Attempts?")
+    }
     if (!timeStatus.open) {
-      this.res.status(403).send("Time is not open for choosing.");
+      throw new this.Terminate(CodeType.Forbidden, "Time is not open for choosing. How can you get here? UI Bugs or Illegal Attempts?");
     }
     const authData = await this.authorize();
     const { choices, answers } = this.req.body as CreateChoosingData;
