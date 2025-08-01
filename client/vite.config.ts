@@ -26,5 +26,16 @@ export default defineConfig({
         changeOrigin: true,
       }
     }
-  }
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "vue": ["vue", "vue-router", "@vueuse/core", "pinia"],
+          "ui": ["@tanstack/vue-table", "lucide-vue-next", "clsx", "radix-vue", "reka-ui"],
+          "xlsx": ["xlsx"],
+        }
+      }
+    }
+  },
 })

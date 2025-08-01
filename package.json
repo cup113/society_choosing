@@ -10,10 +10,10 @@
 		"pocketbase": "^0.26.2",
 		"seedrandom": "^3.0.5",
 		"tailwindcss": "^3.4.4",
-		"tailwindcss-animate": "^1.0.7",
-		"vite": "7.0.6"
+		"tailwindcss-animate": "^1.0.7"
 	},
 	"devDependencies": {
-		"@types/seedrandom": "^3.0.8"
+		"@types/seedrandom": "^3.0.8",
+		"vite": "7.0.6"
 	}
 }
