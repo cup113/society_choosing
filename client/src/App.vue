@@ -65,12 +65,12 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { link: "/", text: () => loginNavText.value, roles: ["student", "teacher"] },
+  { link: "/", text: () => loginNavText.value, roles: ["student", "teacher", ""] },
   { link: "/choose", text: "选课", bold: true, roles: ["student"] },
   { link: '/admin', text: "网站管理", roles: ["teacher"] },
   { link: "/dashboard", text: "数据总览", roles: ["teacher"] },
   { link: "/about", text: "关于此网站", roles: ["teacher", "student"] },
-  { link: "#", text: "清除缓存", roles: ["teacher", "student"] },
+  { link: "#", text: "清除缓存", roles: ["teacher", "student", ""] },
 ];
 </script>
 
