@@ -10,6 +10,7 @@ import societiesRouter from './routes/societies.mjs';
 import loginRouter from './routes/login.mjs';
 import chooseRouter from './routes/choose.mjs';
 import reviewRouter from './routes/review.mjs';
+import adminRouter from './routes/admin.mjs';
 
 var app = express();
 
@@ -25,16 +26,14 @@ app.use((req, res, next) => {
         next();
     }
 });
-app.get("/", (req, res) => {
-    res.redirect("/index.html");
-});
 app.use(compression());
 
 app.use('/api/societies', societiesRouter);
 app.use('/api/login', loginRouter);
 app.use('/api/choose', chooseRouter);
 app.use('/api/review', reviewRouter);
-app.use('/', express.static('./client/dist'))
+app.use('/api/admin', adminRouter);
 app.use(history());
+app.use('/', express.static('./client/dist'))
 
 export default app;
