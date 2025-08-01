@@ -12,7 +12,7 @@ import type {
 } from "./pocketbase-types.d.ts";
 import dayjs from "dayjs";
 
-export { Collections, TypedPocketBase, Choosing25bRecord, DatesRecord, UsersRoleOptions, UsersGenderOptions };
+export { Collections, TypedPocketBase, DatesRecord, UsersRoleOptions, UsersGenderOptions };
 
 export type TimeStatus = {
     open: true;
@@ -27,19 +27,16 @@ export type TimeStatus = {
     reason: 'ended';
 }));
 
-export type CreateUserInner = Omit<UsersRecord, "id" | "tokenKey"> & { username: string; password: string };
-
+export type CreateUserInner = Omit<UsersRecord, "id" | "tokenKey">;
 export type CreateSocietyInner = Omit<SocietiesRecord, "id">;
+export type CreateDateInner = Omit<DatesRecord, "id" | "created" | "updated">;
+export type CreateChoosingData = Omit<Choosing25bRecord, "user" | "id" | "created" | "updated">;
 
 export type User = UsersRecord;
-
 export type Society = SocietiesRecord;
-
 export type Choice = Choosing25bRecord;
 
 export type HistoryChoiceResponse = { result: Choice | null };
-
-export type CreateChoosingData = Omit<Choosing25bRecord, "user" | "id" | "created" | "updated">;
 
 export type ListSocietyResponse = {
     societies: Society[];
