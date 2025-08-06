@@ -3,12 +3,9 @@ import { ref, onMounted } from 'vue'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { useAdminStore } from '@/stores/admin'
-import UserIcon from '@/components/icon/UserIcon.vue'
-import TickIcon from '@/components/icon/TickIcon.vue'
-import DeleteIcon from '@/components/icon/DeleteIcon.vue'
+import { UserIcon, CheckIcon, DeleteIcon } from 'lucide-vue-next'
 
 const adminStore = useAdminStore()
 const userImportData = ref('')
@@ -38,7 +35,7 @@ onMounted(() => {
             <p class="text-sm text-gray-600 mb-3">从 Excel 文件复制后粘贴到以下输入框。表头：班级、学号、密码、姓名、性别、角色。</p>
             <Textarea v-model="userImportData" class="min-h-[120px] mb-3" placeholder="粘贴用户数据..." />
             <Button @click="adminStore.importUsers(userImportData)" class="bg-amber-600 hover:bg-amber-700">
-              <TickIcon />
+              <CheckIcon />
               导入用户
             </Button>
           </div>

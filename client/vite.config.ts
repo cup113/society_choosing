@@ -32,9 +32,19 @@ export default defineConfig({
       output: {
         manualChunks: {
           "vue": ["vue", "vue-router", "@vueuse/core", "pinia"],
-          "ui": ["@tanstack/vue-table", "lucide-vue-next", "clsx", "radix-vue", "reka-ui"],
-          "xlsx": ["xlsx"],
-        }
+          "ui": ["@tanstack/vue-table", "lucide-vue-next", "clsx", "radix-vue", "reka-ui", "vaul-vue"],
+          "dashboard": [
+            './src/views/DashboardView.vue',
+            './src/stores/admission.ts',
+          ],
+          "admin": [
+            './src/views/AdminView.vue',
+            './src/views/AdminUserManagement.vue',
+            './src/views/AdminDateManagement.vue',
+            './src/views/AdminSocietyManagement.vue',
+            './src/stores/admin.ts',
+          ],
+        },
       }
     }
   },

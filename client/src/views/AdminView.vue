@@ -2,9 +2,7 @@
 import { RouterView, useRouter, useRoute } from 'vue-router'
 import { onMounted, ref, watch } from 'vue'
 import { Button } from '@/components/ui/button'
-import UserIcon from '@/components/icon/UserIcon.vue'
-import CalendarIcon from '@/components/icon/CalendarIcon.vue'
-import GroupIcon from '@/components/icon/GroupIcon.vue'
+import { UserIcon, CalendarIcon, GroupIcon } from 'lucide-vue-next'
 
 const router = useRouter()
 const route = useRoute()

@@ -3,11 +3,6 @@ import HomeView from '@/views/HomeView.vue';
 import ThanksView from '@/views/ThanksView.vue';
 import ChooseView from '@/views/ChooseView.vue';
 import AboutView from '@/views/AboutView.vue';
-import DashboardView from '@/views/DashboardView.vue';
-import AdminView from '@/views/AdminView.vue';
-import AdminUserManagement from '@/views/AdminUserManagement.vue';
-import AdminDateManagement from '@/views/AdminDateManagement.vue';
-import AdminSocietyManagement from '@/views/AdminSocietyManagement.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -35,31 +30,31 @@ const router = createRouter({
     {
       path: '/dashboard',
       name: 'dashboard',
-      component: DashboardView,
+      component: () => import('@/views/DashboardView.vue'),
     },
     {
       path: '/admin',
       name: 'Admin',
-      component: AdminView,
+      component: () => import('@/views/AdminView.vue'),
       children: [
         {
           path: '',
           name: 'UserManagement',
-          component: AdminUserManagement,
+          component: () => import('@/views/AdminUserManagement.vue'),
         },
         {
           path: 'dates',
           name: 'DateManagement',
-          component: AdminDateManagement,
+          component: () => import('@/views/AdminDateManagement.vue'),
         },
         {
           path: 'societies',
           name: 'SocietyManagement',
-          component: AdminSocietyManagement,
+          component: () => import('@/views/AdminSocietyManagement.vue'),
         }
       ]
     },
   ]
 })
 
-export default router
+export default router;

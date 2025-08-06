@@ -6,8 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table'
 import { useAdminStore } from '@/stores/admin'
-import CalendarIcon from '@/components/icon/CalendarIcon.vue'
-import TickIcon from '@/components/icon/TickIcon.vue'
+import { CalendarIcon, CheckIcon } from 'lucide-vue-next'
 
 const adminStore = useAdminStore()
 const startDate = ref('')
@@ -44,7 +43,7 @@ onMounted(() => {
                 </div>
               </div>
               <Button @click="adminStore.createDate(startDate, endDate)" class="mt-4 md:mt-6 bg-amber-600 hover:bg-amber-700">
-                <TickIcon />
+                <CheckIcon />
                 创建活动
               </Button>
             </div>

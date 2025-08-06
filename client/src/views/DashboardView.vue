@@ -26,7 +26,7 @@ onMounted(() => {
   <div class="flex flex-col gap-6 w-full max-w-7xl py-6 mx-auto px-4">
     <div class="text-center mb-2">
       <h1 class="text-3xl font-bold text-amber-800">数据总览</h1>
-      <p class="text-amber-600 mt-2">查看和管理选课数据</p>
+      <p class="text-amber-600 mt-2">查看和管理选课数据（选课结束前，可能存在偏差）</p>
     </div>
 
     <Tabs default-value="student-raw-data" class="w-full">

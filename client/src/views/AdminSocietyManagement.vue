@@ -8,8 +8,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 import { Command, CommandGroup, CommandInput, CommandList, CommandItem, CommandEmpty } from '@/components/ui/command'
 import { useAdminStore } from '@/stores/admin'
-import GroupIcon from '@/components/icon/GroupIcon.vue'
-import TickIcon from '@/components/icon/TickIcon.vue'
+import { GroupIcon, CheckIcon } from 'lucide-vue-next'
 
 const adminStore = useAdminStore()
 const societyImportData = ref('')
@@ -56,7 +55,7 @@ function updateSocietyField(societyId: string, field: string, value: string | nu
                         <Textarea v-model="societyImportData" class="min-h-[120px] mb-3" placeholder="粘贴社团数据..." />
                         <Button @click="adminStore.importSocieties(societyImportData)"
                             class="bg-amber-600 hover:bg-amber-700">
-                            <TickIcon />
+                            <CheckIcon />
                             导入社团
                         </Button>
                     </div>
