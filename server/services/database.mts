@@ -22,6 +22,7 @@ export abstract class DatabaseService {
   public abstract toggle_choice_reject(userID: string, societyID: string, reject: boolean): Promise<Choice>;
 
   // Dates
+  public abstract list_dates(): Promise<DatesRecord[]>;
   public abstract create_date(data: CreateDateInner): Promise<DatesRecord>;
   public abstract toggle_activate_date(dateID: string, activate: boolean): Promise<DatesRecord>;
   public abstract get_active_date(): Promise<DatesRecord | null>;
@@ -119,6 +120,10 @@ export class PocketBaseService extends DatabaseService {
     return await this.pb.collection("choosing_25B").update(choice.id, {
       rejects,
     });
+  }
+
+  public async list_dates(): Promise<DatesRecord[]> {
+    return await this.pb.collection("dates").getFullList();
   }
 
   public async create_date(data: DatesRecord): Promise<DatesRecord> {
