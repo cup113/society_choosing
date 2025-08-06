@@ -1,22 +1,17 @@
 <script lang="ts" setup>
 import { Tabs, TabsTrigger, TabsList, TabsContent } from '@/components/ui/tabs';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
-import { ChevronsUpDown, Check } from 'lucide-vue-next';
-import { Command, CommandInput, CommandList, CommandGroup, CommandItem, CommandEmpty } from '@/components/ui/command';
-import DashboardTable from '@/components/DashboardTable.vue';
-
 import { ref, computed, onMounted } from 'vue';
-import { createReusableTemplate } from '@vueuse/core';
 import { useAdmissionStore } from '@/stores/admission';
+import DashboardTable from '@/components/DashboardTable.vue';
+import SearchSociety from '@/components/SearchSociety.vue';
+import SearchClass from '@/components/SearchClass.vue';
+import ButtonExport from '@/components/ButtonExport.vue';
 
 const admissionStore = useAdmissionStore();
-const [UseTemplate, SearchSociety] = createReusableTemplate();
 
-const open = ref(false);
 const societyName = ref('');
+const society = computed(() => admissionStore.societies.find(s => s.name === societyName.value));
 const className = ref('');
-const society = computed(() => admissionStore.societies.find(society => society.name === societyName.value));
 
 const tableReview = computed(() => admissionStore.getTableReview(societyName.value));
 const tableResultSocieties = computed(() => admissionStore.getTableResultSocieties(societyName.value));
@@ -28,104 +23,94 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-4 w-4xl py-4 mx-auto">
-    <UseTemplate>
+  <div class="flex flex-col gap-6 w-full max-w-7xl py-6 mx-auto px-4">
+    <div class="text-center mb-2">
+      <h1 class="text-3xl font-bold text-amber-800">数据总览</h1>
+      <p class="text-amber-600 mt-2">查看和管理选课数据</p>
+    </div>
 
-      <div class="flex items-center gap-2 justify-center">
-        <span>选择社团</span>
-        <popover v-model:open="open">
-          <popover-trigger as-child>
-            <Button variant="outline" role="combobox" class="w-3xs justify-between" :aria-expanded="open">
-              {{ societyName }}
-              <ChevronsUpDown class="ml-2 h-4 w-4 opacity-50" />
-            </Button>
-          </popover-trigger>
-          <popover-content side="top">
-            <command v-model="societyName">
-              <command-input placeholder="搜索社团名称..."></command-input>
-              <command-empty>没有包含该名称的社团。</command-empty>
-              <command-list>
-                <command-group>
-                  <command-item v-for="society in admissionStore.societies" :key="society.id" :value="society.name"
-                    @select="open = false">
-                    <Check class="mr-2 h-2 w-4" :class="{ 'opacity-0': society.name !== societyName }"></Check>
-                    {{ society.name }}
-                  </command-item>
-                </command-group>
-              </command-list>
-            </command>
-          </popover-content>
-        </popover>
-      </div>
-    </UseTemplate>
-    <tabs>
-      <tabs-list class="w-full">
-        <tabs-trigger value="student-raw-data">学生原始数据</tabs-trigger>
-        <tabs-trigger value="society-stat">社团统计数据</tabs-trigger>
-        <tabs-trigger value="review">审核退档</tabs-trigger>
-        <tabs-trigger value="result-societies">按社团分</tabs-trigger>
-        <tabs-trigger value="result-classes">按班级分</tabs-trigger>
-      </tabs-list>
-      <tabs-content value="student-raw-data">
-        <div class="text-center my-4">
-          <Button @click="admissionStore.generateExcelOverview()">导出 数据总览.xlsx</Button>
+    <Tabs default-value="student-raw-data" class="w-full">
+      <TabsList class="grid w-full grid-cols-5 bg-amber-100 p-1 rounded-xl">
+        <TabsTrigger value="student-raw-data"
+          class="data-[state=active]:bg-amber-600 data-[state=active]:text-white rounded-lg transition-all">
+          学生原始数据
+        </TabsTrigger>
+        <TabsTrigger value="society-stat"
+          class="data-[state=active]:bg-amber-600 data-[state=active]:text-white rounded-lg transition-all">
+          社团统计数据
+        </TabsTrigger>
+        <TabsTrigger value="review"
+          class="data-[state=active]:bg-amber-600 data-[state=active]:text-white rounded-lg transition-all">
+          审核退档
+        </TabsTrigger>
+        <TabsTrigger value="result-societies"
+          class="data-[state=active]:bg-amber-600 data-[state=active]:text-white rounded-lg transition-all">
+          按社团分
+        </TabsTrigger>
+        <TabsTrigger value="result-classes"
+          class="data-[state=active]:bg-amber-600 data-[state=active]:text-white rounded-lg transition-all">
+          按班级分
+        </TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="student-raw-data" class="mt-6">
+        <div class="flex justify-center">
+          <ButtonExport :on-click="admissionStore.generateExcelOverview" filename="数据总览.xlsx" />
         </div>
-        <DashboardTable :data="admissionStore.tableUsers"></DashboardTable>
-      </tabs-content>
-      <tabs-content value="society-stat">
-        <DashboardTable :data="admissionStore.tableSocieties"></DashboardTable>
-      </tabs-content>
-      <tabs-content value="review">
-        <SearchSociety></SearchSociety>
-        <DashboardTable :data="tableReview">
-          <template #head>退档</template>
-          <template #cell="{ row }">
-            <Button @click="admissionStore.toggle_reject(row.id, society)" v-if="row.canReject && !row.isRejected"
-              type="danger">退档</Button>
-            <Button @click="admissionStore.toggle_reject(row.id, society)" v-if="row.canReject && row.isRejected"
-              type="success">取消退档</Button>
-          </template>
-        </DashboardTable>
-      </tabs-content>
-      <tabs-content value="result-societies">
-        <div class="text-center my-4">
-          <Button @click="admissionStore.generateExcelSocieties()">导出 按社团分.xlsx</Button>
+        <div class="bg-white rounded-xl shadow-lg border border-amber-200 overflow-hidden">
+          <DashboardTable :data="admissionStore.tableUsers" />
         </div>
-        <SearchSociety></SearchSociety>
-        <DashboardTable :data="tableResultSocieties"></DashboardTable>
-      </tabs-content>
-      <tabs-content value="result-classes">
-        <div class="text-center my-4">
-          <Button @click="admissionStore.generateExcelClasses()">导出 按班级分.xlsx</Button>
+      </TabsContent>
+
+      <TabsContent value="society-stat" class="mt-6">
+        <div class="bg-white rounded-xl shadow-lg border border-amber-200 overflow-hidden">
+          <DashboardTable :data="admissionStore.tableSocieties" />
         </div>
-        <div class="flex items-center gap-2 justify-center">
-          <span>选择班级</span>
-          <popover v-model:open="open">
-            <popover-trigger as-child>
-              <Button variant="outline" role="combobox" class="w-3xs justify-between" :aria-expanded="open">
-                {{ className }}
-                <ChevronsUpDown class="ml-2 h-4 w-4 opacity-50" />
-              </Button>
-            </popover-trigger>
-            <popover-content side="top">
-              <command v-model="className">
-                <command-input placeholder="搜索班级名称..."></command-input>
-                <command-empty>没有包含该名称的班级。</command-empty>
-                <command-list>
-                  <command-group>
-                    <command-item v-for="_class in admissionStore.classes" :key="_class" :value="_class"
-                      @select="open = false">
-                      <Check class="mr-2 h-2 w-4" :class="{ 'opacity-0': _class !== className }"></Check>
-                      {{ _class }}
-                    </command-item>
-                  </command-group>
-                </command-list>
-              </command>
-            </popover-content>
-          </popover>
+      </TabsContent>
+
+      <TabsContent value="review" class="mt-6">
+        <div class="mb-6">
+          <SearchSociety v-model="societyName" :societies="admissionStore.societies" placeholder="搜索社团名称..." />
         </div>
-        <DashboardTable :data="tableResultClasses"></DashboardTable>
-      </tabs-content>
-    </tabs>
+        <div class="bg-white rounded-xl shadow-lg border border-amber-200 overflow-hidden">
+          <DashboardTable :data="tableReview">
+            <template #head>退档</template>
+            <template #cell="{ row }">
+              <button @click="admissionStore.toggle_reject(row.id, society)"
+                class="px-3 py-1 rounded-lg text-sm font-medium transition-colors" :class="{
+                  'bg-red-500 hover:bg-red-600 text-white': row.canReject && !row.isRejected,
+                  'bg-green-500 hover:bg-green-600 text-white': row.canReject && row.isRejected
+                }">
+                {{ row.isRejected ? '取消退档' : '退档' }}
+              </button>
+            </template>
+          </DashboardTable>
+        </div>
+      </TabsContent>
+
+      <TabsContent value="result-societies" class="mt-6">
+        <div class="flex justify-center">
+          <ButtonExport :on-click="admissionStore.generateExcelSocieties" filename="按社团分.xlsx" />
+        </div>
+        <div class="mb-6">
+          <SearchSociety v-model="societyName" :societies="admissionStore.societies" placeholder="搜索社团名称..." />
+        </div>
+        <div class="bg-white rounded-xl shadow-lg border border-amber-200 overflow-hidden">
+          <DashboardTable :data="tableResultSocieties" />
+        </div>
+      </TabsContent>
+
+      <TabsContent value="result-classes" class="mt-6">
+        <div class="flex justify-center">
+          <ButtonExport :on-click="admissionStore.generateExcelClasses" filename="按班级分.xlsx" />
+        </div>
+        <div class="mb-6">
+          <SearchClass v-model="className" :classes="admissionStore.classes" placeholder="搜索班级名称..." />
+        </div>
+        <div class="bg-white rounded-xl shadow-lg border border-amber-200 overflow-hidden">
+          <DashboardTable :data="tableResultClasses" />
+        </div>
+      </TabsContent>
+    </Tabs>
   </div>
 </template>

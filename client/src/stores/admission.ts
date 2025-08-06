@@ -69,7 +69,7 @@ export const useAdmissionStore = defineStore('admission', () => {
     const societies = reactive<AdmittedSociety[]>([]);
 
     const classes = computed(() => {
-        return new Set<string>(users.map(user => user.class));
+        return Array.from(new Set<string>(users.map(user => user.class)));
     });
 
     const tableUsers = computed<TableData<ItemUser>>(() => {
