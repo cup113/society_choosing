@@ -1,20 +1,15 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-
-import { useUserStore, type Batch } from '@/stores/user';
+import { useUserStore } from '@/stores/user';
 import { useSocietyStore } from '@/stores/society';
 import { Fetcher } from '@/lib/fetch';
 import router from '@/router';
-
-import SocietyCard from '@/components/SocietyCard.vue';
-import ChoiceComboBox from '@/components/ChoiceComboBox.vue'
-import { Accordion, AccordionTrigger, AccordionContent, AccordionItem } from '@/components/ui/accordion';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-
 import Waiting from '@/components/Waiting.vue';
 import ConfirmChoice from '@/components/ConfirmChoice.vue';
 import { useErrorStore } from '@/stores/error';
+import ChooseGuide from '@/components/ChooseGuide.vue';
+import ChooseList from '@/components/ChooseSocietyList.vue';
+import ChooseForm from '@/components/ChooseForm.vue';
 
 const userStore = useUserStore();
 const societyStore = useSocietyStore();
@@ -22,10 +17,6 @@ const errorStore = useErrorStore();
 
 const waiting = ref(false);
 const waiting_confirm = ref(false);
-
-function confirm_choice() {
-  waiting_confirm.value = true;
-}
 
 function submit() {
   const errors = new Array<string>();
@@ -46,7 +37,7 @@ function submit() {
     errorStore.add_error(...errors);
     return;
   }
-  confirm_choice();
+  waiting_confirm.value = true;
 }
 
 function submit_confirmed() {
@@ -73,7 +64,6 @@ function submit_confirmed() {
 
 const choiceNames = computed(() => {
   const get_name = (id: string | undefined) => id ? societyStore.get_society(id)?.name : undefined;
-
   return userStore.choices.map(id => get_name(id)!);
 });
 
@@ -83,68 +73,20 @@ const favoriteSocieties = computed(() => {
 </script>
 
 <template>
-  <main class="flex flex-col gap-4 py-6">
-    <accordion class="w-xs md:w-lg lg:w-2xl py-2 px-2 mx-auto border-slate-500 border-2 rounded-lg"
-      :default-open="true" :collapsible="true">
-      <accordion-item value="guide">
-        <accordion-trigger>
-          <h2 class="text-center w-full font-bold text-xl">选课指引</h2>
-        </accordion-trigger>
-        <accordion-content>
-          <div class="indent-8">
-            <p></p>
-            <p></p>
-            <ol>
-              <li>1. 您可以先浏览每个社团及其介绍，在感兴趣的社团右下角点击<strong>“收藏”</strong>以便最终填报选择。</li>
-              <li>2. 填报时，确保您满足社团的限制（若有）。</li>
-              <li>3. 录取时，<strong>志愿优先，同一志愿先到先得。</strong>以下两条建议可以有效防止您滑档。</li>
-              <li>4. <strong>兴趣优先。</strong>社团不分高下，不必追寻热门。适合自己的就是最好的。</li>
-              <li>5. <strong>在第二/三志愿填报您比较感兴趣的非热门社团保底。</strong>对于备注了去年录取截止批次及时间的社团，请您尽量不要将其选为第三志愿。</li>
-            </ol>
-          </div>
-        </accordion-content>
-      </accordion-item>
-    </accordion>
-    <div class="flex flex-wrap justify-center grow py-8 px-2 mb-2 gap-y-4 gap-x-8 md:w-2xl lg:w-5xl mx-auto">
-      <SocietyCard v-for="society in societyStore.societies" :key="society.id" :society="society" />
-    </div>
-    <h2 class="font-bold text-center text-2xl" v-show="favoriteSocieties">已收藏</h2>
-    <div class="flex flex-wrap justify-center grow py-8 px-2 mb-64 gap-y-4 gap-x-8 md:w-2xl lg:w-5xl mx-auto">
-      <SocietyCard v-for="society in favoriteSocieties" :key="society.id" :society="society" />
-    </div>
-    <div class="fixed bottom-0 border-2 shadow-lg bg-[#fde1ba] w-full flex flex-col items-center  pt-4 pb-2">
-      <div class="flex items-center justify-center gap-4 md:gap-8 lg:gap-12 md:px-8">
-        <div class="flex flex-col md:flex-row md:flex-wrap md:gap-x-8 md:justify-center lg:flex-nowrap gap-1">
-          <ChoiceComboBox v-for="batch in userStore.batches" :key="batch.name" :batch="batch"></ChoiceComboBox>
-        </div>
-        <Button v-if="societyStore.timeStatus?.open && !societyStore.coreMemberOf" @click="submit()"
-          class="submit-btn relative w-20 my-8 bg-amber-700 hover:bg-amber-800">提交</Button>
-      </div>
-      <div class="px-4 flex flex-col md:flex-row gap-2" v-if="societyStore.questions.length > 0">
-        <div>
-          <p><b>附加问题：</b></p>
-          <p>{{ societyStore.questions }}</p>
-        </div>
-        <Textarea class="max-w-80" v-model="userStore.answer" placeholder="请输入答案..."></Textarea>
-      </div>
-    </div>
+  <main class="flex flex-col gap-8 py-6 pb-48">
+    <ChooseGuide />
+
+    <ChooseList title="所有社团" :societies="societyStore.societies" />
+
+    <ChooseList title="已收藏社团" :societies="favoriteSocieties" />
+
+    <ChooseForm @submit="submit" />
+
     <Waiting :show="waiting">
-      <div>正在提交选课...</div>
+      <div class="text-lg">正在提交选课...</div>
     </Waiting>
+
     <ConfirmChoice :open="waiting_confirm" @confirm-choice="submit_confirmed" @cancel-choice="waiting_confirm = false"
-      :choices="choiceNames"></ConfirmChoice>
+      :choices="choiceNames" />
   </main>
 </template>
-
-<style>
-@reference "tailwindcss";
-
-.submit-btn::before {
-  @apply absolute -right-1 bg-contain;
-  width: 44px;
-  height: 30px;
-  top: -30px;
-  content: "";
-  background-image: url('/img/button-bird.png');
-}
-</style>

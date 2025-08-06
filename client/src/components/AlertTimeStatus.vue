@@ -35,10 +35,10 @@ watch(() => timeStore.now, () => {
         </div>
         <p class="mb-2">
           距离选课开始还有 <span class="font-bold text-amber-800">{{ eta }}</span>
-          <br>预计开始时间: <span class="font-mono bg-amber-300/50 px-2 py-1 rounded">{{ estimated }}</span>
+          <br>预计开始时间（本机）: <span class="bg-amber-300/50 px-2 py-1 rounded">{{ estimated }}</span>
         </p>
         <p class="text-sm italic font-bold">
-          您可以先在浏览器上预览和选择社团，开始后会自动显示"提交"按钮
+          您可以先在浏览器上预览和选择社团，开始后会自动显示"提交"按钮，无需刷新
         </p>
       </div>
       <div class="text-center text-amber-900" v-else-if="reason === 'no-activity'">
