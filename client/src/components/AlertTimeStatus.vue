@@ -2,11 +2,12 @@
 import { computed, ref, watch } from 'vue';
 import { useSocietyStore } from '@/stores/society';
 import { useTimeStore } from '@/stores/time';
+import { Card, CardContent } from '@/components/ui/card';
 
 const societyStore = useSocietyStore();
 const timeStore = useTimeStore();
 
-const estimated = computed(() => societyStore.timeStatus?.open === false && societyStore.timeStatus.reason === 'not-started' ? societyStore.timeStatus.estimated.format("MM-DD HH:mm:ss") : undefined);
+const estimated = computed(() => societyStore.timeStatus?.open === false && societyStore.timeStatus.reason === 'not-started' ? societyStore.timeStatus.estimated.format("MM月DD日 HH:mm:ss") : undefined);
 
 const reason = computed(() => societyStore.timeStatus && !societyStore.timeStatus.open ? societyStore.timeStatus.reason : undefined);
 
@@ -25,14 +26,36 @@ watch(() => timeStore.now, () => {
 </script>
 
 <template>
-  <p class="text-center p-2 bg-amber-300" v-if="reason">
-    <span class="text-lg md:text-2xl text-amber-900 [&>b]:text-amber-800" v-if="reason === 'not-started'">
-      <span>选课时间还未到。</span><b>{{ eta }}&nbsp;</b><span>后到达开始时间 {{ estimated }}，到时间后</span>
-      <b>无需</b><span>刷新页面。</span>
-      <br>
-      <span>您可以</span><b>先在浏览器上对社团进行预览、选择</b><span>，开始后会自动出现"提交"按钮。</span>
-    </span>
-    <span v-else-if="reason === 'no-activity'">管理员没有设置当前选课活动。若您被通知在接下来的几天内即将进入选课，请联系管理员。</span>
-    <span class="text-red-600 md:text-lg" v-else-if="reason === 'ended'">选课时间已结束。</span>
-  </p>
+  <Card class="mt-4 md:mx-4 bg-gradient-to-r from-amber-100 to-amber-200 border-amber-300 shadow-md" v-if="reason">
+    <CardContent>
+      <div class="text-center text-amber-900" v-if="reason === 'not-started'">
+        <div class="flex items-center justify-center gap-2 mb-2">
+          <div class="w-3 h-3 rounded-full bg-amber-500 animate-pulse"></div>
+          <span class="font-bold text-lg md:text-xl">选课尚未开始</span>
+        </div>
+        <p class="mb-2">
+          距离选课开始还有 <span class="font-bold text-amber-800">{{ eta }}</span>
+          <br>预计开始时间: <span class="font-mono bg-amber-300/50 px-2 py-1 rounded">{{ estimated }}</span>
+        </p>
+        <p class="text-sm italic font-bold">
+          您可以先在浏览器上预览和选择社团，开始后会自动显示"提交"按钮
+        </p>
+      </div>
+      <div class="text-center text-amber-900" v-else-if="reason === 'no-activity'">
+        <div class="flex items-center justify-center gap-2 mb-2">
+          <div class="w-3 h-3 rounded-full bg-amber-500"></div>
+          <span class="font-bold text-lg md:text-xl">暂无选课活动</span>
+        </div>
+        <p>管理员尚未设置当前选课活动</p>
+        <p class="text-sm mt-1">若您被通知即将选课，请联系管理员</p>
+      </div>
+      <div class="text-center text-red-600" v-else-if="reason === 'ended'">
+        <div class="flex items-center justify-center gap-2 mb-2">
+          <div class="w-3 h-3 rounded-full bg-red-500"></div>
+          <span class="font-bold text-lg md:text-xl">选课已结束</span>
+        </div>
+        <p>选课时间已经结束，如有疑问请联系管理员</p>
+      </div>
+    </CardContent>
+  </Card>
 </template>

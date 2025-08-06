@@ -1,128 +1,48 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { createReusableTemplate } from '@vueuse/core';
-
 import { useUserStore } from '@/stores/user';
 import { useSocietyStore } from '@/stores/society';
-
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
-
 import Waiting from '@/components/Waiting.vue';
-import ChoiceShow from '@/components/ChoiceShow.vue';
+import LoginForm from '@/components/LoginForm.vue';
+import LoginStatus from '@/components/LoginStatus.vue';
+import ChoiceHistory from '@/components/ChoiceHistory.vue';
 
-import { useErrorStore } from '@/stores/error.js';
-
-const username = ref('');
-const password = ref('');
 const userStore = useUserStore();
 const societyStore = useSocietyStore();
-const errorStore = useErrorStore();
-const loginLoading = ref(false);
-const [UseTemplate, LoginCard] = createReusableTemplate();
-
-function login() {
-  if (!username.value || !password.value) {
-    errorStore.add_error('请填写用户名、密码');
-    return;
-  }
-  userStore.login(username.value, password.value);
-}
+const showLogin = ref(false);
 
 const choice = computed(() => {
   return societyStore.historyChoice;
 });
-
-const choices = computed(() => {
-  return choice.value?.choices.map(id => societyStore.get_society(id)?.name ?? "未知") ?? ["", "", ""];
-})
 </script>
 
 <template>
-  <div class="flex flex-col gap-y-8 min-h-[70vh] justify-center items-center px-6 py-8">
-    <UseTemplate>
-      <form @submit.prevent>
-        <Card>
-          <CardHeader></CardHeader>
-          <CardContent class="flex flex-col gap-4">
-            <div class="flex flex-col gap-2">
-              <div class="flex items-center gap-2">
-                <Label for="username" class="text-xl w-24">用户名</Label>
-                <Input type="text" name="username" id="username" v-model="username" placeholder="Username"
-                  class="bg-amber-100"></Input>
-              </div>
-              <div class="text-gray-500 font-bold text-right text-sm">9位学号，如320270101。</div>
-            </div>
-            <div class="flex flex-col gap-2">
-              <div class="flex items-center gap-2">
-                <Label for="password" class="text-xl w-24">密码</Label>
-                <Input type="password" name="password" id="password" v-model="password" placeholder="Password"
-                  class="bg-amber-100"></Input>
-              </div>
-              <div class="text-gray-500 font-bold text-right text-sm">密码为学号后6位@身份证后6位<br>（如有X，要大写），如270101@12345X。</div>
-            </div>
-          </CardContent>
-          <CardFooter class="text-center">
-            <Button @click="login" class="login-btn mt-5 relative text-lg w-full bg-amber-500 hover:bg-amber-600">
-              登录
-            </Button>
-          </CardFooter>
-        </Card>
-      </form>
-    </UseTemplate>
-    <div class="w-xs shadow-lg rounded-lg border-4" v-if="userStore.token.length === 0">
-      <LoginCard></LoginCard>
+  <div class="flex flex-col gap-y-8 min-h-[70vh] justify-center items-center px-4 py-8">
+    <div class="text-center mb-4">
+      <h1 class="text-3xl md:text-4xl font-bold text-amber-800 mb-2">华二宝山社团选课系统</h1>
+      <p class="text-amber-600">欢迎使用社团选课系统，请登录后进行选课操作</p>
     </div>
-    <div class="w-xs" v-else>
-      <div>
-        <accordion :collapsible="true">
-          <accordion-item value="login">
-            <accordion-trigger class="font-bold px-4 py-2 w-full text-center">您已登录，点此展开重新登录。</accordion-trigger>
-            <accordion-content>
-              <LoginCard></LoginCard>
-            </accordion-content>
-          </accordion-item>
-        </accordion>
+
+    <LoginStatus v-if="userStore.token.length !== 0" v-model:show-login="showLogin">
+      <template #default>
+        <LoginForm></LoginForm>
+      </template>
+    </LoginStatus>
+    <LoginForm v-else></LoginForm>
+
+    <div v-if="userStore.userInformation.role === 'student' && userStore.token" class="w-full max-w-md">
+      <div v-if="choice === null" class="text-center py-8 bg-amber-50 rounded-lg border-2 border-amber-200">
+        <p class="text-amber-700 text-lg font-medium">还没有选课记录哦，快去选课吧！</p>
+        <router-link to="/choose"
+          class="inline-block mt-4 px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors font-medium">
+          前往选课
+        </router-link>
       </div>
+      <ChoiceHistory v-else :choice="choice" />
     </div>
-    <div v-if="userStore.userInformation.role === 'student'">
-      <p v-if="choice === null">还没有选课记录哦，快去选课吧！</p>
-      <div v-else class="flex flex-col gap-3 items-center">
-        <ChoiceShow :choice="choices">
-          <template #title>
-            <div>选课记录</div>
-          </template>
-          <template #description>
-            <div class="flex flex-col px-1 item-center">
-              <span>提交时间: {{ choice.updated.format("MM-DD HH:mm:ss.SSS") }}</span>
-              <span v-if="choice.ip">
-                <span v-if="choice.ip === societyStore.localIP">请求来自本 IP</span>
-                <span v-else v-show="false">请求来自 IP {{ choice.ip }}</span>
-              </span>
-            </div>
-          </template>
-        </ChoiceShow>
-      </div>
-    </div>
-    <Waiting :show="loginLoading">
+
+    <Waiting :show="userStore.loginLoading">
       <template #default>正在登录...</template>
     </Waiting>
   </div>
 </template>
-
-<style>
-@reference "tailwindcss";
-
-.login-btn::before {
-  @apply block absolute right-0 bg-contain;
-  width: 130px;
-  height: 36.5px;
-  top: -36.5px;
-  transform: rotateY(180deg);
-  background-image: url('/img/homepage-bird.jpg');
-  content: '';
-}
-</style>

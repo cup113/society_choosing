@@ -83,7 +83,7 @@ const favoriteSocieties = computed(() => {
 </script>
 
 <template>
-  <main class="flex flex-col gap-4">
+  <main class="flex flex-col gap-4 py-6">
     <accordion class="w-xs md:w-lg lg:w-2xl py-2 px-2 mx-auto border-slate-500 border-2 rounded-lg"
       :default-open="true" :collapsible="true">
       <accordion-item value="guide">

@@ -19,8 +19,12 @@ import AlertError from '@/components/AlertError.vue';
       </RouterView>
     </div>
     <AlertError />
-    <footer class="p-4 text-center">
-      <img src="/img/logo.png" width="323" class="inline-block">
+
+    <footer class="p-6 text-center bg-gradient-to-r from-amber-700/10 to-stone-800/10 mt-8">
+      <img src="/img/logo.png" width="320" class="inline-block opacity-80">
+      <p class="text-stone-600 dark:text-stone-300 text-sm mt-2">
+        华二宝山社团选课系统 © {{ new Date().getFullYear() }}
+      </p>
     </footer>
   </div>
 </template>
