@@ -26,35 +26,35 @@ function login() {
 
 <template>
   <form @submit.prevent>
-    <Card class="border-2 border-amber-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
-      <CardHeader class="rounded-t-lg">
-        <h2 class="text-2xl font-bold text-center text-amber-800">用户登录</h2>
+    <Card class="card py-0 border-2 border-amber-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
+      <CardHeader class="card-header rounded-t-lg gradient-amber-title">
+        <h2 class="text-2xl text-center">用户登录</h2>
       </CardHeader>
-      <CardContent class="flex flex-col gap-5 p-6">
+      <CardContent class="card-content flex flex-col gap-5">
         <div class="flex flex-col gap-2">
           <div class="flex items-center gap-3">
-            <Label for="username" class="text-lg font-medium w-24 text-amber-700">用户名</Label>
+            <Label for="username" class="text-lg font-medium w-24 text-amber-primary">用户名</Label>
             <Input type="text" name="username" id="username" v-model="username" placeholder="请输入9位学号"
-              class="bg-amber-50 border-amber-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent" />
+              class="form-input" />
           </div>
-          <p class="text-amber-600 text-sm ml-28 -mt-1">示例：320270101</p>
+          <p class="text-amber-secondary text-sm ml-28 -mt-1">示例：320270101</p>
         </div>
 
         <div class="flex flex-col gap-2">
           <div class="flex items-center gap-3">
-            <Label for="password" class="text-lg font-medium w-24 text-amber-700">密码</Label>
+            <Label for="password" class="text-lg font-medium w-24 text-amber-primary">密码</Label>
             <Input type="password" name="password" id="password" v-model="password" placeholder="密码规则见下方说明"
-              class="bg-amber-50 border-amber-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent" />
+              class="form-input" />
           </div>
-          <p class="text-amber-600 text-sm ml-28 -mt-1">
+          <p class="text-amber-secondary text-sm ml-28 -mt-1">
             格式：学号后6位@身份证后6位<br>
             示例：270101@12345X（X需大写）
           </p>
         </div>
       </CardContent>
-      <CardFooter class="flex justify-center p-6 rounded-b-lg">
+      <CardFooter class="card-footer flex justify-center rounded-b-lg">
         <Button @click="login"
-          class="login-btn relative text-lg w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold py-3 rounded-lg transition-all duration-300 transform hover:scale-[1.02] shadow-md">
+          class="btn gradient-amber-btn relative text-lg w-full py-3 rounded-lg transition-all duration-300 transform hover:scale-[1.02]">
           登录系统
         </Button>
       </CardFooter>
@@ -77,11 +77,11 @@ function login() {
   }
 }
 
-.login-btn:hover {
+.btn:hover {
   animation: float 2s ease-in-out infinite;
 }
 
-.login-btn::before {
+.btn::before {
   display: block;
   position: absolute;
   right: 0;
