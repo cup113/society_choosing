@@ -14,11 +14,6 @@ const name = computed(() => userStore.userInformation.name);
 const role = computed(() => userStore.userInformation.role);
 const loginNavText = computed(() => name.value ? `账号 (${name.value})` : '登录')
 
-function clear_local_storage_cache() {
-  localStorage.clear();
-  location.reload();
-}
-
 interface NavItem {
   link: string;
   text: string | (() => string);
@@ -32,7 +27,6 @@ const navItems: NavItem[] = [
   { link: '/admin', text: "网站管理", roles: ["teacher"] },
   { link: "/dashboard", text: "数据总览", roles: ["teacher"] },
   { link: "/about", text: "关于此网站", roles: ["teacher", "student"] },
-  { link: "#", text: "清除缓存", roles: ["teacher", "student", ""], bold: true },
 ];
 </script>
 
@@ -48,18 +42,12 @@ const navItems: NavItem[] = [
     <NavigationMenu>
       <NavigationMenuList class="flex-wrap py-2 gap-1 md:gap-0">
         <NavigationMenuItem v-for="item in navItems" :key="item.link"
-          class="py-1 px-3 mx-1 text-sm md:text-base text-center rounded-lg transition-all duration-200 hover:bg-amber-600 hover:text-white"
-          :class="{
-            'bg-amber-600/30': item.link !== '#',
-            'bg-red-500/80 hover:bg-red-600': item.text === '清除缓存'
-          }" v-show="item.roles.includes(role)">
-          <RouterLink v-if="item.link !== '#'" :to="item.link" :class="{ 'font-bold': item.bold }"
+          class="py-1 px-3 mx-1 text-sm md:text-base text-center rounded-lg transition-all duration-200 hover:bg-amber-600 hover:text-white bg-amber-600/30"
+          v-show="item.roles.includes(role)">
+          <RouterLink :to="item.link" :class="{ 'font-bold': item.bold }"
             class="block w-full h-full">
             {{ typeof item.text === 'function' ? item.text() : item.text }}
           </RouterLink>
-          <button v-else @click="clear_local_storage_cache" class="font-bold">
-            {{ typeof item.text === 'function' ? item.text() : item.text }}
-          </button>
         </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>

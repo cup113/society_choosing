@@ -4,6 +4,11 @@ import AppNavigation from '@/components/AppNavigation.vue';
 import AlertTimeStatus from '@/components/AlertTimeStatus.vue';
 import AlertCoreMember from '@/components/AlertCoreMember.vue';
 import AlertError from '@/components/AlertError.vue';
+
+function clear_local_storage_cache() {
+  localStorage.clear();
+  location.reload();
+}
 </script>
 
 <template>
@@ -25,6 +30,9 @@ import AlertError from '@/components/AlertError.vue';
       <p class="text-stone-600 dark:text-stone-300 text-sm mt-2">
         华二宝山社团选课系统 © {{ new Date().getFullYear() }}
       </p>
+      <button @click="clear_local_storage_cache" class="text-stone-500 dark:text-stone-400 text-xs mt-2 hover:text-stone-700 dark:hover:text-stone-300 transition-colors">
+        清除缓存
+      </button>
     </footer>
   </div>
 </template>
