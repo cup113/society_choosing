@@ -12,9 +12,9 @@ defineProps<{
         <h2 v-if="title" class="font-bold text-center text-2xl mb-6 text-amber-800">{{ title }}</h2>
         <div v-if="societies.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             <SocietyCard v-for="society in societies" :key="society.id" :society="society"
-                class="transition-transform duration-300 hover:scale-[1.02] mx-auto" />
+                class="hover-card mx-auto" />
         </div>
-        <div v-else class="text-center py-12 bg-amber-50 rounded-xl border-2 border-amber-200">
+        <div v-else class="text-center py-12 bg-amber-50 rounded-xl border-2 border-amber-200 shadow-card">
             <p class="text-amber-700 text-lg">暂无社团信息</p>
         </div>
     </section>

@@ -9,9 +9,9 @@ import {
 
 <template>
   <Accordion
-    class="w-full max-w-4xl mx-auto border-2 border-amber-300 rounded-xl shadow-md bg-gradient-to-br from-amber-50 to-white"
+    class="w-full max-w-4xl mx-auto border-2 border-amber-300 rounded-xl shadow-card bg-gradient-to-br from-amber-50 to-white"
     default-value="guide" type="single" :collapsible="true">
-    <AccordionItem value="guide">
+    <AccordionItem value="guide" class="border-0">
       <AccordionTrigger class="px-6 py-4 hover:bg-amber-100 rounded-t-xl">
         <h2 class="text-center w-full font-bold text-xl text-amber-800">选课指引</h2>
       </AccordionTrigger>

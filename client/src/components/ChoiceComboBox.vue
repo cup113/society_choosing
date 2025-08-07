@@ -57,8 +57,8 @@ const selectedSociety = computed(() => {
 </script>
 
 <template>
-  <div class="flex flex-col sm:flex-row items-start sm:items-center w-full">
-    <div class="flex items-center w-full h-full sm:w-auto bg-amber-600 text-white font-bold py-1 rounded-l-lg text-sm">
+  <div class="flex flex-row items-start sm:items-center w-full">
+    <div class="flex items-center h-full w-auto bg-amber-600 text-white font-bold py-1 rounded-l-lg text-sm">
       <div class="px-2 w-20 text-center">
         {{ batch.name }}
       </div>

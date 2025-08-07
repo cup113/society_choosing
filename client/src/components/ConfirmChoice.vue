@@ -29,18 +29,18 @@ const limits = computed(() => {
 
 <template>
   <AlertDialog :open="open">
-    <AlertDialogContent>
+    <AlertDialogContent class="rounded-xl shadow-xl">
       <ChoiceShow :choice="choices">
         <template #title>选课确认</template>
-        <template #content>是否确认选择以下课程：</template>
+        <template #description>是否确认选择以下课程：</template>
         <template #extra>
           <div v-if="societyStore.questions">您对附加问题的回答是：<b>{{ userStore.answer }}</b></div>
           <div v-if="limits">请确认您满足以下限制：<b>{{ limits }}</b></div>
         </template>
       </ChoiceShow>
       <AlertDialogFooter>
-        <AlertDialogCancel class="bg-red-500 hover:bg-red-600" @click="$emit('cancel-choice')">取消</AlertDialogCancel>
-        <AlertDialogAction class="bg-green-500 hover:bg-green-600" @click="$emit('confirm-choice')">确认</AlertDialogAction>
+        <AlertDialogCancel class="bg-red-500 hover:bg-red-600 rounded-lg px-6 py-2">取消</AlertDialogCancel>
+        <AlertDialogAction class="bg-green-500 hover:bg-green-600 rounded-lg px-6 py-2">确认</AlertDialogAction>
       </AlertDialogFooter>
     </AlertDialogContent>
   </AlertDialog>
