@@ -18,7 +18,16 @@ class AdminUserImportHandler extends RequestHandler {
     public async handle_core(): Promise<User[]> {
         await this.authorize();
         const users = this.req.body as CreateUserInner[];
-        return await Promise.all(users.map(user => this.databaseService.create_or_update_user(user)));
+        return await Promise.all(users.map(user => {
+            const { password, username, ...remaining } = user;
+            const realPassword = username.match(/[0-9]{9}/) ? `${username.substring(4, 10)}@${password}` : password;
+
+            return this.databaseService.create_or_update_user({
+                username,
+                password: realPassword,
+                ...remaining
+            });
+        }));
     }
 }
 

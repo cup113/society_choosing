@@ -31,10 +31,10 @@ const choice = computed(() => {
     <LoginForm v-else></LoginForm>
 
     <div v-if="userStore.userInformation.role === 'student' && userStore.token" class="w-full max-w-md">
-      <div v-if="choice === null" class="text-center py-8 bg-amber-50 rounded-lg border-2 border-amber-200">
-        <p class="text-amber-700 text-lg font-medium">还没有选课记录哦，快去选课吧！</p>
+      <div v-if="choice === null" class="text-center py-8 bg-amber-50 rounded-xl border-2 border-amber-200 shadow-card hover-card">
+        <p class="text-amber-700 text-lg font-medium mb-4">还没有选课记录哦，快去选课吧！</p>
         <router-link to="/choose"
-          class="inline-block mt-4 px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors font-medium">
+          class="inline-block mt-2 px-6 py-3 gradient-amber-btn rounded-lg font-bold text-lg shadow-md hover-lift">
           前往选课
         </router-link>
       </div>

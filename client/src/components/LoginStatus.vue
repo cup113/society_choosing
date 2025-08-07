@@ -13,10 +13,10 @@ defineEmits<{
 <template>
   <div class="w-full max-w-md">
     <Accordion type="single" collapsible>
-      <AccordionItem value="login" class="border rounded-lg overflow-hidden">
+      <AccordionItem value="login" class="border rounded-xl overflow-hidden shadow-card">
         <AccordionTrigger
-          class="font-bold px-4 py-3 w-full text-center bg-amber-100 hover:bg-amber-200 text-amber-800 transition-colors"
-          :class="{ 'bg-green-100 hover:bg-green-200 text-green-800': !showLogin }">
+          class="font-bold px-4 py-3 w-full text-center gradient-amber-header text-amber-800 transition-colors"
+          :class="{ '!bg-green-100 hover:!bg-green-200 text-green-800': !showLogin }">
           <div class="flex items-center justify-center gap-2">
             <div class="w-3 h-3 rounded-full" :class="showLogin ? 'bg-amber-500' : 'bg-green-500'"></div>
             <span>
@@ -24,7 +24,7 @@ defineEmits<{
             </span>
           </div>
         </AccordionTrigger>
-        <AccordionContent>
+        <AccordionContent class="rounded-b-xl pb-0">
           <slot></slot>
         </AccordionContent>
       </AccordionItem>

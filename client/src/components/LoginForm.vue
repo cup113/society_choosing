@@ -47,8 +47,7 @@ function login() {
               class="form-input" />
           </div>
           <p class="text-amber-secondary text-sm ml-28 -mt-1">
-            格式：学号后6位@身份证后6位<br>
-            示例：270101@12345X（X需大写）
+            格式：身份证后6位(若有 X，要大写)
           </p>
         </div>
       </CardContent>
