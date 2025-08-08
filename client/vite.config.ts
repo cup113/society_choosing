@@ -42,6 +42,7 @@ export default defineConfig({
             './src/views/AdminUserManagement.vue',
             './src/views/AdminDateManagement.vue',
             './src/views/AdminSocietyManagement.vue',
+            './src/views/AdminChoiceManagement.vue',
             './src/stores/admin.ts',
           ],
         },

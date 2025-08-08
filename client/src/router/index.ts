@@ -51,6 +51,11 @@ const router = createRouter({
           path: 'societies',
           name: 'SocietyManagement',
           component: () => import('@/views/AdminSocietyManagement.vue'),
+        },
+        {
+          path: 'choice',
+          name: 'ChoiceManagement',
+          component: () => import('@/views/AdminChoiceManagement.vue'),
         }
       ]
     },

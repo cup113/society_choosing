@@ -2,7 +2,10 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { Fetcher } from '@/lib/fetch'
 import { useErrorStore } from '@/stores/error'
-import type { User, DatesRecord, Society, ListSocietyResponse } from '../../../types/types'
+import type { User, DatesRecord, Society, ListSocietyResponse, Choice } from '../../../types/types'
+import dayjs from 'dayjs';
+
+type ChoiceDisplay = Omit<Choice, 'user' | 'updated'> & { user?: User } & { updated: dayjs.Dayjs };
 
 export const useAdminStore = defineStore('admin', () => {
     const users = ref<User[]>([])
@@ -20,6 +23,8 @@ export const useAdminStore = defineStore('admin', () => {
 
     const societies = ref<Society[]>([])
     const societySuccessHint = ref('')
+
+    const choices = ref<ChoiceDisplay[]>([])
 
     const errorStore = useErrorStore()
 
@@ -460,6 +465,62 @@ export const useAdminStore = defineStore('admin', () => {
         }
     }
 
+    async function getChoices() {
+        try {
+            await getUsers()
+
+            const data = await new Fetcher<Choice[]>({
+                url: '/api/admin/choice/list',
+                method: 'GET'
+            }).fetch_json()
+
+            choices.value.splice(0, choices.value.length, ...data.map(choice => {
+                const { updated, user, ...remaining } = choice
+                return {
+                    ...remaining,
+                    updated: dayjs(updated),
+                    user: users.value.find(u => u.id === user),
+                }
+            }))
+        } catch (error) {
+            errorStore.add_error("获取选课记录失败：" + errorToString(error))
+        }
+    }
+
+    async function deleteChoicesByDateRange(startDate: string, endDate: string) {
+        try {
+            const data = {
+                startDate: new Date(startDate).toISOString(),
+                endDate: new Date(endDate).toISOString()
+            }
+
+            await new Fetcher<{ deletedCount: number }>({
+                url: '/api/admin/choice/delete-by-date',
+                method: 'POST',
+                data: JSON.stringify(data)
+            }).fetch_json()
+
+            await getChoices()
+            userSuccessHint.value = `已成功删除指定时间段的选课记录`
+        } catch (error) {
+            errorStore.add_error("删除选课记录失败：" + errorToString(error))
+        }
+    }
+
+    async function clearAllChoices() {
+        try {
+            await new Fetcher<{ deletedCount: number }>({
+                url: '/api/admin/choice/clear',
+                method: 'POST'
+            }).fetch_json()
+
+            choices.value = []
+            userSuccessHint.value = `已成功清空所有选课记录`
+        } catch (error) {
+            errorStore.add_error("清空选课记录失败：" + errorToString(error))
+        }
+    }
+
     // Utility functions
     function getUserClassNameById(userId: string) {
         const user = users.value.find(u => u.id === userId)
@@ -532,6 +593,7 @@ export const useAdminStore = defineStore('admin', () => {
         userSuccessHint,
         dates,
         dateSuccessHint,
+        choices,
         societies,
         societySuccessHint,
         currentPage,
@@ -557,6 +619,9 @@ export const useAdminStore = defineStore('admin', () => {
         deleteSociety,
         addCoreMember,
         removeCoreMember,
+        getChoices,
+        deleteChoicesByDateRange,
+        clearAllChoices,
         getUserClassNameById,
         getClasses,
         setSearchQuery,

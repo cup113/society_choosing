@@ -1,4 +1,4 @@
-import type { User, CreateUserInner, CreateDateInner, DatesRecord, CreateSocietyInner, Society } from "../../types/types.js";
+import type { User, CreateUserInner, CreateDateInner, DatesRecord, CreateSocietyInner, Society, Choice } from "../../types/types.js";
 import RequestHandler from "../services/request-handler.mjs";
 
 class AdminUserGetHandler extends RequestHandler {
@@ -109,6 +109,53 @@ class AdminDateUpdateHandler extends RequestHandler {
     }
 }
 
+class AdminChoiceListHandler extends RequestHandler {
+    static method = RequestHandler.GET;
+    static path = "/choice/list";
+
+    public async handle_core(): Promise<Choice[]> {
+        await this.authorize();
+        return await this.databaseService.list_choosing();
+    }
+}
+
+class AdminChoiceDeleteByDateHandler extends RequestHandler {
+    static method = RequestHandler.POST;
+    static path = "/choice/delete-by-date";
+
+    public async handle_core(): Promise<{ deletedCount: number }> {
+        await this.authorize();
+        const { startDate, endDate } = this.req.body as { startDate: string; endDate: string };
+        const choices = await this.databaseService.list_choosing();
+        const idsToDelete = choices
+            .filter(choice => {
+                if (!choice.created) {
+                    return false;
+                }
+                const choiceDate = new Date(choice.created);
+                return choiceDate >= new Date(startDate) && choiceDate <= new Date(endDate);
+            })
+            .map(choice => choice.id);
+
+        await Promise.all(idsToDelete.map(id => this.databaseService.delete_choice(id)));
+        return { deletedCount: idsToDelete.length };
+    }
+}
+
+class AdminChoiceClearHandler extends RequestHandler {
+    static method = RequestHandler.POST;
+    static path = "/choice/clear";
+
+    public async handle_core(): Promise<{ deletedCount: number }> {
+        await this.authorize();
+        const choices = await this.databaseService.list_choosing();
+        const idsToDelete = choices.map(choice => choice.id);
+        await Promise.all(idsToDelete.map(id => this.databaseService.delete_choice(id)));
+        return { deletedCount: idsToDelete.length };
+    }
+}
+
+
 class AdminSocietyImportHandler extends RequestHandler {
     static method = RequestHandler.POST;
     static path = "/society/import";
@@ -146,5 +193,6 @@ class AdminSocietyUpdateHandler extends RequestHandler {
 export default RequestHandler.inject(
     AdminUserGetHandler, AdminUserImportHandler, AdminUserDeleteHandler, AdminUserUpdateHandler,
     AdminDateGetHandler, AdminDateCreateHandler, AdminDateActivateHandler, AdminDateDeleteHandler, AdminDateUpdateHandler,
+    AdminChoiceListHandler, AdminChoiceDeleteByDateHandler, AdminChoiceClearHandler,
     AdminSocietyImportHandler, AdminSocietyDeleteHandler, AdminSocietyUpdateHandler
 );

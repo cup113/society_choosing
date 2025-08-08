@@ -2,7 +2,7 @@
 import { RouterView, useRouter, useRoute } from 'vue-router'
 import { onMounted, ref, watch } from 'vue'
 import { Button } from '@/components/ui/button'
-import { UserIcon, CalendarIcon, GroupIcon } from 'lucide-vue-next'
+import { UserIcon, CalendarIcon, GroupIcon, FileTextIcon } from 'lucide-vue-next'
 
 const router = useRouter()
 const route = useRoute()
@@ -20,6 +20,9 @@ watch(
         break
       case 'SocietyManagement':
         activeTab.value = 'societies'
+        break
+      case 'ChoiceManagement':
+        activeTab.value = 'choices'
         break
       default:
         activeTab.value = 'users'
@@ -39,8 +42,10 @@ onMounted(() => {
     case 'SocietyManagement':
       activeTab.value = 'societies'
       break
+    case 'ChoiceManagement':
+      activeTab.value = 'choices'
+      break
     default:
-      // 默认导航到用户管理
       if (route.name === 'Admin') {
         router.push({ name: 'UserManagement' })
       }
@@ -60,6 +65,9 @@ function navigateTo(tab: string) {
     case 'societies':
       router.push({ name: 'SocietyManagement' })
       break
+    case 'choices': // 添加这一行
+      router.push({ name: 'ChoiceManagement' })
+      break
   }
 }
 </script>
@@ -73,32 +81,29 @@ function navigateTo(tab: string) {
 
     <!-- 导航标签 -->
     <div class="flex justify-center bg-amber-200 p-1 rounded-t-lg shadow-md mt-2">
-      <Button
-        @click="navigateTo('users')"
-        :variant="activeTab === 'users' ? 'default' : 'ghost'"
+      <Button @click="navigateTo('users')" :variant="activeTab === 'users' ? 'default' : 'ghost'"
         class="flex items-center gap-2"
-        :class="{ 'bg-amber-600 text-white hover:bg-amber-700': activeTab === 'users' }"
-      >
+        :class="{ 'bg-amber-600 text-white hover:bg-amber-700': activeTab === 'users' }">
         <UserIcon class="w-5 h-5" />
         用户管理
       </Button>
-      <Button
-        @click="navigateTo('dates')"
-        :variant="activeTab === 'dates' ? 'default' : 'ghost'"
+      <Button @click="navigateTo('dates')" :variant="activeTab === 'dates' ? 'default' : 'ghost'"
         class="flex items-center gap-2"
-        :class="{ 'bg-amber-600 text-white hover:bg-amber-700': activeTab === 'dates' }"
-      >
+        :class="{ 'bg-amber-600 text-white hover:bg-amber-700': activeTab === 'dates' }">
         <CalendarIcon class="w-5 h-5" />
         选课管理
       </Button>
-      <Button
-        @click="navigateTo('societies')"
-        :variant="activeTab === 'societies' ? 'default' : 'ghost'"
+      <Button @click="navigateTo('societies')" :variant="activeTab === 'societies' ? 'default' : 'ghost'"
         class="flex items-center gap-2"
-        :class="{ 'bg-amber-600 text-white hover:bg-amber-700': activeTab === 'societies' }"
-      >
+        :class="{ 'bg-amber-600 text-white hover:bg-amber-700': activeTab === 'societies' }">
         <GroupIcon class="w-5 h-5" />
         社团管理
+      </Button>
+      <Button @click="navigateTo('choices')" :variant="activeTab === 'choices' ? 'default' : 'ghost'"
+        class="flex items-center gap-2"
+        :class="{ 'bg-amber-600 text-white hover:bg-amber-700': activeTab === 'choices' }">
+        <FileTextIcon class="w-5 h-5" />
+        选课记录
       </Button>
     </div>
 
@@ -110,15 +115,3 @@ function navigateTo(tab: string) {
     </RouterView>
   </main>
 </template>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>
