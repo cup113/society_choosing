@@ -17,11 +17,11 @@ function go_home() {
         <ArrowLeftIcon class="w-4 h-4" />
         返回主页
       </Button>
-      <h1 class="text-3xl font-bold text-amber-800">关于我们</h1>
+      <h1 class="text-3xl font-bold text-amber-800">关于本网站</h1>
     </div>
 
-    <Card class="border-2 border-amber-200 shadow-lg bg-gradient-to-br from-amber-50 to-white">
-      <CardHeader class="rounded-t-lg">
+    <Card class="border-2 border-amber-200 shadow-card bg-gradient-to-br from-amber-50 to-white rounded-xl">
+      <CardHeader class="rounded-t-lg gradient-amber-title">
         <CardTitle class="flex items-center gap-2 text-amber-800">
           <UsersIcon class="w-6 h-6" />
           贡献者 / Contributors
@@ -56,8 +56,8 @@ function go_home() {
       </CardContent>
     </Card>
 
-    <Card class="border-2 border-amber-200 shadow-lg bg-gradient-to-br from-amber-50 to-white">
-      <CardHeader class="rounded-t-lg">
+    <Card class="border-2 border-amber-200 shadow-card bg-gradient-to-br from-amber-50 to-white rounded-xl">
+      <CardHeader class="rounded-t-lg gradient-amber-title">
         <CardTitle class="flex items-center gap-2 text-amber-800">
           <ServerIcon class="w-6 h-6" />
           服务 / Services
@@ -77,8 +77,8 @@ function go_home() {
       </CardContent>
     </Card>
 
-    <Card class="border-2 border-amber-200 shadow-lg bg-gradient-to-br from-amber-50 to-white">
-      <CardHeader class="rounded-t-lg">
+    <Card class="border-2 border-amber-200 shadow-card bg-gradient-to-br from-amber-50 to-white rounded-xl">
+      <CardHeader class="rounded-t-lg gradient-amber-title">
         <CardTitle class="flex items-center gap-2 text-amber-800">
           <CodeIcon class="w-6 h-6" />
           第三方库 / Third-party libraries
@@ -97,7 +97,7 @@ function go_home() {
             </div>
             <div class="flex flex-col gap-2 py-2 border-b border-amber-100 last:border-0">
               <span class="font-medium text-amber-700">UI 框架</span>
-              <span class="text-gray-700 bg-amber-50 px-3 py-2 rounded">shadcn-vue</span>
+              <span class="text-gray-700 bg-amber-50 px-3 py-2 rounded">shadcn-vue, TailwindCSS</span>
             </div>
           </div>
           <div class="space-y-3">
@@ -107,8 +107,7 @@ function go_home() {
             </div>
             <div class="flex flex-col gap-2 py-2 border-b border-amber-100 last:border-0">
               <span class="font-medium text-amber-700">工具库</span>
-              <span class="text-gray-700 bg-amber-50 px-3 py-2 rounded">TailwindCSS, vueuse, vue-router, clsx,
-                priority-queue, winston, xlsx</span>
+              <span class="text-gray-700 bg-amber-50 px-3 py-2 rounded">VueUse, clsx, Tailwind Merge, Winston, XLSX, Day.js, Fast Shuffle</span>
             </div>
           </div>
         </div>

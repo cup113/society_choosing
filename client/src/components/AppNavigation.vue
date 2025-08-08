@@ -32,10 +32,10 @@ const navItems: NavItem[] = [
 
 <template>
   <header
-    class="flex flex-col md:flex-row gap-2 justify-between items-center bg-gradient-to-r from-amber-700 to-amber-800 text-amber-50 p-4 shadow-lg">
+    class="flex flex-col md:flex-row gap-2 justify-between items-center navbar-gradient p-4 shadow-lg">
     <div class="flex items-center">
       <h1
-        class="border-2 border-amber-200 rounded-lg bg-gradient-to-r from-amber-50 to-amber-100 text-amber-800 font-bold px-4 py-2 text-xl md:text-2xl shadow-md">
+        class="border-2 border-amber-200 rounded-lg gradient-amber-title font-bold px-4 py-2 text-xl md:text-2xl shadow-md">
         华二宝山社团选课系统
       </h1>
     </div>

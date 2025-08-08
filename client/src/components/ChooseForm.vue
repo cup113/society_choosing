@@ -24,17 +24,18 @@ const isExpanded = ref(true);
 const isMobile = useMediaQuery('(max-width: 768px)');
 </script>
 
-
 <template>
   <div class="fixed bottom-0 left-0 right-0 w-full flex flex-col items-center z-10 max-h-100">
+    <!-- 展开/收起按钮，放置在分界线上，添加旋转动画 -->
     <Button v-if="isMobile" @click="isExpanded = !isExpanded" variant="outline"
-      class="self-center h-5 z-20 bg-amber-600 border-amber-700 hover:bg-amber-700 text-white rounded-t-md rounded-b-none border-b-0 shadow-lg px-2 transition-all duration-300">
+      class="self-center h-5 z-20 bg-amber-600 border-amber-700 hover:bg-amber-700 text-white rounded-t-md rounded-b-none shadow-lg px-2 transition-all duration-300">
       <Transition name="rotate" mode="out-in">
         <ChevronDownIcon v-if="isExpanded" class="w-5 h-5" :key="1" />
         <ChevronUpIcon v-else class="w-5 h-5" :key="2" />
       </Transition>
     </Button>
 
+    <!-- 主要表单内容，添加展开/收起动画 -->
     <div class="border-t-4 border-amber-600 w-full overflow-hidden"
       :class="isMobile && !isExpanded ? 'shadow-lg' : 'shadow-xl'">
       <div class="bg-gradient-to-r from-amber-50 to-amber-100 w-full"
@@ -110,43 +111,5 @@ const isMobile = useMediaQuery('(max-width: 768px)');
   background-image: url('/img/button-bird.png');
   background-size: contain;
   background-repeat: no-repeat;
-}
-
-/* 添加展开/收起动画 */
-.slide-enter-active {
-  transition: all 0.3s ease-out;
-}
-
-.slide-leave-active {
-  transition: all 0.3s ease-in;
-}
-
-.slide-enter-from {
-  opacity: 0;
-  transform: translateY(30px);
-}
-
-.slide-leave-to {
-  opacity: 0;
-  transform: translateY(30px);
-}
-
-/* 添加图标旋转动画 */
-.rotate-enter-active {
-  transition: all 0.3s ease-out;
-}
-
-.rotate-leave-active {
-  transition: all 0.3s ease-in;
-}
-
-.rotate-enter-from {
-  opacity: 0;
-  transform: rotate(180deg);
-}
-
-.rotate-leave-to {
-  opacity: 0;
-  transform: rotate(-180deg);
 }
 </style>

@@ -54,16 +54,16 @@ onMounted(() => {
       </TabsList>
 
       <TabsContent value="student-raw-data" class="mt-6">
-        <div class="flex justify-center">
+        <div class="flex justify-center mb-4">
           <ButtonExport :on-click="admissionStore.generateExcelOverview" filename="数据总览.xlsx" />
         </div>
-        <div class="bg-white rounded-xl shadow-lg border border-amber-200 overflow-hidden">
+        <div class="bg-white rounded-xl shadow-card border border-amber-200 overflow-hidden">
           <DashboardTable :data="admissionStore.tableUsers" />
         </div>
       </TabsContent>
 
       <TabsContent value="society-stat" class="mt-6">
-        <div class="bg-white rounded-xl shadow-lg border border-amber-200 overflow-hidden">
+        <div class="bg-white rounded-xl shadow-card border border-amber-200 overflow-hidden">
           <DashboardTable :data="admissionStore.tableSocieties" />
         </div>
       </TabsContent>
@@ -72,7 +72,7 @@ onMounted(() => {
         <div class="mb-6">
           <SearchSociety v-model="societyName" :societies="admissionStore.societies" placeholder="搜索社团名称..." />
         </div>
-        <div class="bg-white rounded-xl shadow-lg border border-amber-200 overflow-hidden">
+        <div class="bg-white rounded-xl shadow-card border border-amber-200 overflow-hidden">
           <DashboardTable :data="tableReview">
             <template #head>退档</template>
             <template #cell="{ row }">
@@ -89,25 +89,25 @@ onMounted(() => {
       </TabsContent>
 
       <TabsContent value="result-societies" class="mt-6">
-        <div class="flex justify-center">
+        <div class="flex justify-center mb-4">
           <ButtonExport :on-click="admissionStore.generateExcelSocieties" filename="按社团分.xlsx" />
         </div>
         <div class="mb-6">
           <SearchSociety v-model="societyName" :societies="admissionStore.societies" placeholder="搜索社团名称..." />
         </div>
-        <div class="bg-white rounded-xl shadow-lg border border-amber-200 overflow-hidden">
+        <div class="bg-white rounded-xl shadow-card border border-amber-200 overflow-hidden">
           <DashboardTable :data="tableResultSocieties" />
         </div>
       </TabsContent>
 
       <TabsContent value="result-classes" class="mt-6">
-        <div class="flex justify-center">
+        <div class="flex justify-center mb-4">
           <ButtonExport :on-click="admissionStore.generateExcelClasses" filename="按班级分.xlsx" />
         </div>
         <div class="mb-6">
           <SearchClass v-model="className" :classes="admissionStore.classes" placeholder="搜索班级名称..." />
         </div>
-        <div class="bg-white rounded-xl shadow-lg border border-amber-200 overflow-hidden">
+        <div class="bg-white rounded-xl shadow-card border border-amber-200 overflow-hidden">
           <DashboardTable :data="tableResultClasses" />
         </div>
       </TabsContent>

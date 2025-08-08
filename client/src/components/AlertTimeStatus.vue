@@ -26,7 +26,7 @@ watch(() => timeStore.now, () => {
 </script>
 
 <template>
-  <Card class="mt-4 md:mx-4 bg-gradient-to-r from-amber-100 to-amber-200 border-amber-300 shadow-md" v-if="reason">
+  <Card class="mt-4 md:mx-4 bg-gradient-to-r from-amber-100 to-amber-200 border-amber-300 shadow-card" v-if="reason">
     <CardContent>
       <div class="text-center text-amber-900" v-if="reason === 'not-started'">
         <div class="flex items-center justify-center gap-2 mb-2">

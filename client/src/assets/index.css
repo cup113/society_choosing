@@ -303,8 +303,53 @@
   }
 }
 
-/* 添加可重用的组件类 */
 @layer components {
+
+  .slide-enter-active {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .slide-leave-active {
+    @apply transition-all duration-300 ease-in;
+  }
+
+  .slide-enter-from {
+    @apply opacity-0 translate-y-6;
+  }
+
+  .slide-leave-to {
+    @apply opacity-0 translate-y-6;
+  }
+
+  .rotate-enter-active {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .rotate-leave-active {
+    @apply transition-all duration-300 ease-in;
+  }
+
+  .rotate-enter-from {
+    @apply opacity-0 rotate-180;
+  }
+
+  .rotate-leave-to {
+    @apply opacity-0 -rotate-180;
+  }
+
+  .fade-enter-active {
+    @apply transition-opacity duration-300 ease-out;
+  }
+
+  .fade-leave-active {
+    @apply transition-opacity duration-300 ease-in;
+  }
+
+  .fade-enter-from,
+  .fade-leave-to {
+    @apply opacity-0;
+  }
+
   .card {
     @apply card-base;
   }
@@ -357,7 +402,6 @@
     @apply text-amber-600;
   }
 
-  /* 添加新的组件类，用于统一hover效果 */
   .hover-card {
     @apply hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300;
   }
@@ -370,7 +414,6 @@
     @apply transition-shadow duration-300 hover:shadow-lg;
   }
 
-  /* 添加渐变边框类 */
   .border-gradient {
     @apply border-2 border-amber-200;
   }

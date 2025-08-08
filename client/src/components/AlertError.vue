@@ -16,7 +16,7 @@ const errorStore = useErrorStore();
 
 <template>
   <AlertDialog :open="errorStore.errorWindowOpen">
-    <AlertDialogContent class="max-w-md bg-white rounded-lg shadow-xl">
+    <AlertDialogContent class="max-w-md bg-white rounded-xl shadow-xl">
       <AlertDialogHeader>
         <div class="flex items-center gap-2 mb-2">
           <AlertTriangleIcon class="text-red-500 w-6 h-6" />
@@ -35,7 +35,7 @@ const errorStore = useErrorStore();
       </div>
       <AlertDialogFooter>
         <AlertDialogAction @click="errorStore.clear_error()"
-          class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded transition-colors">
+          class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition-colors">
           确认并关闭
         </AlertDialogAction>
       </AlertDialogFooter>

@@ -27,7 +27,7 @@ const open = ref(false);
 </script>
 
 <template>
-  <div class="flex items-center gap-3 justify-center bg-white p-3 rounded-xl shadow-sm border border-amber-200">
+  <div class="flex items-center gap-3 justify-center bg-white p-3 rounded-xl shadow-card">
     <UsersIcon class="w-5 h-5 text-amber-600" />
     <span class="font-medium text-amber-800">选择班级</span>
     <Popover v-model:open="open">
