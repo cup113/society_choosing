@@ -8,7 +8,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 import { Command, CommandGroup, CommandInput, CommandList, CommandItem, CommandEmpty } from '@/components/ui/command'
 import { useAdminStore } from '@/stores/admin'
-import { GroupIcon, CheckIcon } from 'lucide-vue-next'
+import { GroupIcon, CheckIcon, EditIcon, SaveIcon, XIcon } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 
 const adminStore = useAdminStore()
@@ -27,16 +27,19 @@ function startEditingField(societyId: string, field: string, value: string | num
     editingValue.value = value
 }
 
-function cancelEditingField() {
+function cancelEditing() {
     editingSocietyId.value = null
     editingField.value = null
+    editingValue.value = ''
 }
 
-async function updateSocietyField(societyId: string, field: string, value: string | number) {
+async function saveEditing(societyId: string) {
   try {
-    await adminStore.updateSocietyField(societyId, field, value)
-    cancelEditingField()
-    toast.success(`已成功更新社团 ${field} 字段`)
+    if (editingField.value) {
+      await adminStore.updateSocietyField(societyId, editingField.value, editingValue.value)
+      cancelEditing()
+      toast.success('已成功更新社团信息')
+    }
   } catch (error) {
     toast.error('更新失败')
   }
@@ -89,17 +92,6 @@ async function updateSocietyField(societyId: string, field: string, value: strin
                                         <TableCell>
                                             <template v-if="editingSocietyId === society.id && editingField === 'name'">
                                                 <Input v-model="editingValue" class="w-full" />
-                                                <div class="flex gap-1 mt-1">
-                                                    <Button
-                                                        @click="updateSocietyField(society.id, 'name', editingValue)"
-                                                        class="h-6 px-2 bg-green-600 hover:bg-green-700">
-                                                        √
-                                                    </Button>
-                                                    <Button @click="cancelEditingField" class="h-6 px-2"
-                                                        variant="outline">
-                                                        ×
-                                                    </Button>
-                                                </div>
                                             </template>
                                             <template v-else>
                                                 <div @click="startEditingField(society.id, 'name', society.name)"
@@ -113,17 +105,6 @@ async function updateSocietyField(societyId: string, field: string, value: strin
                                         <TableCell>
                                             <template v-if="editingSocietyId === society.id && editingField === 'cap'">
                                                 <Input v-model.number="editingValue" type="number" class="w-full" />
-                                                <div class="flex gap-1 mt-1">
-                                                    <Button
-                                                        @click="updateSocietyField(society.id, 'cap', Number(editingValue))"
-                                                        class="h-6 px-2 bg-green-600 hover:bg-green-700">
-                                                        √
-                                                    </Button>
-                                                    <Button @click="cancelEditingField" class="h-6 px-2"
-                                                        variant="outline">
-                                                        ×
-                                                    </Button>
-                                                </div>
                                             </template>
                                             <template v-else>
                                                 <div @click="startEditingField(society.id, 'cap', society.cap)"
@@ -138,17 +119,6 @@ async function updateSocietyField(societyId: string, field: string, value: strin
                                             <template
                                                 v-if="editingSocietyId === society.id && editingField === 'teacher'">
                                                 <Input v-model="editingValue" class="w-full" />
-                                                <div class="flex gap-1 mt-1">
-                                                    <Button
-                                                        @click="updateSocietyField(society.id, 'teacher', editingValue)"
-                                                        class="h-6 px-2 bg-green-600 hover:bg-green-700">
-                                                        √
-                                                    </Button>
-                                                    <Button @click="cancelEditingField" class="h-6 px-2"
-                                                        variant="outline">
-                                                        ×
-                                                    </Button>
-                                                </div>
                                             </template>
                                             <template v-else>
                                                 <div @click="startEditingField(society.id, 'teacher', society.teacher)"
@@ -162,22 +132,11 @@ async function updateSocietyField(societyId: string, field: string, value: strin
                                         <TableCell>
                                             <template
                                                 v-if="editingSocietyId === society.id && editingField === 'description'">
-                                                <Textarea v-model="editingValue" class="w-full min-h-[60px]" />
-                                                <div class="flex gap-1 mt-1">
-                                                    <Button
-                                                        @click="updateSocietyField(society.id, 'description', editingValue)"
-                                                        class="h-6 px-2 bg-green-600 hover:bg-green-700">
-                                                        √
-                                                    </Button>
-                                                    <Button @click="cancelEditingField" class="h-6 px-2"
-                                                        variant="outline">
-                                                        ×
-                                                    </Button>
-                                                </div>
+                                                <Textarea v-model="editingValue" class="w-full min-h-12" />
                                             </template>
                                             <template v-else>
                                                 <div @click="startEditingField(society.id, 'description', society.description)"
-                                                    class="cursor-pointer hover:bg-amber-100 p-1 rounded min-h-[40px]">
+                                                    class="cursor-pointer hover:bg-amber-100 p-1 rounded">
                                                     {{ society.description }}
                                                 </div>
                                             </template>
@@ -188,32 +147,38 @@ async function updateSocietyField(societyId: string, field: string, value: strin
                                             <template
                                                 v-if="editingSocietyId === society.id && editingField === 'limit'">
                                                 <Input v-model="editingValue" class="w-full" />
-                                                <div class="flex gap-1 mt-1">
-                                                    <Button
-                                                        @click="updateSocietyField(society.id, 'limit', editingValue)"
-                                                        class="h-6 px-2 bg-green-600 hover:bg-green-700">
-                                                        √
-                                                    </Button>
-                                                    <Button @click="cancelEditingField" class="h-6 px-2"
-                                                        variant="outline">
-                                                        ×
-                                                    </Button>
-                                                </div>
                                             </template>
                                             <template v-else>
                                                 <div @click="startEditingField(society.id, 'limit', society.limit || '')"
-                                                    class="cursor-pointer hover:bg-amber-100 p-1 rounded">
+                                                    class="cursor-pointer hover:bg-amber-100 p-1 rounded min-h-5">
                                                     {{ society.limit }}
                                                 </div>
                                             </template>
                                         </TableCell>
 
-                                        <!-- 删除操作 -->
+                                        <!-- 操作字段 -->
                                         <TableCell>
-                                            <Button @click="adminStore.deleteSociety(society.id)" variant="destructive"
-                                                size="sm">
-                                                删除
-                                            </Button>
+                                            <div class="flex gap-1">
+                                                <template v-if="editingSocietyId === society.id">
+                                                    <Button @click="saveEditing(society.id)" size="sm"
+                                                        class="h-8 px-2 bg-green-600 hover:bg-green-700">
+                                                        <SaveIcon class="w-4 h-4" />
+                                                    </Button>
+                                                    <Button @click="cancelEditing" size="sm" class="h-8 px-2" variant="outline">
+                                                        <XIcon class="w-4 h-4" />
+                                                    </Button>
+                                                </template>
+                                                <template v-else>
+                                                    <Button @click="startEditingField(society.id, '', '')" size="sm" variant="outline"
+                                                        class="h-8 px-2">
+                                                        <EditIcon class="w-4 h-4" />
+                                                    </Button>
+                                                    <Button @click="adminStore.deleteSociety(society.id)" variant="destructive"
+                                                        size="sm">
+                                                        删除
+                                                    </Button>
+                                                </template>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                     <TableRow v-if="adminStore.societies.length === 0">

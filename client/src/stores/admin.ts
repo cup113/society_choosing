@@ -282,7 +282,6 @@ export const useAdminStore = defineStore('admin', () => {
             if (index !== -1) {
                 dates.value[index] = updatedDate
             }
-            // Deleted:dateSuccessHint.value = `已成功更新选课活动 ${updatedDate.start} - ${updatedDate.end}`
             toast.success(`已成功更新选课活动 ${updatedDate.start} - ${updatedDate.end}`)
         } catch (error) {
             errorStore.add_error(`更新失败: ${errorToString(error)}`)
@@ -292,6 +291,9 @@ export const useAdminStore = defineStore('admin', () => {
     // Society management actions
     async function getSocieties() {
         try {
+            if (users.value.length === 0) {
+                await getUsers()
+            }
             const data = await new Fetcher<ListSocietyResponse>({
                 url: '/api/societies/list',
                 method: 'GET'
@@ -467,7 +469,9 @@ export const useAdminStore = defineStore('admin', () => {
 
     async function getChoices() {
         try {
-            await getUsers()
+            if (users.value.length === 0) {
+                await getUsers()
+            }
 
             const data = await new Fetcher<Choice[]>({
                 url: '/api/admin/choice/list',

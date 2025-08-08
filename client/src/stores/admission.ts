@@ -241,7 +241,12 @@ export const useAdmissionStore = defineStore('admission', () => {
                     society: user.society?.name ?? "未录取",
                 };
             });
-        return { heads: { 'number': '学号', 'name': '姓名', 'society': '录取社团', 'gender': '性别' }, rows: _users };
+        return { heads: {
+            'number': '学号',
+            'name': '姓名',
+            'gender': '性别',
+            'society': '录取社团',
+        }, rows: _users };
     }
 
     function toggle_reject(userID: string, society: AdmittedSociety | undefined): void {
