@@ -17,7 +17,7 @@ export const useUserStore = defineStore('user', () => {
   const token = useLocalStorage('SC_token', '');
   const userInformation = useLocalStorage('SC_userInformation', {
     name: '',
-    role: 'student' as UsersRoleOptions,
+    role: '' as UsersRoleOptions | '',
     username: '',
   });
   const favorites = useLocalStorage('SC_favorites', new Array<string>());
