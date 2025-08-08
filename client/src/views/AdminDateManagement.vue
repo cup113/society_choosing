@@ -33,9 +33,9 @@ function cancelEditing() {
   editingEndDate.value = ''
 }
 
-function updateDate() {
+async function updateDate() {
   if (editingDateId.value) {
-    adminStore.updateDate(editingDateId.value, editingStartDate.value, editingEndDate.value)
+    await adminStore.updateDate(editingDateId.value, editingStartDate.value, editingEndDate.value)
     cancelEditing()
   }
 }
@@ -176,8 +176,5 @@ function formatDateForInput(dateString: string) {
         </section>
       </div>
     </CardContent>
-    <CardFooter class="font-bold" v-show="adminStore.dateSuccessHint">
-      <p class="text-green-600">{{ adminStore.dateSuccessHint }}</p>
-    </CardFooter>
   </Card>
 </template>

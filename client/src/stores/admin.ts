@@ -4,12 +4,12 @@ import { Fetcher } from '@/lib/fetch'
 import { useErrorStore } from '@/stores/error'
 import type { User, DatesRecord, Society, ListSocietyResponse, Choice } from '../../../types/types'
 import dayjs from 'dayjs';
+import { toast } from 'vue-sonner';
 
 type ChoiceDisplay = Omit<Choice, 'user' | 'updated'> & { user?: User } & { updated: dayjs.Dayjs };
 
 export const useAdminStore = defineStore('admin', () => {
     const users = ref<User[]>([])
-    const userSuccessHint = ref('')
 
     const currentPage = ref(1)
     const totalPages = ref(1)
@@ -19,10 +19,8 @@ export const useAdminStore = defineStore('admin', () => {
 
 
     const dates = ref<DatesRecord[]>([])
-    const dateSuccessHint = ref('')
 
     const societies = ref<Society[]>([])
-    const societySuccessHint = ref('')
 
     const choices = ref<ChoiceDisplay[]>([])
 
@@ -110,7 +108,7 @@ export const useAdminStore = defineStore('admin', () => {
                 }
             })
 
-            userSuccessHint.value = `已成功新建 ${totalNewUsers} 位用户，修改 ${totalModifiedUsers} 位用户。`
+            toast.success(`已成功新建 ${totalNewUsers} 位用户，修改 ${totalModifiedUsers} 位用户。`)
         } catch (error: any) {
             errorStore.add_error(`导入失败: ${error.message}`)
         }
@@ -129,7 +127,7 @@ export const useAdminStore = defineStore('admin', () => {
                 data: JSON.stringify(usersToDelete),
             }).fetch_json()
             users.value = users.value.filter(user => user.class !== userDeleteClass)
-            userSuccessHint.value = `已成功删除 ${userDeleteClass} 的 ${usersToDelete.length} 位用户。`
+            toast.success(`已成功删除 ${userDeleteClass} 的 ${usersToDelete.length} 位用户。`)
         } catch (error: any) {
             errorStore.add_error(`删除失败: ${error.message}`)
         }
@@ -181,6 +179,7 @@ export const useAdminStore = defineStore('admin', () => {
 
             // 重新过滤用户列表
             filterUsers()
+            toast.success('已成功删除用户')
         } catch (error: any) {
             errorStore.add_error(`删除用户失败: ${error.message}`)
             throw error
@@ -220,7 +219,7 @@ export const useAdminStore = defineStore('admin', () => {
             }).fetch_json()
 
             dates.value.push(result)
-            dateSuccessHint.value = `已创建选课活动 ${result.start} - ${result.end}`
+            toast.success(`已创建选课活动 ${result.start} - ${result.end}`)
         } catch (error: any) {
             errorStore.add_error(`创建选课活动失败: ${error.message}`)
         }
@@ -242,7 +241,7 @@ export const useAdminStore = defineStore('admin', () => {
             const index = dates.value.findIndex(date => date.id == id)
             dates.value[index].isActive = activate
             const startDateStr = new Date(dates.value[index].start).toLocaleString()
-            dateSuccessHint.value = `成功 ${activate ? '激活' : '取消激活'} 选课活动（开始于 ${startDateStr}）`
+            toast.success(`成功 ${activate ? '激活' : '取消激活'} 选课活动（开始于 ${startDateStr}）`)
         } catch (error) {
             errorStore.add_error(`操作失败: ${errorToString(error)}`)
         }
@@ -258,7 +257,7 @@ export const useAdminStore = defineStore('admin', () => {
             }).fetch_json()
 
             dates.value = dates.value.filter(date => date.id !== id)
-            dateSuccessHint.value = '已成功删除选课活动'
+            toast.success('已成功删除选课活动')
         } catch (error) {
             errorStore.add_error(`删除失败: ${errorToString(error)}`)
         }
@@ -283,7 +282,8 @@ export const useAdminStore = defineStore('admin', () => {
             if (index !== -1) {
                 dates.value[index] = updatedDate
             }
-            dateSuccessHint.value = `已成功更新选课活动 ${updatedDate.start} - ${updatedDate.end}`
+            // Deleted:dateSuccessHint.value = `已成功更新选课活动 ${updatedDate.start} - ${updatedDate.end}`
+            toast.success(`已成功更新选课活动 ${updatedDate.start} - ${updatedDate.end}`)
         } catch (error) {
             errorStore.add_error(`更新失败: ${errorToString(error)}`)
         }
@@ -356,7 +356,7 @@ export const useAdminStore = defineStore('admin', () => {
                 }
             })
 
-            societySuccessHint.value = `已成功导入 ${societyCreatedCount} 个社团，更新 ${societyUpdatedCount} 个社团`
+            toast.success(`已成功导入 ${societyCreatedCount} 个社团，更新 ${societyUpdatedCount} 个社团`)
         } catch (error: any) {
             errorStore.add_error(`导入失败: ${error.message}`)
         }
@@ -384,7 +384,7 @@ export const useAdminStore = defineStore('admin', () => {
                 societies.value[index] = updatedSociety
             }
 
-            societySuccessHint.value = `已成功更新社团 ${updatedSociety.name} 的 ${field} 字段`
+            toast.success(`已成功更新社团 ${updatedSociety.name} 的 ${field} 字段`)
         } catch (error: any) {
             errorStore.add_error(`更新社团失败: ${error.message}`)
         }
@@ -399,7 +399,7 @@ export const useAdminStore = defineStore('admin', () => {
             }).fetch_json()
 
             societies.value = societies.value.filter(s => s.id !== societyId)
-            societySuccessHint.value = '已成功删除社团'
+            toast.success('已成功删除社团')
         } catch (error: any) {
             errorStore.add_error(`删除社团失败: ${error.message}`)
         }
@@ -429,7 +429,7 @@ export const useAdminStore = defineStore('admin', () => {
                 societies.value[index] = updatedSociety
             }
 
-            societySuccessHint.value = `已成功添加核心成员`
+            toast.success(`已成功添加核心成员`)
         } catch (error: any) {
             errorStore.add_error(`添加核心成员失败: ${error.message}`)
         }
@@ -459,7 +459,7 @@ export const useAdminStore = defineStore('admin', () => {
                 societies.value[index] = updatedSociety
             }
 
-            societySuccessHint.value = `已成功移除核心成员`
+            toast.success(`已成功移除核心成员`)
         } catch (error: any) {
             errorStore.add_error(`移除核心成员失败: ${error.message}`)
         }
@@ -501,7 +501,7 @@ export const useAdminStore = defineStore('admin', () => {
             }).fetch_json()
 
             await getChoices()
-            userSuccessHint.value = `已成功删除指定时间段的选课记录`
+            toast.success(`已成功删除指定时间段的选课记录`)
         } catch (error) {
             errorStore.add_error("删除选课记录失败：" + errorToString(error))
         }
@@ -515,7 +515,7 @@ export const useAdminStore = defineStore('admin', () => {
             }).fetch_json()
 
             choices.value = []
-            userSuccessHint.value = `已成功清空所有选课记录`
+            toast.success(`已成功清空所有选课记录`)
         } catch (error) {
             errorStore.add_error("清空选课记录失败：" + errorToString(error))
         }
@@ -575,27 +575,12 @@ export const useAdminStore = defineStore('admin', () => {
         return filteredUsers.value.slice(start, end)
     }
 
-    function clearUserSuccessHint() {
-        userSuccessHint.value = ''
-    }
-
-    function clearDateSuccessHint() {
-        dateSuccessHint.value = ''
-    }
-
-    function clearSocietySuccessHint() {
-        societySuccessHint.value = ''
-    }
-
     return {
         // State
         users,
-        userSuccessHint,
         dates,
-        dateSuccessHint,
         choices,
         societies,
-        societySuccessHint,
         currentPage,
         totalPages,
         usersPerPage,
@@ -628,8 +613,5 @@ export const useAdminStore = defineStore('admin', () => {
         setCurrentPage,
         filterUsers,
         getCurrentPageUsers,
-        clearUserSuccessHint,
-        clearDateSuccessHint,
-        clearSocietySuccessHint
     }
 })

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted, watch, inject } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
@@ -19,11 +19,6 @@ const searchQuery = ref('')
 const editingUserId = ref<string | null>(null)
 const editingField = ref<string | null>(null)
 const editingValue = ref<string>('')
-
-// 注入toast方法
-const showToast = inject('showToast', (message: string, type: 'success' | 'error' = 'success') => {
-  console.log(`${type}: ${message}`)
-})
 
 onMounted(() => {
   adminStore.getUsers()
@@ -52,47 +47,27 @@ function cancelEditing() {
 
 // 保存编辑
 async function saveEditing(userId: string) {
-  try {
-    if (editingField.value) {
-      await adminStore.updateUser(userId, editingField.value, editingValue.value)
-      cancelEditing()
-      showToast('已成功更新用户信息', 'success')
-    }
-  } catch (error: any) {
-    showToast('更新失败: ' + error.message, 'error')
+  if (editingField.value) {
+    await adminStore.updateUser(userId, editingField.value, editingValue.value)
+    cancelEditing()
   }
 }
 
 // 删除单个用户
 async function deleteUser(userId: string) {
-  try {
-    await adminStore.deleteUser(userId)
-    showToast('已成功删除用户', 'success')
-  } catch (error: any) {
-    showToast('删除失败: ' + error.message, 'error')
-  }
+  await adminStore.deleteUser(userId)
 }
 
 // 包装importUsers方法以使用toast
 async function importUsers() {
-  try {
-    await adminStore.importUsers(userImportData.value)
-    userImportData.value = ''
-    showToast('已成功导入用户', 'success')
-  } catch (error: any) {
-    showToast('导入失败: ' + error.message, 'error')
-  }
+  await adminStore.importUsers(userImportData.value)
+  userImportData.value = ''
 }
 
 // 包装deleteUsers方法以使用toast
 async function deleteUsers() {
-  try {
-    await adminStore.deleteUsers(userDeleteClass.value)
-    userDeleteClass.value = ''
-    showToast('已成功删除用户', 'success')
-  } catch (error: any) {
-    showToast('删除失败: ' + error.message, 'error')
-  }
+  await adminStore.deleteUsers(userDeleteClass.value)
+  userDeleteClass.value = ''
 }
 </script>
 
@@ -127,14 +102,10 @@ async function deleteUsers() {
             <div class="flex gap-2 mb-4">
               <div class="relative flex-1">
                 <SearchIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input 
-                  v-model="searchQuery" 
-                  placeholder="按姓名、班级、学号或 {姓名}-{班级}-{学号} 搜索" 
-                  class="pl-10 w-full" 
-                />
+                <Input v-model="searchQuery" placeholder="按姓名、班级、学号或 {姓名}-{班级}-{学号} 搜索" class="pl-10 w-full" />
               </div>
             </div>
-            
+
             <!-- 用户表格 -->
             <div class="space-y-4">
               <Table>
@@ -225,7 +196,8 @@ async function deleteUsers() {
                       <TableCell>
                         <div class="flex gap-1">
                           <template v-if="editingUserId === user.id">
-                            <Button @click="saveEditing(user.id)" size="sm" class="h-8 px-2 bg-green-600 hover:bg-green-700">
+                            <Button @click="saveEditing(user.id)" size="sm"
+                              class="h-8 px-2 bg-green-600 hover:bg-green-700">
                               <SaveIcon class="w-4 h-4" />
                             </Button>
                             <Button @click="cancelEditing" size="sm" class="h-8 px-2" variant="outline">
@@ -233,7 +205,8 @@ async function deleteUsers() {
                             </Button>
                           </template>
                           <template v-else>
-                            <Button @click="startEditingField(user.id, '', '')" size="sm" variant="outline" class="h-8 px-2">
+                            <Button @click="startEditingField(user.id, '', '')" size="sm" variant="outline"
+                              class="h-8 px-2">
                               <EditIcon class="w-4 h-4" />
                             </Button>
                             <AlertDialog>
@@ -269,28 +242,25 @@ async function deleteUsers() {
                   </TableRow>
                 </TableBody>
               </Table>
-              
+
               <!-- 分页控件 -->
               <div class="flex justify-between items-center">
                 <div class="text-sm text-gray-600">
-                  显示第 {{ (adminStore.currentPage - 1) * adminStore.usersPerPage + 1 }} 到 {{ Math.min(adminStore.currentPage * adminStore.usersPerPage, adminStore.filteredUsers.length) }} 条，共 {{ adminStore.filteredUsers.length }} 条记录
+                  显示第 {{ (adminStore.currentPage - 1) * adminStore.usersPerPage + 1 }} 到 {{
+                    Math.min(adminStore.currentPage *
+                      adminStore.usersPerPage, adminStore.filteredUsers.length) }} 条，共 {{ adminStore.filteredUsers.length }}
+                  条记录
                 </div>
                 <div class="flex gap-2">
-                  <Button 
-                    @click="adminStore.setCurrentPage(adminStore.currentPage - 1)" 
-                    :disabled="adminStore.currentPage <= 1"
-                    variant="outline"
-                  >
+                  <Button @click="adminStore.setCurrentPage(adminStore.currentPage - 1)"
+                    :disabled="adminStore.currentPage <= 1" variant="outline">
                     上一页
                   </Button>
                   <span class="flex items-center px-3">
                     第 {{ adminStore.currentPage }} 页，共 {{ adminStore.totalPages }} 页
                   </span>
-                  <Button 
-                    @click="adminStore.setCurrentPage(adminStore.currentPage + 1)" 
-                    :disabled="adminStore.currentPage >= adminStore.totalPages"
-                    variant="outline"
-                  >
+                  <Button @click="adminStore.setCurrentPage(adminStore.currentPage + 1)"
+                    :disabled="adminStore.currentPage >= adminStore.totalPages" variant="outline">
                     下一页
                   </Button>
                 </div>

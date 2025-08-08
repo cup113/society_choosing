@@ -9,6 +9,7 @@ import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover
 import { Command, CommandGroup, CommandInput, CommandList, CommandItem, CommandEmpty } from '@/components/ui/command'
 import { useAdminStore } from '@/stores/admin'
 import { GroupIcon, CheckIcon } from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
 
 const adminStore = useAdminStore()
 const societyImportData = ref('')
@@ -31,9 +32,14 @@ function cancelEditingField() {
     editingField.value = null
 }
 
-function updateSocietyField(societyId: string, field: string, value: string | number) {
-    adminStore.updateSocietyField(societyId, field, value)
+async function updateSocietyField(societyId: string, field: string, value: string | number) {
+  try {
+    await adminStore.updateSocietyField(societyId, field, value)
     cancelEditingField()
+    toast.success(`已成功更新社团 ${field} 字段`)
+  } catch (error) {
+    toast.error('更新失败')
+  }
 }
 </script>
 
@@ -300,8 +306,5 @@ function updateSocietyField(societyId: string, field: string, value: string | nu
                 </section>
             </div>
         </CardContent>
-        <CardFooter class="font-bold text-green-600" v-show="adminStore.societySuccessHint">
-            <p>{{ adminStore.societySuccessHint }}</p>
-        </CardFooter>
     </Card>
 </template>

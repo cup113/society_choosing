@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -132,8 +132,5 @@ onMounted(() => {
         </section>
       </div>
     </CardContent>
-    <CardFooter class="font-bold" v-show="adminStore.userSuccessHint">
-      <p class="text-green-600">{{ adminStore.userSuccessHint }}</p>
-    </CardFooter>
   </Card>
 </template>

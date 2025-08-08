@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router';
+import { Toaster } from '@/components/ui/sonner';
 import AppNavigation from '@/components/AppNavigation.vue';
 import AlertTimeStatus from '@/components/AlertTimeStatus.vue';
 import AlertCoreMember from '@/components/AlertCoreMember.vue';
 import AlertError from '@/components/AlertError.vue';
 import { RefreshCcwIcon } from 'lucide-vue-next'
+import 'vue-sonner/style.css';
 
 function clear_local_storage_cache() {
   localStorage.clear();
@@ -25,6 +27,8 @@ function clear_local_storage_cache() {
       </RouterView>
     </div>
     <AlertError />
+
+    <Toaster position="bottom-right" />
 
     <footer
       class="mt-8 border-t border-amber-200 dark:border-stone-700 bg-gradient-to-r from-amber-50/50 to-stone-100/50 dark:from-stone-800/50 dark:to-stone-900/50">
