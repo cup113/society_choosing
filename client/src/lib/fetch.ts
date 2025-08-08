@@ -32,6 +32,9 @@ export class Fetcher<T = unknown> {
   private options: FetchOptions;
 
   constructor(options: FetchOptions) {
+    if (!options.url.startsWith('/api/')) {
+      options.url = '/api' + (options.url.startsWith('/') ? '' : '/') + options.url;
+    }
     this.options = options;
   }
 
@@ -79,4 +82,25 @@ export class Fetcher<T = unknown> {
       throw new FetchError(response.status, response.statusText, CodeType.UnknownError, response.statusText);
     }
   }
+}
+
+export async function fetchJson<T>(url: string, options?: { method?: 'GET' | 'POST', data?: string }): Promise<T> {
+  const method = options?.method || 'GET';
+  const fetcher = new Fetcher<T>({
+    url,
+    method,
+    ...(method === 'POST' && {
+      data: options?.data
+    })
+  });
+
+  try {
+    return await fetcher.fetch_json();
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function postJson<T>(url: string, data?: string): Promise<T> {
+  return await fetchJson<T>(url, { method: 'POST', data });
 }

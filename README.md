@@ -2,6 +2,11 @@
 
 社团选课系统是一个为学校社团选课设计的完整解决方案，支持学生在线选择社团志愿、教师管理社团和审核选课等功能。
 
+[![Vue.js](https://img.shields.io/badge/Vue.js-3.x-42b883?style=flat-square)](https://vuejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178c6?style=flat-square)](https://www.typescriptlang.org/)
+[![PocketBase](https://img.shields.io/badge/PocketBase-0.29.x-ff6b6b?style=flat-square)](https://pocketbase.io/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ed?style=flat-square)](https://www.docker.com/)
+
 ## 项目概述
 
 该系统基于现代Web技术栈构建，包括：
@@ -24,14 +29,17 @@
 
 - 导出选课数据
 - 审核学生志愿
+- 管理社团信息
+- 设置选课时间窗口
 
 ### 系统特色
 
 - 响应式设计，支持PC和移动端
 - 实时状态更新，无需手动刷新
-- 权限控制（学生/教师）
+- 基于角色的权限控制（学生/教师）
 - 数据持久化存储
 - Docker 容器化部署
+- 完整的 TypeScript 类型支持
 
 ## 环境要求
 
@@ -43,7 +51,7 @@
 
 ### 生产环境
 
-- 支持 Docker 的服务器
+- 支持 Docker 和 Docker Compose 的服务器
 
 ## 快速开始
 
@@ -106,7 +114,6 @@ cp .env.example .env
 - `admin_email` 和 `admin_password`: 管理员账户信息
 - `PB_TYPEGEN_URL`: PocketBase地址 (生产环境通常为 `http://pocketbase:4128`)
 - `PB_TYPEGEN_EMAIL` 和 `PB_TYPEGEN_PASSWORD`: 与管理员账户相同
-- `teacher_username` 和 `teacher_password`: 教师账户信息
 
 2. 构建项目
 
@@ -130,19 +137,24 @@ docker-compose up -d
 .
 ├── client/                 # 前端Vue应用
 │   ├── src/
+│   │   ├── assets/         # 静态资源
 │   │   ├── components/     # Vue组件
 │   │   ├── views/          # 页面视图
 │   │   ├── stores/         # 状态管理(Pinia)
-│   │   └── router/         # 路由配置
+│   │   ├── router/         # 路由配置
+│   │   ├── lib/            # 工具库
+│   │   └── main.ts         # 应用入口
 │   └── ...
 ├── server/                 # 后端Express服务
 │   ├── src/
-│   │   └── script/         # 管理脚本
 │   └── ...
 ├── db/                     # 数据库迁移文件
 │   └── pb_migrations/
 ├── types/                  # TypeScript类型定义
-└── ...
+├── Dockerfile.express      # 前端和API服务Docker配置
+├── Dockerfile.pocketbase   # 数据库服务Docker配置
+├── docker-compose.yml      # Docker编排配置
+└── run_dev.py              # 开发环境启动脚本
 ```
 
 ## 核心概念
@@ -172,3 +184,17 @@ docker-compose up -d
 
 1. **前台报错**
    主要原因可能是未将 ACTIVITY_ID 添加到数据库中，请登录数据库管理员账号手动添加。
+
+2. **无法连接到 PocketBase**
+   检查 `.env` 文件中的 `PB_TYPEGEN_URL` 配置是否正确，开发环境通常为 `http://localhost:4128`。
+
+3. **Docker 部署失败**
+   确保已正确配置所有环境变量，并且端口未被其他服务占用。
+
+## 贡献指南
+
+欢迎提交 Issue 和 Pull Request 来改进这个项目。
+
+## 许可证
+
+本项目采用 MIT 许可证，详见 [LICENSE.md](./LICENSE.md) 文件。
