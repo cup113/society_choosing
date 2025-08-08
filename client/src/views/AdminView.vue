@@ -8,7 +8,6 @@ const router = useRouter()
 const route = useRoute()
 const activeTab = ref('users')
 
-// 监听路由变化以更新活动标签
 watch(
   () => route.name,
   (newRouteName) => {
@@ -29,7 +28,6 @@ watch(
   { immediate: true }
 )
 
-// 初始化时根据当前路由设置活动标签
 onMounted(() => {
   switch (route.name) {
     case 'UserManagement':

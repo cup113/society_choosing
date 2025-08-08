@@ -5,15 +5,19 @@ import { useErrorStore } from '@/stores/error'
 import type { User, DatesRecord, Society, ListSocietyResponse } from '../../../types/types'
 
 export const useAdminStore = defineStore('admin', () => {
-    // Users state
     const users = ref<User[]>([])
     const userSuccessHint = ref('')
 
-    // Dates state
+    const currentPage = ref(1)
+    const totalPages = ref(1)
+    const usersPerPage = ref(20)
+    const searchQuery = ref('')
+    const filteredUsers = ref<User[]>([])
+
+
     const dates = ref<DatesRecord[]>([])
     const dateSuccessHint = ref('')
 
-    // Societies state
     const societies = ref<Society[]>([])
     const societySuccessHint = ref('')
 
@@ -126,6 +130,59 @@ export const useAdminStore = defineStore('admin', () => {
         }
     }
 
+    async function updateUser(userId: string, field: string, value: string) {
+        try {
+            const userToUpdate = users.value.find(user => user.id === userId)
+            if (!userToUpdate) {
+                throw new Error('未找到要更新的用户')
+            }
+
+            // 构造更新数据
+            const updateData: Partial<User> = {
+                id: userId,
+                [field]: value,
+            }
+
+            const updatedUser = await new Fetcher<User>({
+                url: '/api/admin/user/update',
+                method: 'POST',
+                data: JSON.stringify(updateData)
+            }).fetch_json()
+
+            const index = users.value.findIndex(user => user.id === userId)
+            if (index !== -1) {
+                users.value[index] = updatedUser
+            }
+
+            filterUsers()
+
+            return updatedUser
+        } catch (error: any) {
+            errorStore.add_error(`更新用户失败: ${error.message}`)
+            throw error
+        }
+    }
+
+    async function deleteUser(userId: string) {
+        try {
+            await new Fetcher({
+                url: '/api/admin/user/delete',
+                method: 'POST',
+                data: JSON.stringify([userId]),
+            }).fetch_json()
+
+            // 从本地列表中移除用户
+            users.value = users.value.filter(user => user.id !== userId)
+
+            // 重新过滤用户列表
+            filterUsers()
+        } catch (error: any) {
+            errorStore.add_error(`删除用户失败: ${error.message}`)
+            throw error
+        }
+    }
+
+
     // Date management actions
     async function getDates() {
         try {
@@ -183,6 +240,47 @@ export const useAdminStore = defineStore('admin', () => {
             dateSuccessHint.value = `成功 ${activate ? '激活' : '取消激活'} 选课活动（开始于 ${startDateStr}）`
         } catch (error) {
             errorStore.add_error(`操作失败: ${errorToString(error)}`)
+        }
+    }
+
+    // 添加删除日期的方法
+    async function deleteDate(id: string) {
+        try {
+            await new Fetcher({
+                url: '/api/admin/date/delete',
+                method: 'POST',
+                data: JSON.stringify({ id }),
+            }).fetch_json()
+
+            dates.value = dates.value.filter(date => date.id !== id)
+            dateSuccessHint.value = '已成功删除选课活动'
+        } catch (error) {
+            errorStore.add_error(`删除失败: ${errorToString(error)}`)
+        }
+    }
+
+    // 添加更新日期的方法
+    async function updateDate(id: string, start: string, end: string) {
+        try {
+            const data = {
+                id,
+                start: new Date(start).toISOString(),
+                end: new Date(end).toISOString()
+            }
+
+            const updatedDate = await new Fetcher<DatesRecord>({
+                url: '/api/admin/date/update',
+                method: 'POST',
+                data: JSON.stringify(data),
+            }).fetch_json()
+
+            const index = dates.value.findIndex(date => date.id === id)
+            if (index !== -1) {
+                dates.value[index] = updatedDate
+            }
+            dateSuccessHint.value = `已成功更新选课活动 ${updatedDate.start} - ${updatedDate.end}`
+        } catch (error) {
+            errorStore.add_error(`更新失败: ${errorToString(error)}`)
         }
     }
 
@@ -380,6 +478,42 @@ export const useAdminStore = defineStore('admin', () => {
         return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name))
     }
 
+    function setSearchQuery(query: string) {
+        searchQuery.value = query
+        filterUsers()
+    }
+
+    function setCurrentPage(page: number) {
+        currentPage.value = page
+        filterUsers()
+    }
+
+    function filterUsers() {
+        // 根据搜索查询过滤用户
+        let result = users.value
+        if (searchQuery.value) {
+            const query = searchQuery.value.toLowerCase()
+            result = users.value.filter(user => `${user.name}-${user.class}-${user.username}`.toLowerCase().includes(query))
+        }
+
+        // 更新过滤后的用户列表
+        filteredUsers.value = result
+
+        // 计算总页数
+        totalPages.value = Math.ceil(filteredUsers.value.length / usersPerPage.value)
+
+        // 确保当前页码不超过总页数
+        if (currentPage.value > totalPages.value) {
+            currentPage.value = totalPages.value || 1
+        }
+    }
+
+    function getCurrentPageUsers() {
+        const start = (currentPage.value - 1) * usersPerPage.value
+        const end = start + usersPerPage.value
+        return filteredUsers.value.slice(start, end)
+    }
+
     function clearUserSuccessHint() {
         userSuccessHint.value = ''
     }
@@ -400,13 +534,22 @@ export const useAdminStore = defineStore('admin', () => {
         dateSuccessHint,
         societies,
         societySuccessHint,
+        currentPage,
+        totalPages,
+        usersPerPage,
+        searchQuery,
+        filteredUsers,
 
         // Actions
         getUsers,
         importUsers,
         deleteUsers,
+        deleteUser,
+        updateUser,
         getDates,
         createDate,
+        deleteDate,
+        updateDate,
         toggleActivateDate,
         getSocieties,
         importSocieties,
@@ -416,6 +559,10 @@ export const useAdminStore = defineStore('admin', () => {
         removeCoreMember,
         getUserClassNameById,
         getClasses,
+        setSearchQuery,
+        setCurrentPage,
+        filterUsers,
+        getCurrentPageUsers,
         clearUserSuccessHint,
         clearDateSuccessHint,
         clearSocietySuccessHint

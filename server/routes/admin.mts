@@ -43,6 +43,17 @@ class AdminUserDeleteHandler extends RequestHandler {
     }
 }
 
+class AdminUserUpdateHandler extends RequestHandler {
+    static method = RequestHandler.POST;
+    static path = "/user/update";
+
+    public async handle_core(): Promise<User> {
+        await this.authorize();
+        const { id, ...userData } = this.req.body as Partial<CreateUserInner> & { id: string };
+        return await this.databaseService.update_user(id, userData);
+    }
+}
+
 class AdminDateGetHandler extends RequestHandler {
     static method = RequestHandler.GET;
     static path = "/date/list";
@@ -72,6 +83,29 @@ class AdminDateActivateHandler extends RequestHandler {
         await this.authorize();
         const { id, activate } = this.req.body as { id: string, activate: boolean };
         return await this.databaseService.toggle_activate_date(id, activate);
+    }
+}
+
+class AdminDateDeleteHandler extends RequestHandler {
+    static method = RequestHandler.POST;
+    static path = "/date/delete";
+
+    public async handle_core(): Promise<{ success: true }> {
+        await this.authorize();
+        const { id } = this.req.body as { id: string };
+        await this.databaseService.delete_date(id);
+        return { success: true };
+    }
+}
+
+class AdminDateUpdateHandler extends RequestHandler {
+    static method = RequestHandler.POST;
+    static path = "/date/update";
+
+    public async handle_core(): Promise<DatesRecord> {
+        await this.authorize();
+        const { id, ...date } = this.req.body as Partial<CreateDateInner> & { id: string };
+        return await this.databaseService.update_date(id, date);
     }
 }
 
@@ -110,7 +144,7 @@ class AdminSocietyUpdateHandler extends RequestHandler {
 }
 
 export default RequestHandler.inject(
-    AdminUserGetHandler, AdminUserImportHandler, AdminUserDeleteHandler,
-    AdminDateGetHandler, AdminDateCreateHandler, AdminDateActivateHandler,
+    AdminUserGetHandler, AdminUserImportHandler, AdminUserDeleteHandler, AdminUserUpdateHandler,
+    AdminDateGetHandler, AdminDateCreateHandler, AdminDateActivateHandler, AdminDateDeleteHandler, AdminDateUpdateHandler,
     AdminSocietyImportHandler, AdminSocietyDeleteHandler, AdminSocietyUpdateHandler
 );

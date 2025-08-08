@@ -8,6 +8,7 @@ export abstract class DatabaseService {
   public abstract create_or_update_user(data: CreateUserInner): Promise<User>;
   public abstract list_users(): Promise<User[]>;
   public abstract delete_user(id: string): Promise<void>;
+  public abstract update_user(id: string, data: Partial<CreateUserInner>): Promise<User>;
 
   // Societies
   public abstract create_or_update_society(data: CreateSocietyInner): Promise<Society>;
@@ -25,6 +26,8 @@ export abstract class DatabaseService {
   public abstract list_dates(): Promise<DatesRecord[]>;
   public abstract create_date(data: CreateDateInner): Promise<DatesRecord>;
   public abstract toggle_activate_date(dateID: string, activate: boolean): Promise<DatesRecord>;
+  public abstract delete_date(id: string): Promise<void>;
+  public abstract update_date(id: string, data: Partial<CreateDateInner>): Promise<DatesRecord>;
   public abstract get_active_date(): Promise<DatesRecord | null>;
 }
 
@@ -56,6 +59,18 @@ export class PocketBaseService extends DatabaseService {
   public async delete_user(id: string): Promise<void> {
     await this.pb.collection("users").delete(id);
   }
+
+  public async update_user(id: string, data: Partial<CreateUserInner>): Promise<User> {
+    if (data.password) {
+      return await this.pb.collection("users").update(id, {
+        ...data,
+        passwordConfirm: data.password,
+      }, { requestKey: data.username });
+    }
+
+    return await this.pb.collection("users").update(id, data, { requestKey: data.username });
+  }
+
 
   public async create_or_update_society(data: CreateSocietyInner): Promise<Society> {
     try {
@@ -134,6 +149,14 @@ export class PocketBaseService extends DatabaseService {
     return await this.pb.collection("dates").update(dateID, {
       isActive: activate,
     });
+  }
+
+  public async delete_date(id: string): Promise<void> {
+    await this.pb.collection("dates").delete(id);
+  }
+
+  public async update_date(id: string, data: Partial<CreateDateInner>): Promise<DatesRecord> {
+    return await this.pb.collection("dates").update(id, data);
   }
 
   public async get_active_date(): Promise<DatesRecord | null> {

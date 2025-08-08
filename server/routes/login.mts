@@ -7,7 +7,7 @@ class LoginHandler extends RequestHandler {
 
   public async handle_core(): Promise<LoginResponse> {
     const { username, password }: { username: string, password: string } = this.req.body;
-    const realPassword = username.match(/[0-9]{9}/) ? `${username.substring(4, 10)}@${password}` : password
+    const realPassword = username.match(/[0-9]{9}/) ? `${username.substring(3, 9)}@${password}` : password
     const authResult = await this.authorizationService.auth_with_password(username, realPassword);
     if (!authResult.success) {
       throw new this.Terminate(authResult.code, authResult.error);
