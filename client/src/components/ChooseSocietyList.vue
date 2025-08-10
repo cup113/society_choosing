@@ -89,8 +89,8 @@ const calculateDirectionAndRotation = (current: { x: number, y: number }, target
     };
 };
 
-watch(() => societyStore.societies.length, async () => {
-    if (!props.isMain) {
+watch(() => societyStore.societies.length, async l => {
+    if (!props.isMain || l === 0) {
         return;
     }
 
@@ -100,7 +100,7 @@ watch(() => societyStore.societies.length, async () => {
     }
 
     startAnimationProcess();
-});
+}, { immediate: true });
 
 function startAnimationProcess() {
     console.log("START MOVING");
