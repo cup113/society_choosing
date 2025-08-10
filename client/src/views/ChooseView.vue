@@ -76,7 +76,7 @@ const favoriteSocieties = computed(() => {
   <main class="flex flex-col gap-8 py-6 pb-48">
     <ChooseGuide />
 
-    <ChooseList title="所有社团" :societies="societyStore.societies" />
+    <ChooseList title="所有社团" :societies="societyStore.societies" is-main />
 
     <ChooseList title="已收藏社团" :societies="favoriteSocieties" />
 

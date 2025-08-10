@@ -2,10 +2,12 @@ import { defineStore } from "pinia";
 import { ref, reactive, computed, nextTick } from "vue";
 import { createShuffle } from 'fast-shuffle';
 import { alea } from 'seedrandom';
+import { useLocalStorage } from "@vueuse/core";
 import dayjs from "dayjs";
 
 import { useUserStore } from "./user";
 import { useErrorStore } from "./error";
+import { useTimeStore } from "./time";
 import { Fetcher } from "@/lib/fetch";
 import type { HistoryChoiceResponse, Choice as _Choice, ListSocietyResponse, Society as _Society } from "../../../types/types.d.ts";
 
@@ -18,6 +20,11 @@ export const useSocietyStore = defineStore('society', () => {
   const societies = ref(new Array<Society>());
   const coreMemberOf = ref<string | null>(null)
   const historyChoice = ref<Choice | null>(null);
+
+  const laidEggs = useLocalStorage<number[]>('SC_laid_eggs', []);
+
+  const hen = reactive({ x: 0, y: 0, deg: 0 });
+
 
   const timeStatus = ref<{
     open: true,
@@ -133,6 +140,22 @@ export const useSocietyStore = defineStore('society', () => {
     return result;
   });
 
+  const shouldSkipAnimation = computed(() => {
+    if (!timeStatus.value || timeStatus.value.open) return false;
+
+    if (timeStatus.value.reason === 'not-started') {
+      const remainingSocieties = societies.value.length - laidEggs.value.length;
+      const remainingEggTime = remainingSocieties * 2;
+
+      const timeStore = useTimeStore();
+
+      const timeToStart = timeStatus.value.estimated.diff(timeStore.now, 'second');
+      return (timeToStart - 2 * remainingEggTime) < 5;
+    }
+
+    return false;
+  });
+
   return {
     societies,
     historyChoice,
@@ -144,5 +167,9 @@ export const useSocietyStore = defineStore('society', () => {
     get_society_id,
     refresh,
     refresh_society_history,
+
+    laidEggs,
+    hen,
+    shouldSkipAnimation,
   }
 });
