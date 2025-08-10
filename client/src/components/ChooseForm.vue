@@ -11,8 +11,8 @@ import { useMediaQuery } from '@vueuse/core';
 const userStore = useUserStore();
 const societyStore = useSocietyStore();
 
-defineProps<{
-  onSubmit: () => void;
+const emit = defineEmits<{
+  (emit: 'submit'): void;
 }>();
 
 const canSubmit = computed(() => {
@@ -25,8 +25,7 @@ const isMobile = useMediaQuery('(max-width: 768px)');
 </script>
 
 <template>
-  <div class="fixed bottom-0 left-0 right-0 w-full flex flex-col items-center z-10 max-h-100">
-    <!-- 展开/收起按钮，放置在分界线上，添加旋转动画 -->
+  <div class="choose-form fixed bottom-0 left-0 right-0 w-full flex flex-col items-center z-10 max-h-100">
     <Button v-if="isMobile" @click="isExpanded = !isExpanded" variant="outline"
       class="self-center h-5 z-20 bg-amber-600 border-amber-700 hover:bg-amber-700 text-white rounded-t-md rounded-b-none shadow-lg px-2 transition-all duration-300">
       <Transition name="rotate" mode="out-in">
@@ -35,7 +34,6 @@ const isMobile = useMediaQuery('(max-width: 768px)');
       </Transition>
     </Button>
 
-    <!-- 主要表单内容，添加展开/收起动画 -->
     <div class="border-t-4 border-amber-600 w-full overflow-hidden"
       :class="isMobile && !isExpanded ? 'shadow-lg' : 'shadow-xl'">
       <div class="bg-gradient-to-r from-amber-50 to-amber-100 w-full"
@@ -49,8 +47,8 @@ const isMobile = useMediaQuery('(max-width: 768px)');
                     class="bg-white rounded-xl shadow-card hover-shadow" />
                 </div>
 
-                <Button v-if="canSubmit" @click="onSubmit"
-                  class="submit-btn relative w-32 h-14 gradient-amber-btn font-bold text-lg rounded-xl shadow-lg hover-lift flex items-center justify-center gap-2">
+                <Button v-if="canSubmit" @click="emit('submit')"
+                  class="relative w-32 h-14 gradient-amber-btn font-bold text-lg rounded-xl shadow-lg hover-lift flex items-center justify-center gap-2">
                   <CalendarIcon class="w-5 h-5" />
                   <span>提交选课</span>
                 </Button>
@@ -101,12 +99,12 @@ const isMobile = useMediaQuery('(max-width: 768px)');
 </template>
 
 <style scoped>
-.submit-btn::before {
+.choose-form::before {
   position: absolute;
-  right: -10px;
+  right: 10px;
   width: 50px;
   height: 35px;
-  top: -40px;
+  top: -30px;
   content: "";
   background-image: url('/img/button-bird.png');
   background-size: contain;

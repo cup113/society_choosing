@@ -14,7 +14,7 @@ onMounted(() => {
   timer = window.setInterval(() => {
     countdown.value--;
     if (countdown.value <= 0) {
-      router.push('/');
+      router.replace('/');
     }
   }, 1000);
 });
@@ -26,7 +26,7 @@ onBeforeUnmount(() => {
 });
 
 function goHome() {
-  router.push('/');
+  router.replace('/');
 }
 </script>
 
@@ -49,7 +49,7 @@ function goHome() {
           您的选课报名已成功提交！
         </p>
         <div class="flex justify-center mb-6">
-          <img src="/img/thanks-bird.jpg" alt="感谢鸟" class="w-40 h-40 rounded-2xl shadow-lg border-4 border-amber-200">
+          <img src="/img/thanks-bird.jpg" alt="感谢鸟" class="w-40 h-40 rounded-2xl shadow-lg">
         </div>
         <div class="flex items-center justify-center gap-2 mb-6 p-3 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
           <TimerIcon class="w-5 h-5 text-amber-700 dark:text-amber-300" />

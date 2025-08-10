@@ -15,7 +15,7 @@ const props = defineProps<{
   choices: string[],
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   (emit: 'confirm-choice'): void;
   (emit: 'cancel-choice'): void;
 }>();
@@ -39,8 +39,8 @@ const limits = computed(() => {
         </template>
       </ChoiceShow>
       <AlertDialogFooter>
-        <AlertDialogCancel class="bg-red-500 hover:bg-red-600 rounded-lg px-6 py-2">取消</AlertDialogCancel>
-        <AlertDialogAction class="bg-green-500 hover:bg-green-600 rounded-lg px-6 py-2">确认</AlertDialogAction>
+        <AlertDialogCancel class="bg-red-500 hover:bg-red-600 rounded-lg px-6 py-2" @click="emit('cancel-choice')">取消</AlertDialogCancel>
+        <AlertDialogAction class="bg-green-500 hover:bg-green-600 rounded-lg px-6 py-2" @click="emit('confirm-choice')">确认</AlertDialogAction>
       </AlertDialogFooter>
     </AlertDialogContent>
   </AlertDialog>
