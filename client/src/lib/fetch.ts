@@ -11,7 +11,7 @@ type FetchOptions = {
   method: 'GET';
 });
 
-class FetchError extends Error {
+export class FetchError extends Error {
   public status: number;
   public statusText: string;
   public code: CodeType;

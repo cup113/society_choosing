@@ -49,7 +49,7 @@ const isMobile = useMediaQuery('(max-width: 768px)');
 
                 <Button v-if="canSubmit" @click="emit('submit')"
                   class="relative w-32 h-14 gradient-amber-btn font-bold text-lg rounded-xl shadow-lg hover-lift flex items-center justify-center gap-2">
-                  <CalendarIcon class="w-5 h-5" />
+                  <CheckIcon class="w-5 h-5" />
                   <span>提交选课</span>
                 </Button>
 

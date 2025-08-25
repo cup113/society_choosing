@@ -8,8 +8,10 @@ import dayjs from "dayjs";
 import { useUserStore } from "./user";
 import { useErrorStore } from "./error";
 import { useTimeStore } from "./time";
-import { Fetcher } from "@/lib/fetch";
+import { clear_local_storage_cache } from "@/lib/utils";
+import { Fetcher, FetchError } from "@/lib/fetch";
 import type { HistoryChoiceResponse, Choice as _Choice, ListSocietyResponse, Society as _Society } from "../../../types/types.d.ts";
+import { CodeType } from "../../../types/codes";
 
 
 export type Society = _Society & { index: string };
@@ -38,10 +40,11 @@ export const useSocietyStore = defineStore('society', () => {
   const localIP = ref("");
 
   async function refresh_society_basic() {
-    return new Fetcher<ListSocietyResponse>({
-      url: '/api/societies/list',
-      method: 'GET',
-    }).fetch_json().then(data => {
+    try {
+      const data = await (new Fetcher<ListSocietyResponse>({
+        url: '/api/societies/list',
+        method: 'GET',
+      }).fetch_json());
       const userID = useUserStore().userID;
       data.societies.filter(society => society.coreMembers?.includes(userID)).forEach(society => {
         coreMemberOf.value = society.name;
@@ -69,11 +72,15 @@ export const useSocietyStore = defineStore('society', () => {
         timeStatus.value = { open: false, reason: 'no-activity' }
       }
       localIP.value = data.ip ?? "";
-    }).catch(error => {
+      return { success: true };
+    }
+
+    catch (error) {
       const errorStore = useErrorStore();
       console.error(error);
-      errorStore.add_error(`获取社团失败，请稍后再试或联系管理员: ${error.toString()}`);
-    });
+      errorStore.add_error(`获取社团失败，请稍后再试或联系管理员: ${error?.toString()}。`);
+      return { success: false };
+    }
   }
 
   function refresh_society_history() {
@@ -99,17 +106,22 @@ export const useSocietyStore = defineStore('society', () => {
     }).catch(error => {
       const errorStore = useErrorStore();
       console.error(error);
-      errorStore.add_error(`获取历史记录失败，请尝试关闭此窗口后重新登录: ${error.toString()}`);
+      const probablyInvalidToken = error instanceof FetchError && error.code === CodeType.AuthFailed
+      errorStore.add_error(`获取历史记录失败，请尝试关闭此窗口后重新登录: ${error.toString()}。推测是您的登录已到期，请重新登录。`);
+      if (probablyInvalidToken) {
+        setTimeout(() => clear_local_storage_cache(), 3000);
+      }
     });
   }
 
-  function refresh() {
-    refresh_society_basic().then(() => {
+  async function refresh() {
+    const { success } = await refresh_society_basic();
+    if (success) {
       const userStore = useUserStore();
       if (userStore.token.length !== 0) {
         refresh_society_history();
       }
-    });
+    }
   }
 
   nextTick(() => {

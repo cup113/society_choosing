@@ -37,3 +37,8 @@ export function batch_to_string(batch: Batch) {
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
+
+export function clear_local_storage_cache() {
+  localStorage.clear();
+  location.reload();
+}

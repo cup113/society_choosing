@@ -7,11 +7,7 @@ import AlertCoreMember from '@/components/AlertCoreMember.vue';
 import AlertError from '@/components/AlertError.vue';
 import { RefreshCcwIcon } from 'lucide-vue-next'
 import 'vue-sonner/style.css';
-
-function clear_local_storage_cache() {
-  localStorage.clear();
-  location.reload();
-}
+import { clear_local_storage_cache } from './lib/utils';
 </script>
 
 <template>
