@@ -27,15 +27,18 @@ export const useSocietyStore = defineStore('society', () => {
 
   const hen = reactive({ x: 0, y: 0, deg: 0 });
 
-
   const timeStatus = ref<{
     open: true,
-    estimatedMaintain?: dayjs.Dayjs,
     estimatedEnd: dayjs.Dayjs,
   } | ({ open: false } & ({
     reason: 'not-started',
     estimated: dayjs.Dayjs,
   } | { reason: 'ended' } | { reason: 'no-activity' })) | null>(null);
+
+  const lastActivity = useLocalStorage('SC_lastActivity', {
+    estimatedStart: null as string | null,
+    estimatedEnd: null as string | null,
+  }); // If the user participated another activity, we should clear cache.
 
   const localIP = ref("");
 
@@ -61,9 +64,27 @@ export const useSocietyStore = defineStore('society', () => {
             open: true,
             estimatedEnd: dayjs().add(data.timeStatus.endEta)
           };
+          const lastEstimatedEnd = lastActivity.value.estimatedEnd;
+          lastActivity.value.estimatedEnd = timeStatus.value.estimatedEnd.toISOString();
+          if (lastEstimatedEnd) {
+            const lastDiff = timeStatus.value.estimatedEnd.diff(dayjs(lastEstimatedEnd), 'hours');
+            if (Math.abs(lastDiff) > 24) {
+              // significant difference, clear cache
+              clear_local_storage_cache();
+            }
+          }
         } else {
           if (data.timeStatus.reason === 'not-started') {
             timeStatus.value = { open: false, reason: 'not-started', estimated: dayjs().add(data.timeStatus.eta) };
+            const lastEstimatedStart = lastActivity.value.estimatedStart;
+            lastActivity.value.estimatedStart = timeStatus.value.estimated.toISOString();
+            if (lastEstimatedStart) {
+              const lastDiff = timeStatus.value.estimated.diff(dayjs(lastEstimatedStart), 'hours');
+              if (Math.abs(lastDiff) > 24) {
+                // significant difference, clear cache
+                clear_local_storage_cache();
+              }
+            }
           } else {
             timeStatus.value = { open: false, reason: data.timeStatus.reason };
           }
@@ -107,7 +128,7 @@ export const useSocietyStore = defineStore('society', () => {
       const errorStore = useErrorStore();
       console.error(error);
       const probablyInvalidToken = error instanceof FetchError && error.code === CodeType.AuthFailed
-      errorStore.add_error(`获取历史记录失败，请尝试关闭此窗口后重新登录: ${error.toString()}。推测是您的登录已到期，请重新登录。`);
+      errorStore.add_error(`获取历史记录失败，请尝试关闭此窗口后重新登录: ${error.toString()}。推测是您的登录已到期，3 秒后为您清除缓存重新登录。`);
       if (probablyInvalidToken) {
         setTimeout(() => clear_local_storage_cache(), 3000);
       }

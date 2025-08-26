@@ -77,9 +77,10 @@ onMounted(() => {
             <template #head>退档</template>
             <template #cell="{ row }">
               <button @click="admissionStore.toggle_reject(row.id, society)"
+                :disabled="!row.canReject"
                 class="px-3 py-1 rounded-lg text-sm font-medium transition-colors" :class="{
-                  'bg-red-500 hover:bg-red-600 text-white': row.canReject && !row.isRejected,
-                  'bg-green-500 hover:bg-green-600 text-white': row.canReject && row.isRejected
+                  'bg-red-500 hover:bg-red-600 text-white': !row.isRejected,
+                  'bg-green-500 hover:bg-green-600 text-white': row.isRejected
                 }">
                 {{ row.isRejected ? '取消退档' : '退档' }}
               </button>

@@ -73,8 +73,15 @@ const favoriteSocieties = computed(() => {
 </script>
 
 <template>
-  <main class="flex flex-col gap-8 py-6 pb-48">
+  <main class="flex flex-col gap-4 py-6 pb-48">
     <ChooseGuide />
+
+    <div class="text-center py-2 mx-auto md:w-lg lg:w-3xl" v-if="societyStore.historyChoice !== null">
+      <div class="text-xl text-amber-600 bg-amber-200 rounded-md py-4 px-4">
+        <p>注意：您已经在 {{ societyStore.historyChoice.updated.format("MM-DD HH:mm:ss") }} 进行过选课，<strong class="text-red-600">无需再次选择</strong>。</p>
+        <p>若您确实需要进行修改，请理解本系统<strong class="text-red-600">将修改后的时间作为录取的排序依据。</strong></p>
+      </div>
+    </div>
 
     <ChooseList title="所有社团" :societies="societyStore.societies" is-main />
 

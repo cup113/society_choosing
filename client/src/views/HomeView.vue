@@ -19,8 +19,7 @@ const choice = computed(() => {
 <template>
   <div class="flex flex-col gap-y-8 min-h-[70vh] justify-center items-center px-4 py-8">
     <div class="text-center mb-4">
-      <h1 class="text-3xl md:text-4xl font-bold text-amber-800 mb-2">华二宝山社团选课系统</h1>
-      <p class="text-amber-600">欢迎使用社团选课系统，请登录后进行选课操作</p>
+      <p class="text-amber-800 font-bold text-xl">欢迎使用社团选课系统，请登录后进行选课操作</p>
     </div>
 
     <LoginStatus v-if="userStore.token.length !== 0" v-model:show-login="showLogin">

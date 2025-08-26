@@ -192,7 +192,7 @@ export const useAdmissionStore = defineStore('admission', () => {
                 name: student.name,
                 gender: student.gender === 'male' ? '男' : '女',
                 batch: choiceBatch,
-                submit: student.submit.toFixed(3),
+                submit: (student.submit / 1000).toFixed(3),
                 admittedSociety: student.society?.name ?? "未录取",
                 answer: student.answer ?? "/",
                 canReject: student.batch !== 'adjust' && student.batch !== 'core',

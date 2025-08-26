@@ -2,6 +2,7 @@ import PocketBase from 'pocketbase';
 import type { Choice, CreateSocietyInner, CreateUserInner, Society, TypedPocketBase, User, DatesRecord, CreateChoosingData, CreateDateInner } from '../../types/types.d.ts';
 import logger from './logger.mjs';
 import { env } from 'node:process';
+import dayjs from 'dayjs';
 
 export abstract class DatabaseService {
   // Users
@@ -36,7 +37,6 @@ export class PocketBaseService extends DatabaseService {
 
   constructor() {
     super();
-    logger.info(`PocketBaseService initialized with URL ${env.POCKETBASE_URL}`);
     this.pb = new PocketBase(env.POCKETBASE_URL);
   }
 
@@ -94,6 +94,7 @@ export class PocketBaseService extends DatabaseService {
   }
 
   public async create_or_update_choosing(data: Choice): Promise<Choice> {
+    logger.info(`User choosing at ${dayjs().toISOString()}: ${JSON.stringify(data)}`);
     try {
       const { id } = await this.pb.collection("choosing_25B").getFirstListItem(
         `user = "${data.user}"`, { requestKey: data.user }

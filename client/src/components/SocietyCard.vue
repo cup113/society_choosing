@@ -11,19 +11,6 @@ const props = defineProps<{
 const userStore = useUserStore();
 
 const society = computed(() => props.society);
-const heatHint = computed(() => {
-  if (!society.value.lastYearBatch || !society.value.lastYearSeconds) {
-    return '';
-  }
-  const batch = ['第一志愿', '第二志愿', '第三志愿'][society.value.lastYearBatch - 1];
-  const sec = society.value.lastYearSeconds;
-  const time = sec < 10 ? (sec.toFixed(2) + "s") : (sec < 300 ? (sec.toFixed(0) + "s") : (sec < 6000 ? (sec / 60).toFixed(0) + "min" : ((sec / 3600).toFixed(0) + "h")));
-  if (society.value.lastYearBatch === 1) {
-    return `去年录取至：<b class="text-amber-700">${batch} ${time}</b>`;
-  } else {
-    return `去年录取至：<span class="text-amber-800">${batch}</span> ${time}`;
-  }
-});
 const isFavorite = computed(() => userStore.favorites.includes(society.value.id));
 const toggle_favorite = () => {
   if (isFavorite.value) {
@@ -48,23 +35,17 @@ const toggle_favorite = () => {
           指导教师：{{ society.teacher }}
         </div>
       </div>
-      <div class="text-center bg-amber-100 rounded-lg px-3 py-1">
-        <span class="text-xs text-amber-700 block">限额</span>
-        <b class="text-amber-800 text-xl">{{ society.cap }}</b>
-      </div>
     </div>
 
     <hr class="my-3 border-amber-100">
 
     <div class="mb-3">
       <div v-if="society.limit"
-        class="inline-flex items-center gap-1 bg-amber-100 text-amber-800 px-2 py-1 rounded-full text-xs font-medium mb-2">
-        <AlertTriangleIcon class="w-3 h-3" />
-        限制：{{ society.limit }}
+        class="inline-flex bg-amber-100 text-amber-800 px-2 py-1 rounded-full text-sm mb-2">
+        <strong>限制：{{ society.limit }}</strong>
       </div>
       <div v-else
-        class="inline-flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium mb-2">
-        <CheckIcon class="w-3 h-3" />
+        class="inline-flex bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm mb-2">
         无选课限制
       </div>
 
@@ -75,8 +56,11 @@ const toggle_favorite = () => {
 
     <hr class="my-3 border-amber-100">
 
-    <div class="flex justify-between items-center">
-      <div class="text-sm text-gray-500 min-h-[20px]" v-html="heatHint"></div>
+    <div class="flex justify-end gap-4 items-center">
+      <div class="flex items-center gap-2 text-center bg-amber-100 rounded-lg px-3 py-1">
+        <span class="text-sm text-amber-700">限额</span>
+        <b class="text-amber-800 text-lg">{{ society.cap }}</b>
+      </div>
       <Button @click="toggle_favorite" variant="outline" size="sm"
         class="h-9 w-9 p-0 border-2 transition-all duration-300" :class="{
           'bg-red-100 border-red-300 hover:bg-red-200 text-red-600': isFavorite,
