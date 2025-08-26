@@ -4,6 +4,7 @@ import { useLocalStorage } from '@vueuse/core';
 import { useSocietyStore } from './society';
 import { useErrorStore } from './error';
 import { Fetcher } from '@/lib/fetch';
+import { convert_password_compatible } from '@/lib/utils';
 import type { UsersRoleOptions, LoginResponse } from '@/../../types/types';
 import router from '@/router';
 
@@ -34,7 +35,7 @@ export const useUserStore = defineStore('user', () => {
     loginLoading.value = true;
     const data = {
       username,
-      password,
+      password: convert_password_compatible(password),
     };
     new Fetcher<LoginResponse>({
       url: '/api/login',

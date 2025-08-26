@@ -42,3 +42,14 @@ export function clear_local_storage_cache() {
   localStorage.clear();
   location.reload();
 }
+
+export function convert_password_compatible(password: string): string {
+  // The password was something like `260101@12345X` before, but it proves to be unnecessary.
+  // So if the password is in the old format, we convert it to the new format (like 12345X).
+  const match = password.match(/^(\d{6})@(\d{5}[X\d])$/);
+  if (match) {
+    return match[2];
+  } else {
+    return password;
+  }
+}

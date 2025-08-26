@@ -5,6 +5,7 @@ import { useErrorStore } from '@/stores/error'
 import type { User, DatesRecord, Society, ListSocietyResponse, Choice } from '../../../types/types'
 import dayjs from 'dayjs';
 import { toast } from 'vue-sonner';
+import { convert_password_compatible } from '@/lib/utils'
 
 type ChoiceDisplay = Omit<Choice, 'user' | 'updated'> & { user?: User } & { updated: dayjs.Dayjs };
 
@@ -77,7 +78,7 @@ export const useAdminStore = defineStore('admin', () => {
                 const values = line.split('\t')
                 const gender = ["male", "男"].includes(values[indexMap.gender]) ? 'male' : 'female'
                 const role = ["teacher", "教师"].includes(values[indexMap.role]) ? 'teacher' : 'student'
-                const password = values[indexMap.password] || ''
+                const password = convert_password_compatible(values[indexMap.password] || '');
                 return {
                     class: values[indexMap.class] || '',
                     username: values[indexMap.username] || '',
@@ -86,7 +87,7 @@ export const useAdminStore = defineStore('admin', () => {
                     name: values[indexMap.name] || '',
                     gender,
                     role,
-                }
+                };
             })
 
             const newUsers = await new Fetcher<User[]>({
