@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import type { Society } from '@/stores/society';
 import { Button } from '@/components/ui/button';
 import { useUserStore } from '@/stores/user';
-import { HeartIcon, HeartOffIcon, CheckIcon, AlertTriangleIcon, UserIcon } from 'lucide-vue-next';
+import { HeartIcon, HeartOffIcon, BuildingIcon, UserIcon } from 'lucide-vue-next';
 
 const props = defineProps<{
   society: Society
@@ -34,23 +34,17 @@ const toggle_favorite = () => {
           <UserIcon class="w-4 h-4" />
           指导教师：{{ society.teacher }}
         </div>
+        <div class="flex gap-1 text-sm text-gray-600 items-center">
+          <BuildingIcon class="w-4 h-4" /> 上课地点：{{ society.location }}
+        </div>
       </div>
     </div>
-
-    <hr class="my-3 border-amber-100">
-
-    <div class="mb-3">
-      <div v-if="society.limit"
-        class="inline-flex bg-amber-100 text-amber-800 px-2 py-1 rounded-full text-sm mb-2">
+    <div class="mt-3">
+      <div v-if="society.limit" class="inline-flex bg-amber-100 text-amber-800 px-2 py-1 rounded-full text-sm mb-2">
         <strong>限制：{{ society.limit }}</strong>
       </div>
-      <div v-else
-        class="inline-flex bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm mb-2">
+      <div v-else class="inline-flex bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm mb-2">
         无选课限制
-      </div>
-
-      <div class="py-2 text-gray-700 text-sm leading-relaxed">
-        {{ society.description }}
       </div>
     </div>
 

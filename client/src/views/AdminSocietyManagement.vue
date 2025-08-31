@@ -34,15 +34,15 @@ function cancelEditing() {
 }
 
 async function saveEditing(societyId: string) {
-  try {
-    if (editingField.value) {
-      await adminStore.updateSocietyField(societyId, editingField.value, editingValue.value)
-      cancelEditing()
-      toast.success('已成功更新社团信息')
+    try {
+        if (editingField.value) {
+            await adminStore.updateSocietyField(societyId, editingField.value, editingValue.value)
+            cancelEditing()
+            toast.success('已成功更新社团信息')
+        }
+    } catch (error) {
+        toast.error('更新失败')
     }
-  } catch (error) {
-    toast.error('更新失败')
-  }
 }
 </script>
 
@@ -60,7 +60,7 @@ async function saveEditing(societyId: string) {
                 <section class="space-y-4 shadow-lg">
                     <div class="bg-amber-50 p-4 rounded-lg">
                         <h3 class="font-semibold text-amber-700 mb-2">批量导入社团</h3>
-                        <p class="text-sm text-gray-600 mb-3">从 Excel 文件复制后粘贴到以下输入框。表头：名称、限额、指导教师、描述、限制。</p>
+                        <p class="text-sm text-gray-600 mb-3">从 Excel 文件复制后粘贴到以下输入框。表头：名称、限额、指导教师、限制、上课地点、调剂阈值。</p>
                         <Textarea v-model="societyImportData" class="min-h-[120px] mb-3" placeholder="粘贴社团数据..." />
                         <Button @click="adminStore.importSocieties(societyImportData)"
                             class="bg-amber-600 hover:bg-amber-700">
@@ -81,8 +81,9 @@ async function saveEditing(societyId: string) {
                                         <TableHead>名称</TableHead>
                                         <TableHead>限额</TableHead>
                                         <TableHead>指导教师</TableHead>
-                                        <TableHead>描述</TableHead>
                                         <TableHead>限制</TableHead>
+                                        <TableHead>上课地点</TableHead>
+                                        <TableHead>调剂阈值</TableHead>
                                         <TableHead>操作</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -128,20 +129,6 @@ async function saveEditing(societyId: string) {
                                             </template>
                                         </TableCell>
 
-                                        <!-- 描述字段 -->
-                                        <TableCell>
-                                            <template
-                                                v-if="editingSocietyId === society.id && editingField === 'description'">
-                                                <Textarea v-model="editingValue" class="w-full min-h-12" />
-                                            </template>
-                                            <template v-else>
-                                                <div @click="startEditingField(society.id, 'description', society.description)"
-                                                    class="cursor-pointer hover:bg-amber-100 p-1 rounded">
-                                                    {{ society.description }}
-                                                </div>
-                                            </template>
-                                        </TableCell>
-
                                         <!-- 限制字段 -->
                                         <TableCell>
                                             <template
@@ -156,6 +143,35 @@ async function saveEditing(societyId: string) {
                                             </template>
                                         </TableCell>
 
+                                        <!-- 上课地点字段 -->
+                                        <TableCell>
+                                            <template
+                                                v-if="editingSocietyId === society.id && editingField === 'location'">
+                                                <Input v-model="editingValue" class="w-full" />
+                                            </template>
+                                            <template v-else>
+                                                <div @click="startEditingField(society.id, 'location', society.location || '')"
+                                                    class="cursor-pointer hover:bg-amber-100 p-1 rounded min-h-5">
+                                                    {{ society.location }}
+                                                </div>
+                                            </template>
+                                        </TableCell>
+
+                                        <!-- 调剂阈值字段 -->
+                                        <TableCell>
+                                            <template
+                                                v-if="editingSocietyId === society.id && editingField === 'adjustThreshold'">
+                                                <Input v-model.number="editingValue" type="number" min="0" max="100"
+                                                    class="w-full" />
+                                            </template>
+                                            <template v-else>
+                                                <div @click="startEditingField(society.id, 'adjustThreshold', society.adjustThreshold || 0)"
+                                                    class="cursor-pointer hover:bg-amber-100 p-1 rounded min-h-5">
+                                                    {{ society.adjustThreshold || 0 }}
+                                                </div>
+                                            </template>
+                                        </TableCell>
+
                                         <!-- 操作字段 -->
                                         <TableCell>
                                             <div class="flex gap-1">
@@ -164,17 +180,18 @@ async function saveEditing(societyId: string) {
                                                         class="h-8 px-2 bg-green-600 hover:bg-green-700">
                                                         <SaveIcon class="w-4 h-4" />
                                                     </Button>
-                                                    <Button @click="cancelEditing" size="sm" class="h-8 px-2" variant="outline">
+                                                    <Button @click="cancelEditing" size="sm" class="h-8 px-2"
+                                                        variant="outline">
                                                         <XIcon class="w-4 h-4" />
                                                     </Button>
                                                 </template>
                                                 <template v-else>
-                                                    <Button @click="startEditingField(society.id, '', '')" size="sm" variant="outline"
-                                                        class="h-8 px-2">
+                                                    <Button @click="startEditingField(society.id, '', '')" size="sm"
+                                                        variant="outline" class="h-8 px-2">
                                                         <EditIcon class="w-4 h-4" />
                                                     </Button>
-                                                    <Button @click="adminStore.deleteSociety(society.id)" variant="destructive"
-                                                        size="sm">
+                                                    <Button @click="adminStore.deleteSociety(society.id)"
+                                                        variant="destructive" size="sm">
                                                         删除
                                                     </Button>
                                                 </template>
@@ -244,10 +261,10 @@ async function saveEditing(societyId: string) {
                                                                             class="flex items-center">
                                                                             <div class="flex items-center">
                                                                                 <span class="font-medium">{{ user.name
-                                                                                    }}</span>
+                                                                                }}</span>
                                                                                 <span
                                                                                     class="text-gray-500 text-sm ml-2">{{
-                                                                                    user.class }}</span>
+                                                                                        user.class }}</span>
                                                                             </div>
                                                                         </CommandItem>
                                                                     </CommandGroup>

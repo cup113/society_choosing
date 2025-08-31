@@ -62,6 +62,7 @@ export interface AdmittedSociety {
     cap: number;
     coreMembers: string[];
     countMembers: number;
+    location: string;
     adjustThreshold: number;
     lastBatch: Batch;
     lastTime: number | null;

@@ -47,7 +47,7 @@ function login() {
               class="form-input" />
           </div>
           <p class="text-amber-secondary text-sm ml-28 -mt-1">
-            格式：身份证后6位(若有 X，要大写)
+            身份证<strong>后 6 位</strong> (若有 X，要大写)
           </p>
         </div>
       </CardContent>

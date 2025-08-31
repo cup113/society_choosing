@@ -63,6 +63,7 @@ export default class AdmissionService {
             coreMembers: s.coreMembers ?? [],
             name: s.name,
             cap: s.cap,
+            location: s.location,
             countMembers: 0,
             adjustThreshold: s.adjustThreshold ?? 0,
             lastBatch: "not-full",

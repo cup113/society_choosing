@@ -319,8 +319,9 @@ export const useAdminStore = defineStore('admin', () => {
                 name: header.indexOf('名称'),
                 cap: header.indexOf('限额'),
                 teacher: header.indexOf('指导教师'),
-                description: header.indexOf('描述'),
                 limit: header.indexOf('限制'),
+                location: header.indexOf('上课地点'),
+                adjustThreshold: header.indexOf('调剂阈值'),
             }
             Object.entries(indexMap).forEach(([key, value]) => {
                 if (value === -1) {
@@ -335,8 +336,9 @@ export const useAdminStore = defineStore('admin', () => {
                     name: values[indexMap.name],
                     cap: parseInt(values[indexMap.cap]),
                     teacher: values[indexMap.teacher],
-                    description: values[indexMap.description],
                     limit: values[indexMap.limit],
+                    location: values[indexMap.location],
+                    adjustThreshold: parseInt(values[indexMap.adjustThreshold] || '0'),
                 }
             })
 

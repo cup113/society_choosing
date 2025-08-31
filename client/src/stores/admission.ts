@@ -61,6 +61,7 @@ interface ItemResultClass {
     name: string;
     society: string;
     gender: string;
+    location: string;
 }
 
 export const useAdmissionStore = defineStore('admission', () => {
@@ -239,6 +240,7 @@ export const useAdmissionStore = defineStore('admission', () => {
                     name: user.name,
                     gender: user.gender === "male" ? "男" : "女",
                     society: user.society?.name ?? "未录取",
+                    location: user.society?.location ?? "/",
                 };
             });
         return { heads: {
@@ -246,6 +248,7 @@ export const useAdmissionStore = defineStore('admission', () => {
             'name': '姓名',
             'gender': '性别',
             'society': '录取社团',
+            'location': '上课地点',
         }, rows: _users };
     }
 

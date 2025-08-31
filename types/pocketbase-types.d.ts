@@ -132,11 +132,9 @@ export type SocietiesRecord = {
 	cap: number
 	coreMembers?: RecordIdString[]
 	created?: IsoDateString
-	description: string
 	id: string
-	lastYearBatch?: number
-	lastYearSeconds?: number
 	limit?: string
+	location: string
 	name: string
 	question?: string
 	teacher: string

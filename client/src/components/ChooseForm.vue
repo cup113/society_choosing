@@ -73,7 +73,7 @@ const isMobile = useMediaQuery('(max-width: 768px)');
                     <HelpCircleIcon class="w-5 h-5 text-amber-600" />
                     <p class="font-bold text-amber-800">附加问题：</p>
                   </div>
-                  <p class="text-gray-700 bg-amber-50 p-3 rounded-lg">{{ societyStore.questions }}</p>
+                  <p class="text-gray-700 bg-amber-50 p-2 rounded-lg">{{ societyStore.questions }}</p>
                 </div>
                 <Textarea
                   class="w-full md:w-80 bg-white border-2 border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent form-input"
