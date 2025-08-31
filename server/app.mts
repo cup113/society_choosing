@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import timeout from 'connect-timeout';
 import compression from 'compression';
 import history from 'connect-history-api-fallback';
+import rateLimit from 'express-rate-limit';
 import 'express-async-errors';
 
 import societiesRouter from './routes/societies.mjs';
@@ -18,6 +19,13 @@ var app = express();
 logger.token('ip', (req) => req.headers['x-forwarded-for']?.toString() ?? req.socket.remoteAddress ?? '-');
 logger.format('dev', ':method :url :status :response-time ms - :ip - :res[content-length]')
 app.use(logger('dev'));
+app.use(rateLimit({
+    windowMs: 2 * 60 * 1000, // 2 minutes
+    limit: 100,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    ipv6Subnet: 56,
+}));
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
