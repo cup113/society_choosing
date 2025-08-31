@@ -44,7 +44,7 @@ export const useAdminStore = defineStore('admin', () => {
         }
     }
 
-    async function importUsers(userImportData: string) {
+    async function importUsers(userImportData: string, progressTracker?: any) {
         try {
             if (!userImportData) {
                 errorStore.add_error('请粘贴用户数据')
@@ -90,28 +90,52 @@ export const useAdminStore = defineStore('admin', () => {
                 };
             })
 
-            const newUsers = await new Fetcher<User[]>({
-                url: '/api/admin/user/import',
-                method: 'POST',
-                data: JSON.stringify(usersToAdd)
-            }).fetch_json()
+            // 分块导入，每块50个用户
+            const CHUNK_SIZE = 50
+            const failedUsers: string[] = []
 
-            let totalNewUsers = 0
-            let totalModifiedUsers = 0
-            newUsers.forEach(newUser => {
-                const index = users.value.findIndex(user => user.id === newUser.id)
-                if (index !== -1) {
-                    users.value[index] = newUser
-                    totalModifiedUsers++
-                } else {
-                    users.value.push(newUser)
-                    totalNewUsers++
+            for (let i = 0; i < usersToAdd.length; i += CHUNK_SIZE) {
+                const chunk = usersToAdd.slice(i, i + CHUNK_SIZE)
+
+                try {
+                    await new Fetcher({
+                        url: '/api/admin/user/import',
+                        method: 'POST',
+                        data: JSON.stringify(chunk)
+                    }).fetch_json()
+
+                    if (progressTracker) {
+                        progressTracker.updateProgress(chunk.length);
+                    }
+
+                    // 小延迟避免请求过于频繁
+                    await new Promise(resolve => setTimeout(resolve, 100))
+                } catch (error: any) {
+                    // 当前块失败，记录失败用户
+                    const failedChunkUsers = chunk.map(user => `${user.name} (${user.class})`)
+                    failedUsers.push(...failedChunkUsers)
+
+                    if (progressTracker) {
+                        progressTracker.updateProgress(chunk.length)
+                    }
+
+                    errorStore.add_error(`导入块 ${i}-${i + CHUNK_SIZE} 失败: ${error.message}`)
                 }
-            })
+            }
 
-            toast.success(`已成功新建 ${totalNewUsers} 位用户，修改 ${totalModifiedUsers} 位用户。`)
+            // 完成进度
+            if (progressTracker) {
+                progressTracker.completeProgress()
+            }
+
+            // Refresh the user list after import
+            await getUsers()
+            toast.success(`用户导入完成，成功导入 ${usersToAdd.length} 个用户`)
         } catch (error: any) {
-            errorStore.add_error(`导入失败: ${error.message}`)
+            if (progressTracker) {
+                progressTracker.stopProgress();
+            }
+            errorStore.add_error(`导入失败: ${error.message}`);
         }
     }
 

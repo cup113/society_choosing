@@ -9,11 +9,13 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@
 import { useAdminStore } from '@/stores/admin'
 import { UserIcon, CheckIcon, DeleteIcon, SearchIcon, EditIcon, SaveIcon, XIcon } from 'lucide-vue-next'
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog'
+import ProgressTracker from '@/components/ProgressTracker.vue'
 
 const adminStore = useAdminStore()
 const userImportData = ref('')
 const userDeleteClass = ref('')
 const searchQuery = ref('')
+const progressTracker = ref<InstanceType<typeof ProgressTracker>>()
 
 // 编辑用户相关的状态
 const editingUserId = ref<string | null>(null)
@@ -60,7 +62,13 @@ async function deleteUser(userId: string) {
 
 // 包装importUsers方法以使用toast
 async function importUsers() {
-  await adminStore.importUsers(userImportData.value)
+  if (progressTracker.value) {
+    // 先计算总用户数来初始化进度条
+    const lines = userImportData.value.trim().split('\n')
+    const totalUsers = Math.max(0, lines.length - 1) // 减去表头
+    progressTracker.value.startProgress(totalUsers)
+  }
+  await adminStore.importUsers(userImportData.value, progressTracker.value)
   userImportData.value = ''
 }
 
@@ -296,4 +304,6 @@ async function deleteUsers() {
       </div>
     </CardContent>
   </Card>
+  
+  <ProgressTracker ref="progressTracker" />
 </template>

@@ -41,14 +41,15 @@ export class PocketBaseService extends DatabaseService {
   }
 
   public async create_or_update_user(data: CreateUserInner): Promise<User> {
+    const newUser = {
+      ...data,
+      passwordConfirm: data.password,
+    };
     try {
       const userExisting = await this.pb.collection("users").getFirstListItem(`username="${data.username}"`, { requestKey: null });
-      return await this.pb.collection("users").update(userExisting.id, data, { requestKey: data.username });
+      return await this.pb.collection("users").update(userExisting.id, newUser, { requestKey: data.username });
     } catch (e) {
-      return await this.pb.collection("users").create({
-        ...data,
-        passwordConfirm: data.password,
-      }, { requestKey: data.username });
+      return await this.pb.collection("users").create(newUser, { requestKey: data.username });
     }
   }
 
