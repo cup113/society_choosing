@@ -4,6 +4,7 @@ export enum CodeType {
     Forbidden = "FORBIDDEN",
     Unauthorized = "UNAUTHORIZED",
     AuthFailed = "AUTH_FAILED",
+    BadRequest = "BAD_REQUEST",
 }
 
 export function to_status(code: CodeType) {
@@ -13,5 +14,6 @@ export function to_status(code: CodeType) {
         [CodeType.Forbidden]: 403,
         [CodeType.Unauthorized]: 401,
         [CodeType.AuthFailed]: 401,
+        [CodeType.BadRequest]: 400,
     }[code];
 }

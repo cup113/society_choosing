@@ -11,6 +11,7 @@ import loginRouter from './routes/login.mjs';
 import chooseRouter from './routes/choose.mjs';
 import reviewRouter from './routes/review.mjs';
 import adminRouter from './routes/admin.mjs';
+import capRouter from './routes/cap.mjs';
 
 var app = express();
 
@@ -33,6 +34,7 @@ app.use('/api/login', loginRouter);
 app.use('/api/choose', chooseRouter);
 app.use('/api/review', reviewRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/cap', capRouter);
 app.use(history());
 app.use('/', express.static('./client/dist'))
 

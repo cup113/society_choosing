@@ -9,10 +9,12 @@ import type {
     DatesRecord,
     UsersRoleOptions,
     UsersGenderOptions,
+    CapChallengesRecord,
+    CapTokensRecord,
 } from "./pocketbase-types.d.ts";
 import dayjs from "dayjs";
 
-export { Collections, TypedPocketBase, DatesRecord, UsersRoleOptions, UsersGenderOptions };
+export { Collections, TypedPocketBase, DatesRecord, UsersRoleOptions, UsersGenderOptions, CapChallengesRecord, CapTokensRecord };
 
 export type TimeStatus = {
     open: true;
@@ -31,6 +33,8 @@ export type CreateUserInner = Omit<UsersRecord, "id" | "tokenKey">;
 export type CreateSocietyInner = Omit<SocietiesRecord, "id">;
 export type CreateDateInner = Omit<DatesRecord, "id" | "created" | "updated">;
 export type CreateChoosingData = Omit<Choosing25bRecord, "user" | "id" | "created" | "updated">;
+export type CreateCapChallengeInner = Omit<CapChallengesRecord, "id" | "created" | "updated">;
+export type CreateCapTokenInner = Omit<CapTokensRecord, "id" | "created" | "updated">;
 
 export type User = UsersRecord;
 export type Society = SocietiesRecord;
@@ -86,3 +90,7 @@ export interface AdmissionResult {
     users: AdmittedUser[];
     societies: AdmittedSociety[];
 }
+
+export type CapVerifyResponse = {
+    success: boolean;
+};

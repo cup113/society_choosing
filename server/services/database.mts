@@ -1,5 +1,5 @@
 import PocketBase from 'pocketbase';
-import type { Choice, CreateSocietyInner, CreateUserInner, Society, TypedPocketBase, User, DatesRecord, CreateChoosingData, CreateDateInner } from '../../types/types.d.ts';
+import type { Choice, CreateSocietyInner, CreateUserInner, Society, TypedPocketBase, User, DatesRecord, CreateChoosingData, CreateDateInner, CapChallengesRecord, CreateCapChallengeInner, CapTokensRecord, CreateCapTokenInner } from '../../types/types.d.ts';
 import logger from './logger.mjs';
 import { env } from 'node:process';
 import dayjs from 'dayjs';
@@ -30,6 +30,18 @@ export abstract class DatabaseService {
   public abstract delete_date(id: string): Promise<void>;
   public abstract update_date(id: string, data: Partial<CreateDateInner>): Promise<DatesRecord>;
   public abstract get_active_date(): Promise<DatesRecord | null>;
+
+  // Cap
+  public abstract create_challenge(record: CreateCapChallengeInner): Promise<CapChallengesRecord>;
+  public abstract get_challenge(token: string): Promise<CapChallengesRecord>;
+  public abstract delete_challenge(id: string): Promise<void>;
+  public abstract list_expired_challenges(): Promise<string[]>;
+  
+  // Cap Tokens
+  public abstract create_token(record: CreateCapTokenInner): Promise<CapTokensRecord>;
+  public abstract get_token(token: string): Promise<CapTokensRecord | null>;
+  public abstract delete_token(token: string): Promise<void>;
+  public abstract list_expired_tokens(): Promise<string[]>;
 }
 
 export class PocketBaseService extends DatabaseService {
@@ -172,5 +184,52 @@ export class PocketBaseService extends DatabaseService {
     } catch (e) {
       return null;
     }
+  }
+
+  // Cap Challenges implementation
+  public async create_challenge(record: CreateCapChallengeInner): Promise<CapChallengesRecord> {
+    return await this.pb.collection("cap_challenges").create(record);
+  }
+
+  public async get_challenge(token: string): Promise<CapChallengesRecord> {
+    return await this.pb.collection("cap_challenges").getFirstListItem(`token="${token}"`);
+  }
+
+  public async delete_challenge(id: string): Promise<void> {
+    await this.pb.collection("cap_challenges").delete(id);
+  }
+
+  public async list_expired_challenges(): Promise<string[]> {
+    const records = await this.pb.collection("cap_challenges")
+      .getFullList({ filter: `expires <= "${new Date().toISOString()}"` });
+    return records.map(record => record.token);
+  }
+
+  // Cap Tokens implementation
+  public async create_token(record: CreateCapTokenInner): Promise<CapTokensRecord> {
+    return await this.pb.collection("cap_tokens").create(record);
+  }
+
+  public async get_token(token: string): Promise<CapTokensRecord | null> {
+    try {
+      return await this.pb.collection("cap_tokens").getFirstListItem(`token="${token}"`);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  public async delete_token(token: string): Promise<void> {
+    try {
+      const record = await this.pb.collection("cap_tokens").getFirstListItem(`token="${token}"`);
+      await this.pb.collection("cap_tokens").delete(record.id);
+    } catch (error) {
+      // Token may not exist, ignore error
+    }
+  }
+
+  public async list_expired_tokens(): Promise<string[]> {
+    const records = await this.pb.collection("cap_tokens")
+      .getFullList({ filter: `expired <= "${new Date().toISOString()}"` });
+    return records.map(record => record.token);
   }
 }
