@@ -16,7 +16,7 @@ const emit = defineEmits<{
 }>();
 
 const canSubmit = computed(() => {
-  return societyStore.timeStatus?.open && !societyStore.coreMemberOf;
+  return societyStore.timeStatus?.open;
 });
 
 // 添加展开/收起状态
@@ -52,12 +52,6 @@ const isMobile = useMediaQuery('(max-width: 768px)');
                   <CheckIcon class="w-5 h-5" />
                   <span>提交选课</span>
                 </Button>
-
-                <div v-else-if="societyStore.coreMemberOf"
-                  class="flex items-center gap-2 bg-green-200 text-green-800 px-4 py-3 rounded-xl shadow-card">
-                  <CheckIcon class="w-5 h-5" />
-                  <span>核心成员无需选课</span>
-                </div>
 
                 <div v-else-if="!societyStore.timeStatus?.open"
                   class="flex items-center gap-2 bg-amber-200 text-amber-800 px-4 py-3 rounded-xl shadow-card">

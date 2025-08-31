@@ -13,7 +13,7 @@ const societyStore = useSocietyStore();
         <span class="font-bold text-green-800">核心成员通知</span>
       </div>
       <p class="text-green-900">
-        您已被 <span class="font-bold">{{ societyStore.coreMemberOf }}</span> 预定为核心成员，无需进行选课。
+        您已被 <span class="font-bold">{{ societyStore.coreMemberOf }}</span> 预定为核心成员，若将该社团填写为第一志愿则会被直接录取。
       </p>
     </CardContent>
   </Card>

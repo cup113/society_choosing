@@ -78,18 +78,13 @@ export default class AdmissionService {
         return user.rejects.includes(society);
     }
 
-    public admit_core_members() {
-        this.societiesIdMap.forEach((s, id) => {
-            for (let userID of s.coreMembers) {
-                const user = this.users.find(u => u.id === userID)!;
-                user.batch = "core";
-                user.society = this.societiesIdMap.get(id)!;
-            }
-        })
-    }
-
-    public admit_choice(batch: number) {
+    private admit_choice(batch: number) {
         this.users.filter(user => user.society === null && user.choices.length > 0 && !this.isRejectedBy(user, user.choices[batch])).sort((a, b) => {
+            if (a.choices[batch].coreMembers.includes(a.id)) {
+                return -1;
+            } else if (b.choices[batch].coreMembers.includes(a.id)) {
+                return 1;
+            }
             return a.submit - b.submit;
         }).forEach(user => {
             const society = user.choices[batch];
@@ -106,7 +101,7 @@ export default class AdmissionService {
         });
     }
 
-    public admit_adjust() {
+    private admit_adjust() {
         this.users = this.users.sort((a, b) => {
             return b.submit - a.submit;
         }); // make the latest submit admitted to the coldest society.
@@ -136,7 +131,6 @@ export default class AdmissionService {
 
     public admit(): AdmissionResult {
         logger.info("Admitting...");
-        this.admit_core_members();
         for (let i = 0; i < 3; i++) {
             this.admit_choice(i);
         }
