@@ -19,6 +19,7 @@ var app = express();
 logger.token('ip', (req) => req.headers['x-forwarded-for']?.toString() ?? req.socket.remoteAddress ?? '-');
 logger.format('dev', ':method :url :status :response-time ms - :ip - :res[content-length]')
 app.use(logger('dev'));
+app.set('trust proxy', true);
 app.use(rateLimit({
     windowMs: 2 * 60 * 1000, // 2 minutes
     limit: 100,
