@@ -4,6 +4,7 @@ import { ref } from 'vue';
 import { useUserStore } from '@/stores/user';
 import { useErrorStore } from '@/stores/error';
 
+import AltchaProtection from './AltchaProtection.vue';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -11,6 +12,7 @@ import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
 
 const username = ref('');
 const password = ref('');
+const altchaPayload = ref(undefined as undefined | string);
 const userStore = useUserStore();
 const errorStore = useErrorStore();
 
@@ -19,7 +21,15 @@ function login() {
     errorStore.add_error('请填写用户名、密码');
     return;
   }
-  userStore.login(username.value, password.value);
+  if (!altchaPayload.value) {
+    errorStore.add_error('请先完成人机验证');
+    return;
+  }
+  userStore.login(username.value, password.value, altchaPayload.value);
+}
+
+function updateAltchaPayload(value: string) {
+  altchaPayload.value = value;
 }
 
 </script>
@@ -49,6 +59,10 @@ function login() {
           <p class="text-amber-secondary text-sm ml-28 -mt-1">
             身份证<strong>后 6 位</strong> (若有 X，要大写)
           </p>
+        </div>
+
+        <div>
+          <AltchaProtection :payload="altchaPayload" @update:payload="updateAltchaPayload" />
         </div>
       </CardContent>
       <CardFooter class="card-footer flex justify-center rounded-b-lg">

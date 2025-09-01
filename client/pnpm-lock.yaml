@@ -14,6 +14,9 @@ importers:
       '@vueuse/core':
         specifier: ^10.11.0
         version: 10.11.0(vue@3.5.18(typescript@5.8.3))
+      altcha:
+        specifier: ^2.2.1
+        version: 2.2.1
       class-variance-authority:
         specifier: ^0.7.0
         version: 0.7.0
@@ -101,6 +104,9 @@ importers:
         version: 2.0.26(typescript@5.8.3)
 
 packages:
+
+  '@altcha/crypto@0.0.1':
+    resolution: {integrity: sha512-qZMdnoD3lAyvfSUMNtC2adRi666Pxdcw9zqfMU5qBOaJWqpN9K+eqQGWqeiKDMqL0SF+EytNG4kR/Pr/99GJ6g==}
 
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
@@ -1159,6 +1165,9 @@ packages:
   agent-base@7.1.1:
     resolution: {integrity: sha512-H0TSyFNDMomMNJQBn8wFV5YC/2eJ+VXECwOadZJT554xP6cODZHPX3H9QMQECxvrgiSOP1pHjy1sMWQVYJOUOA==}
     engines: {node: '>= 14'}
+
+  altcha@2.2.1:
+    resolution: {integrity: sha512-Iij1MZK7HJ/6ZKNSrjDT8Csc1XQNdWCT/v2JivdUVEHhFvTyIkY1iwKbkACGcm7R2T88BFZ1gdTefbSVnKvB5Q==}
 
   ansi-regex@5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
@@ -2403,6 +2412,8 @@ packages:
 
 snapshots:
 
+  '@altcha/crypto@0.0.1': {}
+
   '@ampproject/remapping@2.3.0':
     dependencies:
       '@jridgewell/gen-mapping': 0.3.5
@@ -3349,6 +3360,12 @@ snapshots:
       debug: 4.3.5
     transitivePeerDependencies:
       - supports-color
+
+  altcha@2.2.1:
+    dependencies:
+      '@altcha/crypto': 0.0.1
+    optionalDependencies:
+      '@rollup/rollup-linux-x64-gnu': 4.18.0
 
   ansi-regex@5.0.1: {}
 

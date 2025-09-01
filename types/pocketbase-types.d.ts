@@ -11,8 +11,7 @@ export enum Collections {
 	Mfas = "_mfas",
 	Otps = "_otps",
 	Superusers = "_superusers",
-	CapChallenges = "cap_challenges",
-	CapTokens = "cap_tokens",
+	AltchaChallenges = "altcha_challenges",
 	Choosing24b = "choosing_24B",
 	Choosing25b = "choosing_25B",
 	Dates = "dates",
@@ -96,20 +95,12 @@ export type SuperusersRecord = {
 	verified?: boolean
 }
 
-export type CapChallengesRecord = {
+export type AltchaChallengesRecord = {
+	challenge: string
 	created?: IsoDateString
-	data: string
 	expires: IsoDateString
+	hmacKey: string
 	id: string
-	token: string
-	updated?: IsoDateString
-}
-
-export type CapTokensRecord = {
-	created?: IsoDateString
-	expired: IsoDateString
-	id: string
-	token: string
 	updated?: IsoDateString
 }
 
@@ -191,8 +182,7 @@ export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRec
 export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
-export type CapChallengesResponse<Texpand = unknown> = Required<CapChallengesRecord> & BaseSystemFields<Texpand>
-export type CapTokensResponse<Texpand = unknown> = Required<CapTokensRecord> & BaseSystemFields<Texpand>
+export type AltchaChallengesResponse<Texpand = unknown> = Required<AltchaChallengesRecord> & BaseSystemFields<Texpand>
 export type Choosing24bResponse<Texpand = unknown> = Required<Choosing24bRecord> & BaseSystemFields<Texpand>
 export type Choosing25bResponse<Texpand = unknown> = Required<Choosing25bRecord> & BaseSystemFields<Texpand>
 export type DatesResponse<Texpand = unknown> = Required<DatesRecord> & BaseSystemFields<Texpand>
@@ -207,8 +197,7 @@ export type CollectionRecords = {
 	_mfas: MfasRecord
 	_otps: OtpsRecord
 	_superusers: SuperusersRecord
-	cap_challenges: CapChallengesRecord
-	cap_tokens: CapTokensRecord
+	altcha_challenges: AltchaChallengesRecord
 	choosing_24B: Choosing24bRecord
 	choosing_25B: Choosing25bRecord
 	dates: DatesRecord
@@ -222,8 +211,7 @@ export type CollectionResponses = {
 	_mfas: MfasResponse
 	_otps: OtpsResponse
 	_superusers: SuperusersResponse
-	cap_challenges: CapChallengesResponse
-	cap_tokens: CapTokensResponse
+	altcha_challenges: AltchaChallengesResponse
 	choosing_24B: Choosing24bResponse
 	choosing_25B: Choosing25bResponse
 	dates: DatesResponse
@@ -240,8 +228,7 @@ export type TypedPocketBase = PocketBase & {
 	collection(idOrName: '_mfas'): RecordService<MfasResponse>
 	collection(idOrName: '_otps'): RecordService<OtpsResponse>
 	collection(idOrName: '_superusers'): RecordService<SuperusersResponse>
-	collection(idOrName: 'cap_challenges'): RecordService<CapChallengesResponse>
-	collection(idOrName: 'cap_tokens'): RecordService<CapTokensResponse>
+	collection(idOrName: 'altcha_challenges'): RecordService<AltchaChallengesResponse>
 	collection(idOrName: 'choosing_24B'): RecordService<Choosing24bResponse>
 	collection(idOrName: 'choosing_25B'): RecordService<Choosing25bResponse>
 	collection(idOrName: 'dates'): RecordService<DatesResponse>

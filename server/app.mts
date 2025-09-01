@@ -12,14 +12,14 @@ import loginRouter from './routes/login.mjs';
 import chooseRouter from './routes/choose.mjs';
 import reviewRouter from './routes/review.mjs';
 import adminRouter from './routes/admin.mjs';
-import capRouter from './routes/cap.mjs';
+import altchaRouter from './routes/altcha.mjs';
 
 var app = express();
 
 logger.token('ip', (req) => req.headers['x-forwarded-for']?.toString() ?? req.socket.remoteAddress ?? '-');
 logger.format('dev', ':method :url :status :response-time ms - :ip - :res[content-length]')
 app.use(logger('dev'));
-app.set('trust proxy', true);
+app.set('trust proxy', 1);
 app.use(rateLimit({
     windowMs: 2 * 60 * 1000, // 2 minutes
     limit: 100,
@@ -43,7 +43,7 @@ app.use('/api/login', loginRouter);
 app.use('/api/choose', chooseRouter);
 app.use('/api/review', reviewRouter);
 app.use('/api/admin', adminRouter);
-app.use('/api/cap', capRouter);
+app.use('/api/altcha', altchaRouter);
 app.use(history());
 app.use('/', express.static('./client/dist'))
 

@@ -31,11 +31,12 @@ export const useUserStore = defineStore('user', () => {
     { 'name': '第三志愿', 'index': 2 },
   ];
 
-  function login(username: string, password: string) {
+  function login(username: string, password: string, altchaPayload: string) {
     loginLoading.value = true;
     const data = {
       username,
       password: convert_password_compatible(password),
+      altcha: altchaPayload,
     };
     new Fetcher<LoginResponse>({
       url: '/api/login',
