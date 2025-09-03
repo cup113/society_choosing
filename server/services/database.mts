@@ -187,7 +187,11 @@ export class PocketBaseService extends DatabaseService {
   public async create_altcha(): Promise<Challenge> {
     const hmacKey = nanoid();
     const expires = dayjs().add(20, 'minutes')
-    const challenge = await createChallenge({ hmacKey, expires: expires.toDate() });
+    const challenge = await createChallenge({
+      hmacKey,
+      expires: expires.toDate(),
+      maxNumber: 100_000,
+    });
     await this.pb.collection("altcha_challenges").create({
       hmacKey,
       expires: expires.toISOString(),

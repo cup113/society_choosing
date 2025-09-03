@@ -21,8 +21,8 @@ logger.format('dev', ':method :url :status :response-time ms - :ip - :res[conten
 app.use(logger('dev'));
 app.set('trust proxy', 1);
 app.use(rateLimit({
-    windowMs: 2 * 60 * 1000, // 2 minutes
-    limit: 100,
+    windowMs: 3 * 60 * 1000, // 3 minutes
+    limit: 200,
     standardHeaders: 'draft-8',
     legacyHeaders: false,
     ipv6Subnet: 56,
