@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue';
 import 'altcha';
+import 'altcha/i18n/zh-cn';
 
 const altchaWidget = ref<HTMLElement | null>(null);
 const props = defineProps<{

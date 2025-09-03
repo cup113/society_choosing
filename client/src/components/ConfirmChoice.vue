@@ -39,7 +39,7 @@ const limits = computed(() => {
         </template>
       </ChoiceShow>
       <AlertDialogFooter>
-        <AlertDialogCancel class="bg-red-500 hover:bg-red-600 rounded-lg px-6 py-2" @click="emit('cancel-choice')">取消</AlertDialogCancel>
+        <AlertDialogCancel class="bg-red-400 hover:bg-red-500 rounded-lg px-6 py-2" @click="emit('cancel-choice')">取消</AlertDialogCancel>
         <AlertDialogAction class="bg-green-500 hover:bg-green-600 rounded-lg px-6 py-2" @click="emit('confirm-choice')">确认</AlertDialogAction>
       </AlertDialogFooter>
     </AlertDialogContent>
