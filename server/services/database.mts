@@ -87,7 +87,7 @@ export class PocketBaseService extends DatabaseService {
       const societyExisting = await this.pb.collection("societies").getFirstListItem(`name="${data.name}"`, { requestKey: null });
       return await this.pb.collection("societies").update(societyExisting.id, data, { requestKey: data.name });
     } catch (e) {
-      return await this.pb.collection("societies").create(data);
+      return await this.pb.collection("societies").create(data, { requestKey: data.name });
     }
   }
 
