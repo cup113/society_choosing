@@ -48,7 +48,7 @@ export const useUserStore = defineStore('user', () => {
       token.value = data.token;
       userInformation.value = data.userInformation;
       societyStore.refresh_society_history();
-      router.push(userInformation.value.role === 'student' ? '/choose' : '/admin');
+      router.push(userInformation.value.role === 'student' ? '/choose' : '/admin/dates');
       societyStore.refresh();
       loginLoading.value = false;
     }).catch(error => {

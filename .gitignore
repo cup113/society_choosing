@@ -16,3 +16,4 @@ nginx/logs/*
 nginx/temp/*
 
 server/script/*.{txt,json}
+server/instances

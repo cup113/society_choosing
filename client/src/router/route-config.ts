@@ -82,7 +82,7 @@ export const routeConfig: RouteConfig[] = [
     },
     children: [
       {
-        path: '',
+        path: 'users',
         name: 'UserManagement',
         component: () => import('@/views/AdminUserManagement.vue'),
         meta: {
@@ -116,7 +116,7 @@ export const routeConfig: RouteConfig[] = [
           roles: ['teacher'],
           requiresAuth: true
         }
-      }
+      },
     ]
   },
 ];

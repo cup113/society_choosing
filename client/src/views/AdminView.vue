@@ -65,7 +65,7 @@ function navigateTo(tab: string) {
     case 'societies':
       router.push({ name: 'SocietyManagement' })
       break
-    case 'choices': // 添加这一行
+    case 'choices':
       router.push({ name: 'ChoiceManagement' })
       break
   }
@@ -107,7 +107,6 @@ function navigateTo(tab: string) {
       </Button>
     </div>
 
-    <!-- 带过渡效果的路由视图 -->
     <RouterView v-slot="{ Component }">
       <transition name="fade" mode="out-in">
         <component :is="Component" />

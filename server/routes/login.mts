@@ -25,7 +25,7 @@ class LoginHandler extends RequestHandler {
     const payloadAscii = Buffer.from(altcha, 'base64').toString("utf-8");
     this.logger.info(`Login request of ${username}: ALTCHA ${payloadAscii})}`);
     const payload = JSON.parse(payloadAscii);
-    if (!this.verify_altcha(payload)) {
+    if (!(await this.verify_altcha(payload))) {
       throw new this.Terminate(CodeType.AuthFailed, "未通过人机验证");
     }
     const realPassword = username.match(/[0-9]{9}/) ? `${username.substring(3, 9)}@${password}` : password;
