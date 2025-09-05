@@ -9,14 +9,16 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
+import dayjs from 'dayjs';
 
 const username = ref('');
 const password = ref('');
+const needRefreshTime = ref(undefined as undefined | string);
 const altchaPayload = ref(undefined as undefined | string);
 const userStore = useUserStore();
 const errorStore = useErrorStore();
 
-function login() {
+async function login() {
   if (!username.value || !password.value) {
     errorStore.add_error('请填写用户名、密码');
     return;
@@ -25,7 +27,8 @@ function login() {
     errorStore.add_error('请先完成人机验证');
     return;
   }
-  userStore.login(username.value, password.value, altchaPayload.value);
+  await userStore.login(username.value, password.value, altchaPayload.value);
+  needRefreshTime.value = dayjs().toISOString();
 }
 
 function updateAltchaPayload(value: string) {
@@ -62,7 +65,8 @@ function updateAltchaPayload(value: string) {
         </div>
 
         <div>
-          <AltchaProtection :payload="altchaPayload" @update:payload="updateAltchaPayload" />
+          <AltchaProtection :payload="altchaPayload" @update:payload="updateAltchaPayload"
+            :need-refresh-time="needRefreshTime" />
         </div>
       </CardContent>
       <CardFooter class="card-footer flex justify-center rounded-b-lg">

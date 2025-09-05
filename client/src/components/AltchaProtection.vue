@@ -3,9 +3,14 @@ import { ref, onMounted, onUnmounted, watch } from 'vue';
 import 'altcha';
 import 'altcha/i18n/zh-cn';
 
-const altchaWidget = ref<HTMLElement | null>(null);
+interface AltchaWidgetElement extends HTMLElement {
+  reset(): void;
+}
+
+const altchaWidget = ref<AltchaWidgetElement | null>(null);
 const props = defineProps<{
   payload?: string;
+  needRefreshTime?: string;
 }>();
 const emit = defineEmits<{
   (e: 'update:payload', value: string): void;
@@ -15,6 +20,14 @@ const internalValue = ref(props.payload);
 
 watch(internalValue, (v) => {
   emit('update:payload', v || '');
+});
+
+watch(() => props.needRefreshTime, v => {
+  if (v !== undefined) {
+    if (altchaWidget.value !== null) {
+      altchaWidget.value.reset();
+    }
+  }
 });
 
 const onStateChange = (ev: CustomEvent | Event) => {

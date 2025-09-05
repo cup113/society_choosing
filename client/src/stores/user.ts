@@ -31,18 +31,19 @@ export const useUserStore = defineStore('user', () => {
     { 'name': '第三志愿', 'index': 2 },
   ];
 
-  function login(username: string, password: string, altchaPayload: string) {
+  async function login(username: string, password: string, altchaPayload: string): Promise<boolean> {
     loginLoading.value = true;
-    const data = {
+    const requestData = {
       username,
       password: convert_password_compatible(password),
       altcha: altchaPayload,
     };
-    new Fetcher<LoginResponse>({
-      url: '/api/login',
-      method: 'POST',
-      data: JSON.stringify(data),
-    }).fetch_json().then(data => {
+    try {
+      const data = await new Fetcher<LoginResponse>({
+        url: '/api/login',
+        method: 'POST',
+        data: JSON.stringify(requestData),
+      }).fetch_json();
       const societyStore = useSocietyStore();
       userID.value = data.userID;
       token.value = data.token;
@@ -51,13 +52,16 @@ export const useUserStore = defineStore('user', () => {
       router.push(userInformation.value.role === 'student' ? '/choose' : '/admin/dates');
       societyStore.refresh();
       loginLoading.value = false;
-    }).catch(error => {
+      return true;
+    }
+    catch (error) {
       const errorStore = useErrorStore();
       loginLoading.value = false;
       console.error(error);
-      errorStore.add_error(`登录失败，请按照输入框下的提示检查用户名和密码是否正确：${error.toString()}`);
-    });
+      errorStore.add_error(`登录失败，请按照输入框下的提示检查用户名和密码是否正确：${error}`);
+      return false;
+    }
   }
 
   return { userID, token, userInformation, choices, favorites, answer, batches, loginLoading, login };
-})
+});

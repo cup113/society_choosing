@@ -46,9 +46,6 @@ onMounted(() => {
       activeTab.value = 'choices'
       break
     default:
-      if (route.name === 'Admin') {
-        router.push({ name: 'UserManagement' })
-      }
       activeTab.value = 'users'
   }
 })
