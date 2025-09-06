@@ -48,7 +48,7 @@ function submit_confirmed() {
     method: 'POST',
     data: JSON.stringify({
       choices: userStore.choices,
-      answer: userStore.answer,
+      answers: userStore.answer,
     }),
   }).fetch_json().then(data => {
     waiting.value = false;
