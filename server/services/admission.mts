@@ -82,7 +82,7 @@ export default class AdmissionService {
         this.users.filter(user => user.society === null && user.choices.length > 0 && !this.isRejectedBy(user, user.choices[batch])).sort((a, b) => {
             if (a.choices[batch].coreMembers.includes(a.id)) {
                 return -1;
-            } else if (b.choices[batch].coreMembers.includes(a.id)) {
+            } else if (b.choices[batch].coreMembers.includes(b.id)) {
                 return 1;
             }
             return a.submit - b.submit;
