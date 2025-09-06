@@ -44,6 +44,7 @@ export const useSocietyStore = defineStore('society', () => {
 
   async function refresh_society_basic() {
     try {
+      const fetchStart = dayjs();
       const data = await (new Fetcher<ListSocietyResponse>({
         url: '/api/societies/list',
         method: 'GET',
@@ -58,6 +59,15 @@ export const useSocietyStore = defineStore('society', () => {
           index: (index < 9 ? '0' : '') + (index + 1).toString(),
         }
       });
+      const fetchEnd = dayjs();
+      const fetchDelay = fetchEnd.diff(fetchStart, 'seconds');
+      if (fetchDelay >= 3) {
+        if (fetchDelay >= 120) {
+          location.reload();
+        } else if (confirm(`检测到您的请求超时 ${fetchDelay} 秒，可能导致提交按钮无法及时弹出，点击确定进行刷新。`)) {
+          location.reload();
+        }
+      }
       if (data.timeStatus !== null) {
         if (data.timeStatus.open) {
           timeStatus.value = {
