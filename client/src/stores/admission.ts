@@ -119,7 +119,6 @@ export const useAdmissionStore = defineStore('admission', () => {
                 cap: society.cap,
                 countMembers: society.countMembers,
                 sourcesAdmitStr: [
-                    society.coreMembers.length,
                     ...choicesAdmit,
                     society.countMembers - society.coreMembers.length - choicesAdmitSum,
                 ].map(n => n.toString()).join("+"),
