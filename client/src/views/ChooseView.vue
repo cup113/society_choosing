@@ -5,7 +5,6 @@ import { useSocietyStore } from '@/stores/society';
 import { Fetcher } from '@/lib/fetch';
 import router from '@/router';
 import Waiting from '@/components/Waiting.vue';
-import ConfirmChoice from '@/components/ConfirmChoice.vue';
 import { useErrorStore } from '@/stores/error';
 import ChooseGuide from '@/components/ChooseGuide.vue';
 import ChooseList from '@/components/ChooseSocietyList.vue';
@@ -16,7 +15,6 @@ const societyStore = useSocietyStore();
 const errorStore = useErrorStore();
 
 const waiting = ref(false);
-const waiting_confirm = ref(false);
 
 function submit() {
   const errors = new Array<string>();
@@ -37,11 +35,10 @@ function submit() {
     errorStore.add_error(...errors);
     return;
   }
-  waiting_confirm.value = true;
+  submit_confirmed();
 }
 
 function submit_confirmed() {
-  waiting_confirm.value = false;
   waiting.value = true;
   new Fetcher<{ success: true }>({
     url: '/api/choose',
@@ -70,6 +67,12 @@ const choiceNames = computed(() => {
 const favoriteSocieties = computed(() => {
   return societyStore.societies.filter(society => userStore.favorites.includes(society.id));
 });
+
+const limits = computed(() => {
+  return choiceNames.value.map(choice => {
+    return societyStore.societies.find(society => society.name === choice)?.limit;
+  }).filter(Boolean).join('、');
+})
 </script>
 
 <template>
@@ -92,8 +95,5 @@ const favoriteSocieties = computed(() => {
     <Waiting :show="waiting">
       <div class="text-lg">正在提交选课...</div>
     </Waiting>
-
-    <ConfirmChoice :open="waiting_confirm" @confirm-choice="submit_confirmed" @cancel-choice="waiting_confirm = false"
-      :choices="choiceNames" />
   </main>
 </template>

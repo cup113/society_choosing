@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useUserStore } from '@/stores/user';
 import { useSocietyStore } from '@/stores/society';
-import { CalendarIcon, AlertTriangleIcon, CheckIcon, HelpCircleIcon, ChevronUpIcon, ChevronDownIcon } from 'lucide-vue-next';
+import { CalendarIcon, AlertTriangleIcon, CheckIcon, HelpCircleIcon, ChevronUpIcon, ChevronDownIcon, XIcon } from 'lucide-vue-next';
 import { useMediaQuery } from '@vueuse/core';
 
 const userStore = useUserStore();
@@ -15,8 +15,28 @@ const emit = defineEmits<{
   (emit: 'submit'): void;
 }>();
 
+// 实时验证逻辑
+const hasDuplicateChoices = computed(() => {
+  const choices = userStore.choices.filter(choice => choice !== undefined);
+  return new Set(choices).size !== choices.length;
+});
+
+const hasEmptyChoices = computed(() => {
+  return userStore.choices.some(choice => choice === undefined);
+});
+
 const canSubmit = computed(() => {
-  return societyStore.timeStatus?.open;
+  return societyStore.timeStatus?.open && !hasDuplicateChoices.value && !hasEmptyChoices.value;
+});
+
+const validationMessage = computed(() => {
+  if (hasDuplicateChoices.value) {
+    return '志愿不能重复';
+  }
+  if (hasEmptyChoices.value) {
+    return '请填满所有志愿';
+  }
+  return '';
 });
 
 // 添加展开/收起状态
@@ -42,12 +62,21 @@ const isMobile = useMediaQuery('(max-width: 768px)');
           <div v-if="!isMobile || isExpanded" key="expanded" class="pb-6">
             <div class="w-full max-w-7xl px-4">
               <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full lg:w-auto">
-                  <ChoiceComboBox v-for="batch in userStore.batches" :key="batch.name" :batch="batch"
-                    class="bg-white rounded-xl shadow-card hover-shadow" />
+                <div class="flex flex-col gap-3 w-full lg:w-auto">
+                  <!-- 志愿选择框 -->
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <ChoiceComboBox v-for="batch in userStore.batches" :key="batch.name" :batch="batch"
+                      class="bg-white rounded-xl shadow-card hover-shadow" />
+                  </div>
                 </div>
 
-                <Button v-if="canSubmit" @click="emit('submit')"
+                <div v-if="validationMessage"
+                  class="flex items-center gap-2 bg-red-100 text-red-800 px-4 py-3 rounded-xl shadow-card min-w-0">
+                  <XIcon class="w-5 h-5 flex-shrink-0" />
+                  <span class="truncate">{{ validationMessage }}</span>
+                </div>
+
+                <Button v-else-if="canSubmit" @click="emit('submit')"
                   class="relative w-32 h-14 gradient-amber-btn font-bold text-lg rounded-xl shadow-lg hover-lift flex items-center justify-center gap-2">
                   <CheckIcon class="w-5 h-5" />
                   <span>提交选课</span>
@@ -58,6 +87,7 @@ const isMobile = useMediaQuery('(max-width: 768px)');
                   <AlertTriangleIcon class="w-5 h-5" />
                   <span>选课未开放</span>
                 </div>
+
               </div>
 
               <div v-if="societyStore.questions.length > 0"
